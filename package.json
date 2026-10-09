@@ -1,14 +1,14 @@
 {
-  "name": "ambit",
+  "name": "dvoyna-vault",
   "private": true,
-  "description": "High-performance local AI image manager for large AI-generated image libraries.",
+  "description": "Dvoyna Vault is a local-first manager for large AI-generated image libraries, based on Ambit.",
   "version": "0.14.0",
   "type": "module",
   "author": "AsuraAce",
   "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AsuraAce/ambit.git"
+    "url": "https://github.com/x0mirag0x/ambit.git"
   },
   "packageManager": "pnpm@11.5.3",
   "engines": {
@@ -70,10 +70,12 @@
     "@tauri-apps/plugin-window-state": "2.4.1",
     "clsx": "^2.1.0",
     "framer-motion": "^12.42.2",
+    "i18next": "^26.4.2",
     "jszip": "^3.10.1",
     "lucide-react": "^1.16.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "react-i18next": "^17.0.16",
     "react-markdown": "10",
     "recharts": "^3.9.2",
     "tailwind-merge": "^3.6.0",

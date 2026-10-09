@@ -191,7 +191,7 @@ describe('IntelligenceTab', () => {
         vi.stubEnv('API_KEY', 'environment-key');
         render(<Harness initialSettings={createSettings()} />);
 
-        expect(screen.getByText(/Ambit reads this API key from your environment and does not save it/)).not.toBeNull();
+        expect(screen.getByText(/Dvoyna Vault reads this API key from your environment and does not save it/)).not.toBeNull();
         expect(screen.queryByText(/stored locally in the OS keyring/)).toBeNull();
     });
 

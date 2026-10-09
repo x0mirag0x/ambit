@@ -6,7 +6,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   hasCompletedOnboarding: false,
   theme: 'dark',
   thumbnailSize: 200,
-  autoCheckForUpdates: true,
+  autoCheckForUpdates: false,
   confirmDelete: true,
   defaultTheaterMode: false,
   viewerPreferredTab: 'details',

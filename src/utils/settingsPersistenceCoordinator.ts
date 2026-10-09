@@ -1,6 +1,6 @@
 export class SettingsPersistenceClosingError extends Error {
     constructor() {
-        super('Privacy and onboarding settings cannot change while Ambit is closing.');
+        super('Privacy and onboarding settings cannot change while Dvoyna Vault is closing.');
         this.name = 'SettingsPersistenceClosingError';
     }
 }

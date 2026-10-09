@@ -12,6 +12,7 @@ import { formatStableImportProgress } from '../../../utils/importProgress';
 import { processNativePaths, type ImportResult } from '../../../services/importService';
 import { isBrowserMockMode } from '../../../services/runtime';
 import { getThumbnailDir } from '../../../services/thumbnailService';
+import { useTranslation } from 'react-i18next';
 
 const MANUAL_IMPORT_CANCELLED_MESSAGE = 'Import cancelled. Imported images were kept; rescan to continue.';
 
@@ -45,6 +46,7 @@ export const useFoldersTabLogic = ({
     onScanFolder,
     onInvokeSync
 }: UseFoldersTabLogicProps) => {
+    const { t } = useTranslation();
     const { addToast } = useToast();
     const [newFolderPath, setNewFolderPath] = useState('');
     const [scanningIds, setScanningIds] = useState<Set<string>>(new Set());
@@ -163,7 +165,7 @@ export const useFoldersTabLogic = ({
                             })
                         });
                         if (!importRunId) {
-                            addToast('Import already in progress', 'info');
+                            addToast(t('Import already in progress'), 'info');
                             return;
                         }
 
@@ -188,9 +190,9 @@ export const useFoldersTabLogic = ({
                                 true
                             );
                             if (result.wasCancelled) {
-                                addToast(MANUAL_IMPORT_CANCELLED_MESSAGE, 'info');
+                                addToast(t(MANUAL_IMPORT_CANCELLED_MESSAGE), 'info');
                             } else {
-                                addToast(`Synced ${result.images.length} new files`, 'success');
+                                addToast(t('Synced {{length}} new files', { length: result.images.length }), 'success');
                             }
                             if (isCompleteImport(result)) {
                                 updateFolderLastScanned(id, Date.now());
@@ -222,7 +224,7 @@ export const useFoldersTabLogic = ({
                                 })
                             });
                             if (!importRunId) {
-                                addToast('Import already in progress', 'info');
+                                addToast(t('Import already in progress'), 'info');
                                 return;
                             }
 
@@ -247,7 +249,7 @@ export const useFoldersTabLogic = ({
                                 repairFailedCount = result.failedPaths.length;
                                 repairWasCancelled = result.wasCancelled;
                                 if (result.wasCancelled) {
-                                    addToast(MANUAL_IMPORT_CANCELLED_MESSAGE, 'info');
+                                    addToast(t(MANUAL_IMPORT_CANCELLED_MESSAGE), 'info');
                                 } else {
                                     addToast(
                                         result.images.length > 0
@@ -265,7 +267,7 @@ export const useFoldersTabLogic = ({
                                 console.warn(`[Resync] Keeping cursor unchanged for ${path}; ${repairFailedCount} repair file(s) failed.`);
                             }
                         } else {
-                            addToast(`No changes detected`, 'info');
+                            addToast(t('No changes detected'), 'info');
                             updateFolderLastScanned(id, Date.now());
                         }
                     }
@@ -273,7 +275,7 @@ export const useFoldersTabLogic = ({
                     const result = await onScanFolder([{ path, variant }]);
                     if (isImportSourceCompleted(result, path)) {
                         updateFolderLastScanned(id, Date.now());
-                        addToast(`Rescan complete`, 'success');
+                        addToast(t('Rescan complete'), 'success');
                     } else if (result && result.wasCancelled) {
                         console.info(`[Resync] Keeping cursor unchanged for ${path}; import was cancelled.`);
                         setSettings(prev => ({
@@ -286,7 +288,7 @@ export const useFoldersTabLogic = ({
                         }));
                     } else if (!result) {
                         console.warn(`[Resync] Keeping cursor unchanged for ${path}; full scan did not start.`);
-                        addToast(`Rescan completed with import errors`, 'warning');
+                        addToast(t('Rescan completed with import errors'), 'warning');
                     } else {
                         console.warn(`[Resync] Keeping cursor unchanged for ${path}; full scan did not fully complete.`);
                         setSettings(prev => ({
@@ -297,14 +299,14 @@ export const useFoldersTabLogic = ({
                                     : folder
                             )
                         }));
-                        addToast(`Rescan completed with import errors`, 'warning');
+                        addToast(t('Rescan completed with import errors'), 'warning');
                     }
                 }
             }
             await fetchCounts();
         } catch (e) {
             console.error(e);
-            addToast(isManaged ? 'InvokeAI sync failed' : `Rescan failed`, 'error');
+            addToast(isManaged ? t('InvokeAI sync failed') : t('Rescan failed'), 'error');
         } finally {
             setScanningIds(prev => {
                 const next = new Set(prev);
@@ -321,7 +323,7 @@ export const useFoldersTabLogic = ({
         const normalizedNew = normalizePath(newFolderPath);
         const existing = settings.monitoredFolders.find(f => normalizePath(f.path) === normalizedNew);
         if (existing) {
-            addToast(`Folder is already monitored`, 'info');
+            addToast(t('Folder is already monitored'), 'info');
             setNewFolderPath('');
             return;
         }
@@ -342,7 +344,7 @@ export const useFoldersTabLogic = ({
             monitoredFolders: [...prev.monitoredFolders, newFolder]
         }));
         setNewFolderPath('');
-        addToast(`Added folder: ${normalizedNew}`, 'success');
+        addToast(t('Added folder: {{normalizedNew}}', { normalizedNew: normalizedNew }), 'success');
 
         // Trigger scan
         pendingScansRef.current.push({ id: newFolder.id, path: normalizedNew, variant });
@@ -398,7 +400,7 @@ export const useFoldersTabLogic = ({
                                 : folder
                         )
                     }));
-                    addToast('Folder scan completed with import errors', 'warning');
+                    addToast(t('Folder scan completed with import errors'), 'warning');
                 }
                 await fetchCounts();
             } catch (e) {
@@ -411,7 +413,7 @@ export const useFoldersTabLogic = ({
                             : folder
                     )
                 }));
-                addToast('Folder scan failed', 'error');
+                addToast(t('Folder scan failed'), 'error');
             }
         }, 500);
     };

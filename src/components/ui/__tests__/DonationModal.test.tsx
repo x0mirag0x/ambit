@@ -34,7 +34,7 @@ describe('DonationModal', () => {
         fireEvent.click(container.querySelector('.fixed.inset-0') as HTMLElement);
         expect(onClose).toHaveBeenCalledTimes(1);
 
-        fireEvent.click(screen.getByText('Support Ambit'));
+        fireEvent.click(screen.getByText('Support Dvoyna Vault'));
         expect(onClose).toHaveBeenCalledTimes(1);
 
         fireEvent.click(container.querySelector('button.absolute') as HTMLButtonElement);

@@ -4,7 +4,7 @@
   "packages": {
     ".": {
       "release-type": "node",
-      "package-name": "ambit",
+      "package-name": "dvoyna-vault",
       "extra-files": [
         "src-tauri/tauri.conf.json",
         "src-tauri/tauri.dev.json",

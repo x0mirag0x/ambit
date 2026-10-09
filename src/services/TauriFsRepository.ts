@@ -229,6 +229,7 @@ const isPersistedSettings = (value: unknown): boolean => {
     return booleanKeys.every(key => hasValidOptionalValue(value, key, item => typeof item === 'boolean'))
         && stringKeys.every(key => hasValidOptionalValue(value, key, item => typeof item === 'string'))
         && hasValidOptionalValue(value, 'theme', item => item === 'dark' || item === 'light')
+        && hasValidOptionalValue(value, 'uiLanguage', item => item === 'en' || item === 'ru')
         && hasValidOptionalValue(value, 'thumbnailSize', item => typeof item === 'number')
         && hasValidOptionalValue(value, 'maskedKeywords', isStringArray)
         && hasValidOptionalValue(value, 'maskingMode', item => item === 'blur' || item === 'hide')

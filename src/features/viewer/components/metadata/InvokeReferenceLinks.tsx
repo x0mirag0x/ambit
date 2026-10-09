@@ -8,6 +8,7 @@ import {
     type InvokeReferenceGroup,
 } from '../../../../services/db/invokeReferenceRepo';
 import { MetadataSectionHeader } from './MetadataSectionHeader';
+import { useTranslation } from 'react-i18next';
 
 interface InvokeReferenceLinksProps {
     imageId: string;
@@ -18,7 +19,7 @@ interface ReferenceListProps {
     currentImageId: string;
     groups: InvokeReferenceGroup[];
     pendingImageId: string | null;
-    title: 'Source Images' | 'Used By';
+    title: string;
     onOpen: (group: InvokeReferenceGroup) => void;
 }
 
@@ -29,6 +30,7 @@ const ReferenceList = ({
     title,
     onOpen,
 }: ReferenceListProps) => {
+    const { t } = useTranslation();
     if (groups.length === 0) return null;
     const headingId = `invoke-${title === 'Source Images' ? 'source-images' : 'used-by'}-heading`;
 
@@ -47,7 +49,7 @@ const ReferenceList = ({
                         : group.availability === 'removed'
                             ? 'Removed from library'
                             : group.availability === 'unresolved'
-                                ? 'Unavailable in Ambit'
+                                ? 'Unavailable in Dvoyna Vault'
                                 : null;
 
                     return (
@@ -55,7 +57,7 @@ const ReferenceList = ({
                             <button
                                 type="button"
                                 disabled={!isAvailable || pendingImageId !== null}
-                                aria-label={isAvailable ? `Open ${group.invokeImageName}` : undefined}
+                                aria-label={isAvailable ? t('Open {{invokeImageName}}', { invokeImageName: group.invokeImageName }) : undefined}
                                 aria-busy={isPending}
                                 onClick={() => onOpen(group)}
                                 className="w-full rounded-lg border border-gray-200 bg-white/70 p-3 text-left transition-colors enabled:hover:border-sage-300 enabled:hover:bg-sage-50 disabled:cursor-default dark:border-white/5 dark:bg-zinc-950/30 dark:enabled:hover:border-sage-500/40 dark:enabled:hover:bg-sage-500/5"
@@ -76,7 +78,7 @@ const ReferenceList = ({
                                             key={role}
                                             className="rounded-full border border-sage-200 bg-sage-50 px-2 py-0.5 text-[10px] font-medium text-sage-600 dark:border-sage-500/20 dark:bg-sage-500/10 dark:text-sage-300"
                                         >
-                                            {INVOKE_REFERENCE_ROLE_LABELS[role]}
+                                            {t(INVOKE_REFERENCE_ROLE_LABELS[role])}
                                         </span>
                                     ))}
                                     {status ? (
@@ -93,6 +95,7 @@ const ReferenceList = ({
 };
 
 export const InvokeReferenceLinks = ({ imageId, onOpenImage }: InvokeReferenceLinksProps) => {
+    const { t } = useTranslation();
     const [pendingImageId, setPendingImageId] = useState<string | null>(null);
     const query = useQuery({
         queryKey: [...INVOKE_REFERENCE_QUERY_KEY, imageId],
@@ -114,11 +117,10 @@ export const InvokeReferenceLinks = ({ imageId, onOpenImage }: InvokeReferenceLi
 
     if (query.isLoading) {
         return (
-            <section aria-label="InvokeAI references" className="rounded-xl border border-gray-200 bg-white/50 p-4 dark:border-white/5 dark:bg-zinc-800/30">
+            <section aria-label={t('InvokeAI references')} className="rounded-xl border border-gray-200 bg-white/50 p-4 dark:border-white/5 dark:bg-zinc-800/30">
                 <div className="flex items-center gap-2 text-xs text-gray-400">
                     <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
-                    Loading references...
-                </div>
+                    {t('Loading references...')}</div>
             </section>
         );
     }
@@ -127,10 +129,9 @@ export const InvokeReferenceLinks = ({ imageId, onOpenImage }: InvokeReferenceLi
         return (
             <section role="alert" className="rounded-xl border border-red-200 bg-red-50/70 p-4 dark:border-red-500/20 dark:bg-red-500/5">
                 <div className="flex items-center justify-between gap-3">
-                    <span className="text-xs text-red-700 dark:text-red-300">Reference links are unavailable.</span>
+                    <span className="text-xs text-red-700 dark:text-red-300">{t('Reference links are unavailable.')}</span>
                     <button type="button" onClick={() => void query.refetch()} className="flex items-center gap-1 text-xs font-medium text-red-700 hover:underline dark:text-red-300">
-                        <RefreshCw className="h-3 w-3" /> Retry
-                    </button>
+                        <RefreshCw className="h-3 w-3" /> {t('Retry')}</button>
                 </div>
             </section>
         );
@@ -141,19 +142,19 @@ export const InvokeReferenceLinks = ({ imageId, onOpenImage }: InvokeReferenceLi
 
     return (
         <div className="space-y-4 rounded-xl border border-gray-200 bg-white/50 p-4 dark:border-white/5 dark:bg-zinc-800/30">
-            <MetadataSectionHeader title="References" icon={Link2} />
+            <MetadataSectionHeader title={t('References')} icon={Link2} />
             <ReferenceList
                 currentImageId={imageId}
                 groups={graph.sourceImages}
                 pendingImageId={pendingImageId}
-                title="Source Images"
+                title={t('Source Images')}
                 onOpen={group => void handleOpen(group)}
             />
             <ReferenceList
                 currentImageId={imageId}
                 groups={graph.usedBy}
                 pendingImageId={pendingImageId}
-                title="Used By"
+                title={t('Used By')}
                 onOpen={group => void handleOpen(group)}
             />
         </div>

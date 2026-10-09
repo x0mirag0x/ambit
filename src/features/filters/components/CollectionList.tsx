@@ -11,6 +11,7 @@ import { useSettings } from '../../../contexts/SettingsContext';
 import { useCollectionStore } from '../../../stores/collectionStore';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import { compareCollectionsByCount } from '../../../utils/collectionCount';
+import { useTranslation } from 'react-i18next';
 
 interface CollectionListProps<T extends Collection> {
     collections: T[];
@@ -64,6 +65,7 @@ export function CollectionList<T extends Collection>({
     renderCreationForm,
     emptyMessage = "No collections found."
 }: CollectionListProps<T>) {
+    const { t } = useTranslation();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [showArchived, setShowArchived] = useState(false);
@@ -218,7 +220,7 @@ export function CollectionList<T extends Collection>({
         <div className="space-y-1 animate-in slide-in-from-top-2 duration-300 ease-spring">
             <div className="flex items-center gap-1.5 px-2 pb-2">
                 <SortDropdown
-                    title="Sort Collections"
+                    title={t('Sort Collections')}
                     options={[
                         { id: 'recent_desc', label: 'Recently Updated', icon: Clock },
                         { id: 'recent_asc', label: 'Least Recently Updated', icon: Clock },
@@ -235,8 +237,8 @@ export function CollectionList<T extends Collection>({
                     triggerClassName={(isOpen) => `transition-colors p-1.5 rounded-lg border ${isOpen ? 'text-sage-600 dark:text-sage-400 bg-sage-50 dark:bg-sage-900/40 border-sage-200 dark:border-sage-500/30' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/5'}`}
                 />
                 <TooltipButton
-                    label={viewMode === 'list' ? 'Switch to Grid View' : 'Switch to List View'}
-                    content={viewMode === 'list' ? 'Switch to Grid View' : 'Switch to List View'}
+                    label={viewMode === 'list' ? t('Switch to Grid View') : t('Switch to List View')}
+                    content={viewMode === 'list' ? t('Switch to Grid View') : t('Switch to List View')}
                     aria-pressed={viewMode === 'grid'}
                     onClick={toggleViewMode}
                     className={`transition-colors p-1.5 rounded-lg border ${viewMode === 'grid' ? 'text-sage-600 dark:text-sage-400 bg-sage-50 dark:bg-sage-900/40 border-sage-200 dark:border-sage-500/30' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/5'}`}
@@ -244,8 +246,8 @@ export function CollectionList<T extends Collection>({
                     {viewMode === 'list' ? <LayoutGrid className="w-3.5 h-3.5" /> : <ListIcon className="w-3.5 h-3.5" />}
                 </TooltipButton>
                 <TooltipButton
-                    label={showArchived ? 'Hide Archived' : 'Include Archived'}
-                    content={showArchived ? 'Hide Archived' : 'Include Archived'}
+                    label={showArchived ? t('Hide Archived') : t('Include Archived')}
+                    content={showArchived ? t('Hide Archived') : t('Include Archived')}
                     aria-pressed={showArchived}
                     onClick={() => setShowArchived(!showArchived)}
                     className={`transition-colors p-1.5 rounded-lg border ${showArchived ? 'text-sage-600 dark:text-sage-400 bg-sage-50 dark:bg-sage-900/40 border-sage-200 dark:border-sage-500/30' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/5'}`}
@@ -253,8 +255,8 @@ export function CollectionList<T extends Collection>({
                     <Archive className="w-3.5 h-3.5" />
                 </TooltipButton>
                 <TooltipButton
-                    label="Search Collections"
-                    content="Search Collections"
+                    label={t('Search Collections')}
+                    content={t('Search Collections')}
                     aria-expanded={isSearchOpen}
                     onClick={() => { setIsSearchOpen(!isSearchOpen); if (isSearchOpen) setSearchQuery(''); }}
                     className={`transition-colors p-1.5 rounded-lg border ${isSearchOpen ? 'text-sage-600 dark:text-sage-400 bg-sage-50 dark:bg-sage-900/40 border-sage-200 dark:border-sage-500/30' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/5'}`}
@@ -267,7 +269,7 @@ export function CollectionList<T extends Collection>({
                 <SearchInput
                     value={searchQuery}
                     onChange={setSearchQuery}
-                    placeholder="Find collection..."
+                    placeholder={t('Find collection...')}
                     className="pb-3"
                 />
             )}
@@ -278,8 +280,7 @@ export function CollectionList<T extends Collection>({
                 {pinned.length > 0 && (
                     <div className="mb-2">
                         <div className="px-2 pb-1.5 text-[10px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-wider flex items-center gap-1">
-                            <Pin className="w-3 h-3" /> Pinned
-                        </div>
+                            <Pin className="w-3 h-3" /> {t('Pinned')}</div>
                         <div className={viewMode === 'grid' ? 'grid grid-cols-3 gap-2 relative' : 'space-y-1 relative'}>
                             <AnimatePresence mode="popLayout" initial={false}>
                                 {pinned.map(col => (
@@ -380,8 +381,7 @@ export function CollectionList<T extends Collection>({
                         onClick={() => setRenderLimit(prev => prev + 60)}
                         className={`w-full py-2 text-xs font-medium text-sage-600 dark:text-sage-400 bg-sage-50 dark:bg-sage-900/20 hover:bg-sage-100 dark:hover:bg-sage-900/40 rounded-lg transition-colors border border-sage-200 dark:border-sage-500/30 ${viewMode === 'grid' ? 'col-span-3' : ''}`}
                     >
-                        Show More ({others.length - renderLimit} remaining)
-                    </button>
+                        {t('Show More (')}{others.length - renderLimit} {t('remaining)')}</button>
                 )}
 
                 {filtered.length === 0 && (

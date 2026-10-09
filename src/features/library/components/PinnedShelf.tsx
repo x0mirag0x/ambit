@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp, Pin } from 'lucide-react';
 import { AIImage } from '../../../types';
 import { GridItem } from './GridItem';
 import { useSettingsStore } from '../../../stores/settingsStore';
+import { useTranslation } from 'react-i18next';
 
 interface PinnedShelfProps {
     images: AIImage[];
@@ -40,6 +41,7 @@ export const PinnedShelf: React.FC<PinnedShelfProps> = ({
     onRangeSelection,
     onBackgroundClick
 }) => {
+    const { t } = useTranslation();
     const privacyEnabled = useSettingsStore(s => s.privacyEnabled);
     const containerRef = React.useRef<HTMLDivElement>(null);
     const [dragBox, setDragBox] = React.useState<{ x: number, y: number, w: number, h: number } | null>(null);
@@ -161,7 +163,7 @@ export const PinnedShelf: React.FC<PinnedShelfProps> = ({
             >
                 <div className="flex items-center gap-2 text-sage-600 dark:text-sage-400 font-bold text-sm">
                     <Pin className="w-4 h-4 fill-current" />
-                    <span>Pinned</span>
+                    <span>{t('Pinned')}</span>
                     <span className="bg-sage-200 dark:bg-sage-900 text-sage-700 dark:text-sage-300 px-2 py-0.5 rounded-full text-xs ml-1 font-mono">
                         {images.length}
                     </span>

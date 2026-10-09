@@ -5,6 +5,7 @@ import { FilterState } from '../../../types';
 import { SectionHeader, SelectableRow, SearchInput } from './FilterPrimitives';
 import { formatModelName } from '../../../utils/formatUtils';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
+import { useTranslation } from 'react-i18next';
 
 interface ArchitectureSectionProps {
     filters: FilterState;
@@ -21,6 +22,7 @@ export const ArchitectureSection: React.FC<ArchitectureSectionProps> = ({
     isOpen,
     onToggle
 }) => {
+    const { t } = useTranslation();
     const [searchQuery, setSearchQuery] = useState('');
     const [isSearchOpen, setIsSearchOpen] = useState(false);
 
@@ -40,13 +42,13 @@ export const ArchitectureSection: React.FC<ArchitectureSectionProps> = ({
     return (
         <div className="space-y-2">
             <SectionHeader
-                title="Model Architecture"
+                title={t('Model Architecture')}
                 isOpen={isOpen}
                 onToggle={onToggle}
                 action={isOpen && (
                     <TooltipButton
-                        label={isSearchOpen ? 'Hide Model Search' : 'Search Models'}
-                        content={isSearchOpen ? 'Hide Model Search' : 'Search Models'}
+                        label={isSearchOpen ? t('Hide Model Search') : t('Search Models')}
+                        content={isSearchOpen ? t('Hide Model Search') : t('Search Models')}
                         onClick={(e) => { e.stopPropagation(); setIsSearchOpen(!isSearchOpen); }}
                         aria-expanded={isSearchOpen}
                         className={`p-1 rounded ${isSearchOpen ? 'text-sage-500' : 'text-gray-400 hover:text-gray-600'}`}
@@ -61,7 +63,7 @@ export const ArchitectureSection: React.FC<ArchitectureSectionProps> = ({
                         <SearchInput
                             value={searchQuery}
                             onChange={setSearchQuery}
-                            placeholder="Search models..."
+                            placeholder={t('Search models...')}
                             className="px-1 pb-1"
                         />
                     )}
@@ -75,7 +77,7 @@ export const ArchitectureSection: React.FC<ArchitectureSectionProps> = ({
                             />
                         ))}
                         {filteredModels.length === 0 && (
-                            <div className="text-xs text-gray-400 text-center py-2 italic">No models found</div>
+                            <div className="text-xs text-gray-400 text-center py-2 italic">{t('No models found')}</div>
                         )}
                     </div>
                 </div>

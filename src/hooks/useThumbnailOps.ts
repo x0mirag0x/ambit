@@ -8,6 +8,7 @@ import { getImagesByIds } from '../services/db/imageRepo';
 import { regenerateThumbnailsForImages } from '../services/thumbnailService';
 import { useQueryClient } from '@tanstack/react-query';
 import { refreshThumbnailConsumers } from '../services/thumbnailConsumerRefresh';
+import { useTranslation } from 'react-i18next';
 
 interface UseThumbnailOpsProps {
     images: AIImage[];
@@ -20,6 +21,7 @@ export const useThumbnailOps = ({
     setImages,
     refreshCollectionThumbnails
 }: UseThumbnailOpsProps) => {
+    const { t } = useTranslation();
     const { addToast } = useToast();
     const queryClient = useQueryClient();
     const {
@@ -30,7 +32,7 @@ export const useThumbnailOps = ({
 
     const regenerateThumbnails = useCallback(async (arg?: string[] | ((current: number, total: number) => void)) => {
         if (isBrowserMockMode()) {
-            addToast('Unavailable in browser mock mode.', 'info');
+            addToast(t('Unavailable in browser mock mode.'), 'info');
             return;
         }
 
@@ -51,7 +53,7 @@ export const useThumbnailOps = ({
         }
 
         if (candidates.length === 0) {
-            if (!targetIds) addToast("No unoptimized images found correctly.", "success");
+            if (!targetIds) addToast(t('No unoptimized images found correctly.'), "success");
             return;
         }
 
@@ -74,11 +76,11 @@ export const useThumbnailOps = ({
                 const msg = abortCtrl.signal.aborted
                     ? `Cancelled after optimizing ${updates.length} thumbnails.`
                     : `Successfully optimized ${updates.length} of ${candidates.length} thumbnails.`;
-                addToast(msg, "success");
+                addToast(t(msg), "success");
             }
         } catch (e) {
             console.error("Regeneration error", e);
-            addToast("Thumbnail optimization failed partway through", "error");
+            addToast(t('Thumbnail optimization failed partway through'), "error");
         } finally {
             try {
                 await refreshThumbnailConsumers({
@@ -88,7 +90,7 @@ export const useThumbnailOps = ({
                 });
             } catch (error) {
                 console.error('[Thumb] Thumbnail changes were saved, but consumers failed to refresh', error);
-                addToast('Thumbnail changes were saved, but the library view failed to refresh', 'error');
+                addToast(t('Thumbnail changes were saved, but the library view failed to refresh'), 'error');
             }
             setIsRegeneratingThumbnails(false);
             setThumbnailProgress(null);

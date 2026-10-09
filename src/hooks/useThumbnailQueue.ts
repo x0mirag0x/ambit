@@ -20,6 +20,7 @@ import { useCollectionStore } from '../stores/collectionStore';
 import { startBackgroundDiagnostic, type BackgroundDiagnosticHandle } from '../utils/backgroundDiagnostics';
 import { listenWithCleanup } from '../utils/tauriListener';
 import { startupDiagnostics } from '../utils/startupDiagnostics';
+import { useTranslation } from 'react-i18next';
 
 const STARTUP_DELAY_MS = 30000;
 const RESUME_DELAY_MS = 5000;
@@ -62,6 +63,7 @@ const hasVisibleThumbnailResult = (result: ThumbnailOptimizationResult): boolean
  * ActivityDock presentation.
  */
 export function useThumbnailQueue(addToast?: ToastFn, startupReady = false): void {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
     const activeImageQueryCount = useIsFetching({ queryKey: ['images'] });
     const isRunningRef = useRef(false);
@@ -560,7 +562,7 @@ export function useThumbnailQueue(addToast?: ToastFn, startupReady = false): voi
 
             finishStartupTrace('failed');
             console.error('[ThumbnailQueue] Backend thumbnail optimization failed', error);
-            addToast?.(`Smart thumbnail optimization failed: ${String(error)}`, 'error');
+            addToast?.(t('Smart thumbnail optimization failed: {{v0}}', { v0: String(error) }), 'error');
             jobDiagnosticRef.current?.finish('failed', {
                 error: error instanceof Error ? error.message : String(error)
             });

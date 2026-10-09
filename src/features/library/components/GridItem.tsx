@@ -9,6 +9,7 @@ import { isImageMasked } from '../../../utils/maskingUtils';
 import { useSettingsStore } from '../../../stores/settingsStore';
 import { commands } from '../../../bindings';
 import { normalizePath, urlToPath } from '../../../utils/pathUtils';
+import { useTranslation } from 'react-i18next';
 
 interface GridItemProps {
     image: AIImage;
@@ -42,6 +43,7 @@ export const GridItem: React.FC<GridItemProps> = memo(({
     onContextMenu,
     isThumbnail = false
 }) => {
+    const { t } = useTranslation();
     const privacyEnabled = useSettingsStore(s => s.privacyEnabled);
 
     // Unified Masking Logic
@@ -137,7 +139,7 @@ export const GridItem: React.FC<GridItemProps> = memo(({
                 {isStack && (
                     <div
                         className={`absolute top-2 right-2 bg-black/70 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-md flex items-center gap-1.5 border border-white/10 shadow-lg pointer-events-none z-30 transition-all duration-300 ${image.isPinned ? 'mt-8' : ''}`}
-                        title={`${stackSize} versions stacked`}
+                        title={t('{{stackSize}} versions stacked', { stackSize: stackSize })}
                     >
                         <Layers className="w-3 h-3 text-sage-400" />
                         {stackSize}

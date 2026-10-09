@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useState, useEffect, useMemo } from 'react';
 import { Search, Monitor, Moon, Sun, LayoutGrid, Clock, BarChart3, Eraser, Settings, Import, FolderPlus, Sparkles } from 'lucide-react';
 import { AppSettings, ViewMode } from '../../types';
+import { useTranslation } from 'react-i18next';
 
 interface CommandPaletteProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   onToggleAI,
   settings
 }) => {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -103,14 +105,14 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             <input 
                 autoFocus
                 type="text"
-                placeholder="Type a command..."
+                placeholder={t('Type a command...')}
                 value={query}
                 onChange={(e) => { setQuery(e.target.value); setSelectedIndex(0); }}
                 className="flex-1 bg-transparent border-none outline-none text-gray-900 dark:text-white placeholder-gray-500 text-base h-6"
             />
             <div className="flex gap-1">
                 <kbd className="hidden sm:inline-block px-2 py-0.5 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-[10px] text-gray-500 font-mono">↑↓</kbd>
-                <kbd className="hidden sm:inline-block px-2 py-0.5 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-[10px] text-gray-500 font-mono">Enter</kbd>
+                <kbd className="hidden sm:inline-block px-2 py-0.5 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-[10px] text-gray-500 font-mono">{t('Enter')}</kbd>
             </div>
         </div>
         
@@ -130,7 +132,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                         >
                             <div className="flex items-center gap-3">
                                 <div className={i === selectedIndex ? 'text-white' : 'text-gray-400'}>{opt.icon}</div>
-                                <span>{opt.label}</span>
+                                <span>{t(opt.label)}</span>
                             </div>
                             {opt.group && (
                                 <span className={`text-[10px] uppercase font-bold tracking-wider ${i === selectedIndex ? 'text-sage-200' : 'text-gray-400'}`}>
@@ -142,8 +144,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                 </div>
             ) : (
                 <div className="py-12 text-center text-gray-500">
-                    No commands found.
-                </div>
+                    {t('No commands found.')}</div>
             )}
         </div>
       </div>

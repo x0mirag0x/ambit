@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Link2, FileUp, FolderOpen, Check, Zap, Sparkles, AlertCircle, ArrowRight, Video } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const FOCUSABLE_SELECTOR = [
     'button:not([disabled])',
@@ -26,6 +27,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
     onImportFiles,
     onImportVideos
 }) => {
+    const { t } = useTranslation();
     const dialogRef = React.useRef<HTMLDivElement>(null);
     const headingRef = React.useRef<HTMLHeadingElement>(null);
 
@@ -108,12 +110,11 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                                     tabIndex={-1}
                                     className="text-xl font-black text-gray-900 dark:text-white tracking-tight outline-none"
                                 >
-                                    Add Media to Your Library
-                                </h2>
+                                    {t('Add Media to Your Library')}</h2>
                             </div>
                             <button
                                 type="button"
-                                aria-label="Close Add Images"
+                                aria-label={t('Close Add Images')}
                                 onClick={onClose}
                                 className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition-all active:scale-95"
                             >
@@ -125,7 +126,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                             {/* RECOMMENDED SECTION */}
                             <section>
                                 <div className="flex items-center justify-between mb-4">
-                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-sage-600 dark:text-sage-400 bg-sage-500/10 px-2 py-0.5 rounded">Recommended</span>
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-sage-600 dark:text-sage-400 bg-sage-500/10 px-2 py-0.5 rounded">{t('Recommended')}</span>
                                 </div>
 
                                 <motion.div
@@ -144,8 +145,8 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                                         </div>
 
                                         <div className="flex-1">
-                                            <h3 className="text-lg font-black text-gray-900 dark:text-white mb-1 tracking-tight">Set Up Integration</h3>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 font-medium">Automatic imports from connected generator output folders.</p>
+                                            <h3 className="text-lg font-black text-gray-900 dark:text-white mb-1 tracking-tight">{t('Set Up Integration')}</h3>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 font-medium">{t('Automatic imports from connected generator output folders.')}</p>
 
                                             <ul className="grid grid-cols-1 gap-2 mb-6">
                                                 <FeatureItem text="Auto-import new images" />
@@ -154,9 +155,9 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                                             </ul>
 
                                             <div className="flex flex-wrap gap-2">
-                                                <IntegrationButton label="InvokeAI" onClick={() => handleOpenSettings('invokeai')} />
-                                                <IntegrationButton label="ComfyUI" onClick={() => handleOpenSettings('comfyui')} />
-                                                <IntegrationButton label="SD WebUI" onClick={() => handleOpenSettings('a1111')} />
+                                                <IntegrationButton label={t('InvokeAI')} onClick={() => handleOpenSettings('invokeai')} />
+                                                <IntegrationButton label={t('ComfyUI')} onClick={() => handleOpenSettings('comfyui')} />
+                                                <IntegrationButton label={t('SD WebUI')} onClick={() => handleOpenSettings('a1111')} />
                                             </div>
                                         </div>
                                     </div>
@@ -175,11 +176,10 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                             <section>
                                 <div className="flex items-center gap-3 mb-4">
                                     <FolderOpen className="w-4 h-4 text-gray-400" />
-                                    <h3 className="font-black text-sm text-gray-900 dark:text-white tracking-tight">One-Time Import</h3>
+                                    <h3 className="font-black text-sm text-gray-900 dark:text-white tracking-tight">{t('One-Time Import')}</h3>
                                 </div>
                                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-5 font-medium leading-relaxed">
-                                    Add generated images, camera photos, screenshots, or supported videos. Image formats: PNG, JPEG, and WebP.
-                                </p>
+                                    {t('Add generated images, camera photos, screenshots, or supported videos. Image formats: PNG, JPEG, and WebP.')}</p>
 
                                 <div className="grid grid-cols-3 gap-3">
                                     <button
@@ -187,22 +187,19 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                                         className="flex-1 px-4 py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl text-xs font-black transition-all hover:translate-y-[-2px] hover:shadow-xl active:translate-y-0 active:scale-95 flex items-center justify-center gap-2 group shadow-lg"
                                     >
                                         <FileUp className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                                        Select Images
-                                    </button>
+                                        {t('Select Images')}</button>
                                     <button
                                         onClick={() => { onImportVideos(); onClose(); }}
                                         className="flex-1 px-4 py-4 bg-sage-600 hover:bg-sage-500 text-white rounded-xl text-xs font-black transition-all hover:translate-y-[-2px] active:translate-y-0 active:scale-95 flex items-center justify-center gap-2 group shadow-lg"
                                     >
                                         <Video className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                                        Select Videos
-                                    </button>
+                                        {t('Select Videos')}</button>
                                     <button
                                         onClick={() => handleOpenSettings('folders')}
                                         className="flex-1 px-4 py-4 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-900 dark:text-white rounded-xl text-xs font-black transition-all hover:translate-y-[-2px] active:translate-y-0 active:scale-95 border border-gray-200 dark:border-white/5 flex items-center justify-center gap-2 group"
                                     >
                                         <FolderOpen className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                                        Add Folder
-                                    </button>
+                                        {t('Add Folder')}</button>
                                 </div>
                             </section>
                         </div>

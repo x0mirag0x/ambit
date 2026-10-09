@@ -440,14 +440,14 @@ describe('OnboardingWizard', () => {
         expect(mocks.setGeminiApiKey).not.toHaveBeenCalled();
     });
 
-    it('requires environment keys to verify without claiming Ambit saves them', async () => {
+    it('requires environment keys to verify without claiming Dvoyna Vault saves them', async () => {
         vi.stubEnv('API_KEY', 'environment-key');
         mocks.state.settings = { ...DEFAULT_APP_SETTINGS, enableAI: true };
         mocks.state.geminiApiKey = 'environment-key';
         renderWizard();
         continueToIntelligence();
 
-        expect(screen.getByText(/Ambit reads this API key from your environment and does not save it/)).not.toBeNull();
+        expect(screen.getByText(/Dvoyna Vault reads this API key from your environment and does not save it/)).not.toBeNull();
         expect(screen.getByText(/Gemini requests are handled by Google/)).not.toBeNull();
         expect(screen.getByText(/A free tier is available for eligible accounts and regions/)).not.toBeNull();
         expect(screen.queryByText(/Stored in your OS keyring/)).toBeNull();
@@ -466,7 +466,7 @@ describe('OnboardingWizard', () => {
         expect(mocks.setGeminiApiKey).not.toHaveBeenCalled();
     });
 
-    it('retains keyring wording for keys entered through Ambit', () => {
+    it('retains keyring wording for keys entered through Dvoyna Vault', () => {
         renderWizard();
         continueToIntelligence();
         fireEvent.click(screen.getByRole('switch', { name: 'Enable AI features' }));

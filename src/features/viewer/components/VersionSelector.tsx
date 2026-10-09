@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { AIImage } from '../../../types';
 
 interface VersionSelectorProps {
@@ -15,6 +16,7 @@ export const VersionSelector: React.FC<VersionSelectorProps> = ({
     onVersionSelect,
     showControls
 }) => {
+    const { t } = useTranslation();
     if (versions.length <= 1) return null;
 
     return (
@@ -26,7 +28,7 @@ export const VersionSelector: React.FC<VersionSelectorProps> = ({
                     <button
                         type="button"
                         key={v.id}
-                        aria-label={`View ${isUpscale ? 'upscaled ' : ''}version at ${v.width} by ${v.height}`}
+                        aria-label={t(isUpscale ? 'View upscaled version at {{width}} by {{height}}' : 'View version at {{width}} by {{height}}', { width: v.width, height: v.height })}
                         aria-pressed={isActive}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();

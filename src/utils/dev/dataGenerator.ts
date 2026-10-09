@@ -34,7 +34,7 @@ export const generateStressTestData = async (
                 height: 1024,
                 timestamp: timestamp,
                 fileSize: Math.floor(Math.random() * 5000000),
-                thumbnailUrl: '/branding/ambit-window-icon.png',
+                thumbnailUrl: '/branding/dv-window-icon.png',
                 isFavorite: Math.random() > 0.9,
                 isPinned: Math.random() > 0.95,
                 metadata: {

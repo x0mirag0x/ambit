@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { BookOpen, History } from 'lucide-react';
 import type { SearchQueryIssue } from '../../../utils/searchQueryReadiness';
+import { useTranslation } from 'react-i18next';
+import { translateRuntimeMessage } from '../../../i18n/statusMessages';
 
 export interface SearchBarOption {
     id: string;
@@ -37,7 +39,7 @@ export const SearchBarPopover = React.memo(({
     onClearRecentSearches,
     onOpenSearchHelp,
     onSelectOption,
-}: SearchBarPopoverProps) => (
+}: SearchBarPopoverProps) => { const { t } = useTranslation(); return ((
     <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
         {queryIssue ? (
             <div
@@ -46,7 +48,7 @@ export const SearchBarPopover = React.memo(({
                 aria-live="polite"
                 className={`px-4 py-2 text-xs border-b ${queryIssue.kind === 'invalid' ? 'text-red-600 dark:text-red-300 bg-red-50 dark:bg-red-950/30 border-red-100 dark:border-red-900/40' : 'text-ember-600 dark:text-ember-300 bg-ember-50 dark:bg-ember-950/30 border-ember-100 dark:border-ember-900/40'}`}
             >
-                {queryIssue.message}
+                {translateRuntimeMessage(queryIssue.message)}
             </div>
         ) : statusMessage ? (
             <div id={statusId} role="status" aria-live="polite" className="px-4 py-2 text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-black/20 border-b border-gray-100 dark:border-white/5">
@@ -57,15 +59,14 @@ export const SearchBarPopover = React.memo(({
         {options.length > 0 ? (
             <div className="py-2">
                 <div className="px-4 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider flex justify-between items-center">
-                    <span>{options[0].kind === 'recent' ? 'Recent Searches' : 'Suggestions'}</span>
+                    <span>{options[0].kind === 'recent' ? t('Recent Searches') : t('Suggestions')}</span>
                     {options[0].kind === 'recent' ? (
                         <button
                             type="button"
                             onClick={onClearRecentSearches}
                             className="hover:text-red-500 transition-colors uppercase"
                         >
-                            Clear recent searches
-                        </button>
+                            {t('Clear recent searches')}</button>
                     ) : null}
                 </div>
                 <div id={listboxId} role="listbox" aria-label={listLabel}>
@@ -83,7 +84,7 @@ export const SearchBarPopover = React.memo(({
                         >
                             {option.kind === 'recent' ? <History aria-hidden="true" className="w-3 h-3 text-gray-400" /> : null}
                             <span className={option.kind === 'operator' ? 'font-mono' : undefined}>{option.value}</span>
-                            {option.description ? <span className="ml-auto text-xs text-gray-400 truncate">{option.description}</span> : null}
+                            {option.description ? <span className="ml-auto text-xs text-gray-400 truncate">{t(option.description)}</span> : null}
                         </button>
                     ))}
                 </div>
@@ -92,7 +93,7 @@ export const SearchBarPopover = React.memo(({
 
         <div className="border-t border-gray-100 dark:border-white/5 px-3 py-2 flex items-center justify-between gap-3">
             <span id={helperId} className="text-[10px] text-gray-400">
-                {statusMessage === helperText ? 'Search syntax opens standard query operators.' : helperText}
+                {statusMessage === helperText ? t('Search syntax opens standard query operators.') : helperText}
             </span>
             <button
                 type="button"
@@ -100,8 +101,7 @@ export const SearchBarPopover = React.memo(({
                 className="shrink-0 inline-flex items-center gap-1.5 text-xs font-medium text-sage-600 hover:text-sage-600 dark:text-sage-300 dark:hover:text-sage-300"
             >
                 <BookOpen aria-hidden="true" className="w-3 h-3" />
-                Search syntax
-            </button>
+                {t('Search syntax')}</button>
         </div>
     </div>
-));
+)); });

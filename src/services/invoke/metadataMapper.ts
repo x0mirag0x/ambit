@@ -229,7 +229,7 @@ function scanForResources(val: unknown, res: Resources, depth = 0) {
         }
     });
 
-    // T2I adapters share Ambit's control-resource taxonomy, but retain their
+    // T2I adapters share Dvoyna Vault's control-resource taxonomy, but retain their
     // source-aware classification instead of being redirected as IP adapters.
     const t2iKeys = ['t2iAdapters', 't2i_adapters', 't2i_adapter'];
     t2iKeys.forEach(key => {
@@ -329,7 +329,7 @@ function scanForResources(val: unknown, res: Resources, depth = 0) {
     }
 }
 
-// Helper to map InvokeAI metadata to Ambit's format using a database row
+// Helper to map InvokeAI metadata to Dvoyna Vault's format using a database row
 export function mapInvokeMetadata(row: unknown, metaCol: string, processedIndex: number): InvokeImageMetadata {
     const rowRecord = asRecord(row);
     const rawVal = rowRecord[metaCol];

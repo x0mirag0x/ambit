@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { AlertTriangle, Loader2, RotateCw, Settings } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface InvokeOwnerScopeOfflineBannerProps {
     isRetrying?: boolean;
@@ -11,7 +12,7 @@ export const InvokeOwnerScopeOfflineBanner: React.FC<InvokeOwnerScopeOfflineBann
     isRetrying = false,
     onRetry,
     onOpenSettings,
-}) => (
+}) => { const { t } = useTranslation(); return ((
     <div
         className="shrink-0 border-b border-ember-500/30 bg-ember-50 px-3 py-2 text-ember-600 dark:bg-ember-950/40 dark:text-ember-300 sm:px-5"
         role="status"
@@ -22,8 +23,7 @@ export const InvokeOwnerScopeOfflineBanner: React.FC<InvokeOwnerScopeOfflineBann
             <div className="flex min-w-0 items-start gap-2 text-xs leading-5 sm:text-sm">
                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-ember-600 dark:text-ember-300" />
                 <span>
-                    <strong>InvokeAI is unavailable</strong> — showing your last verified local view. Sync and Live Watch are paused.
-                </span>
+                    <strong>{t('InvokeAI is unavailable')}</strong> {t('— showing your last verified local view. Sync and Live Watch are paused.')}</span>
             </div>
             <div className="flex shrink-0 items-center gap-2 pl-6 min-[394px]:pl-0">
                 <button
@@ -33,7 +33,7 @@ export const InvokeOwnerScopeOfflineBanner: React.FC<InvokeOwnerScopeOfflineBann
                     className="inline-flex items-center gap-1.5 rounded-lg bg-ember-200/70 px-2.5 py-1.5 text-xs font-bold hover:bg-ember-200 disabled:cursor-wait disabled:opacity-70 dark:bg-ember-500/20 dark:hover:bg-ember-500/30"
                 >
                     {isRetrying ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCw className="h-3.5 w-3.5" />}
-                    {isRetrying ? 'Retrying…' : 'Retry'}
+                    {isRetrying ? t('Retrying…') : t('Retry')}
                 </button>
                 <button
                     type="button"
@@ -41,9 +41,8 @@ export const InvokeOwnerScopeOfflineBanner: React.FC<InvokeOwnerScopeOfflineBann
                     className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-bold hover:bg-ember-200/60 dark:hover:bg-ember-500/20"
                 >
                     <Settings className="h-3.5 w-3.5" />
-                    Open Settings
-                </button>
+                    {t('Open Settings')}</button>
             </div>
         </div>
     </div>
-);
+)); };

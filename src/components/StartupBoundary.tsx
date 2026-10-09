@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { startupDiagnostics } from '../utils/startupDiagnostics';
+import i18n from '../i18n';
 
 interface StartupBoundaryProps {
     children: React.ReactNode;
@@ -55,15 +56,14 @@ export class StartupBoundary extends React.Component<StartupBoundaryProps, Start
                     role="alert"
                 >
                     <div className="max-w-md space-y-3">
-                        <h1 className="text-xl font-semibold">Something went wrong</h1>
-                        <p className="text-sm text-zinc-300">Ambit was already open, but this view stopped rendering.</p>
+                        <h1 className="text-xl font-semibold">{i18n.t('Something went wrong')}</h1>
+                        <p className="text-sm text-zinc-300">{i18n.t('Dvoyna Vault was already open, but this view stopped rendering.')}</p>
                         <button
                             type="button"
                             className="rounded-lg bg-sage-600 px-4 py-2 text-sm font-medium text-white hover:bg-sage-500"
                             onClick={this.handleRetry}
                         >
-                            Try Again
-                        </button>
+                            {i18n.t('Try Again')}</button>
                     </div>
                 </main>
             );
@@ -76,9 +76,9 @@ export class StartupBoundary extends React.Component<StartupBoundaryProps, Start
                 style={{ position: 'fixed', inset: 0, zIndex: 2147483647 }}
             >
                 <div className="max-w-md space-y-3">
-                    <h1 className="text-xl font-semibold">Ambit couldn’t start</h1>
-                    <p className="text-sm text-zinc-300">Restart Ambit. If the problem continues, share this launch ID with support.</p>
-                    <p className="font-mono text-xs text-zinc-400">Launch ID: {this.state.launchId ?? 'unavailable'}</p>
+                    <h1 className="text-xl font-semibold">{i18n.t('DV couldn’t start')}</h1>
+                    <p className="text-sm text-zinc-300">{i18n.t('Restart DV. If the problem continues, share this launch ID with support.')}</p>
+                    <p className="font-mono text-xs text-zinc-400">{i18n.t('Launch ID:')} {this.state.launchId ?? 'unavailable'}</p>
                 </div>
             </main>
         );

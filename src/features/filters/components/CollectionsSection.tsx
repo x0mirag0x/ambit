@@ -6,6 +6,7 @@ import { useCollectionStore } from '../../../stores/collectionStore';
 import { SectionHeader } from './FilterPrimitives';
 import { CollectionList } from './CollectionList';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
+import { useTranslation } from 'react-i18next';
 
 interface CollectionsSectionProps {
     isInvokeCollectionCatchupPending?: boolean;
@@ -48,6 +49,7 @@ export const CollectionsSection: React.FC<CollectionsSectionProps> = ({
     isDirty,
     onEditCollection
 }) => {
+    const { t } = useTranslation();
     const [isCreating, setIsCreating] = useState(false);
     const [isSavingSearch, setIsSavingSearch] = useState(false);
     const [newName, setNewName] = useState('');
@@ -72,7 +74,7 @@ export const CollectionsSection: React.FC<CollectionsSectionProps> = ({
     return (
         <div className="space-y-2">
             <SectionHeader
-                title="Collections"
+                title={t('Collections')}
                 isOpen={isOpen}
                 onToggle={onToggle}
             />
@@ -80,8 +82,7 @@ export const CollectionsSection: React.FC<CollectionsSectionProps> = ({
             {collections.some(collection => collection.countState === 'failed') && (
                 <button type="button" onClick={retryCounts}
                     className="text-xs text-sage-600 dark:text-sage-400 underline">
-                    Retry counts
-                </button>
+                    {t('Retry counts')}</button>
             )}
             {isOpen && (
                 <CollectionList
@@ -109,10 +110,9 @@ export const CollectionsSection: React.FC<CollectionsSectionProps> = ({
                                     <Loader2 className="h-5 w-5 animate-spin text-sage-500 motion-reduce:animate-none" />
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-xs font-medium text-gray-600 dark:text-gray-300">Preparing InvokeAI collections…</p>
+                                    <p className="text-xs font-medium text-gray-600 dark:text-gray-300">{t('Preparing InvokeAI collections…')}</p>
                                     <p className="max-w-[190px] text-[10px] text-gray-400 dark:text-gray-500">
-                                        Boards and thumbnails will appear here as they become available.
-                                    </p>
+                                        {t('Boards and thumbnails will appear here as they become available.')}</p>
                                 </div>
                             </div>
                         ) : (
@@ -121,17 +121,16 @@ export const CollectionsSection: React.FC<CollectionsSectionProps> = ({
                                 <FolderOpen className="w-5 h-5 text-sage-400 dark:text-zinc-500" />
                             </div>
                             <div className="space-y-1">
-                                <p className="text-xs font-medium text-gray-600 dark:text-gray-300">No collections yet</p>
+                                <p className="text-xs font-medium text-gray-600 dark:text-gray-300">{t('No collections yet')}</p>
                                 <p className="text-[10px] text-gray-400 dark:text-gray-500 max-w-[180px]">
-                                    Organize your generations into collections for easy access.
-                                </p>
+                                    {t('Organize your generations into collections for easy access.')}</p>
                             </div>
                             <button
                                 onClick={() => startCreation(false)}
                                 className="text-xs bg-sage-500 hover:bg-sage-600 text-white px-3 py-1.5 rounded-lg shadow-sm shadow-sage-500/20 transition-all flex items-center gap-1.5"
                             >
                                 <Plus className="w-3 h-3" />
-                                <span>Create Collection</span>
+                                <span>{t('Create Collection')}</span>
                             </button>
                         </div>
                         )
@@ -140,8 +139,8 @@ export const CollectionsSection: React.FC<CollectionsSectionProps> = ({
                         <div className="ml-auto flex items-center gap-1">
                             {isDirty && !isCreating && (
                                 <TooltipButton
-                                    label="Save Filters as Collection"
-                                    content="Save the current filters as a smart collection"
+                                    label={t('Save Filters as Collection')}
+                                    content={t('Save the current filters as a smart collection')}
                                     onClick={(e) => { e.stopPropagation(); startCreation(true); }}
                                     className="text-sage-600 dark:text-sage-400 hover:text-white hover:bg-sage-500 transition-all bg-sage-50 dark:bg-sage-900/40 border border-sage-500/30 p-1.5 rounded-lg shadow-sm"
                                 >
@@ -149,8 +148,8 @@ export const CollectionsSection: React.FC<CollectionsSectionProps> = ({
                                 </TooltipButton>
                             )}
                             <TooltipButton
-                                label="New Empty Collection"
-                                content="Create a collection without saving the current filters"
+                                label={t('New Empty Collection')}
+                                content={t('Create a collection without saving the current filters')}
                                 onClick={(e) => { e.stopPropagation(); startCreation(false); }}
                                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/5 p-1.5 rounded-lg shadow-sm"
                             >
@@ -165,7 +164,7 @@ export const CollectionsSection: React.FC<CollectionsSectionProps> = ({
                                 type="text"
                                 value={newName}
                                 onChange={(e) => setNewName(e.target.value)}
-                                placeholder={isSavingSearch ? "Save search as..." : "New collection name..."}
+                                placeholder={isSavingSearch ? t('Save search as...') : t('New collection name...')}
                                 className="w-full bg-white dark:bg-zinc-900 border border-gray-300 dark:border-gray-700 rounded-lg px-2 py-1.5 text-xs focus:border-sage-500 outline-none text-gray-900 dark:text-white"
                                 onBlur={() => { !newName && setIsCreating(false); setIsSavingSearch(false); }}
                             />

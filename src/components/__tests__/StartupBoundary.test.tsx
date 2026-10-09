@@ -42,7 +42,7 @@ describe('StartupBoundary', () => {
         render(<StartupBoundary><BrokenChild /></StartupBoundary>);
 
         const fallback = screen.getByRole('alert');
-        expect(fallback.textContent).toContain('Ambit couldn’t start');
+        expect(fallback.textContent).toContain('DV couldn’t start');
         expect(fallback.textContent).toContain('Launch ID: launch-123');
         expect(fallback.textContent).not.toContain('private database path');
         expect((fallback as HTMLElement).style.position).toBe('fixed');
@@ -74,7 +74,7 @@ describe('StartupBoundary', () => {
         view.rerender(<StartupBoundary><ConditionalChild /></StartupBoundary>);
 
         expect(screen.getByRole('alert').textContent).toContain('Something went wrong');
-        expect(screen.getByRole('alert').textContent).not.toContain('Ambit couldn’t start');
+        expect(screen.getByRole('alert').textContent).not.toContain('DV couldn’t start');
         expect(screen.getByRole('alert').textContent).not.toContain('private runtime detail');
         expect(showFailure).not.toHaveBeenCalled();
         expect(diagnostics.fail).not.toHaveBeenCalled();

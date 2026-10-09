@@ -26,6 +26,8 @@ import { MetadataGeneratorField } from './metadata/MetadataGeneratorField';
 import { MetadataModelField } from './metadata/MetadataModelField';
 import { useMetadataDisclosureState } from '../hooks/useMetadataDisclosureState';
 import { useViewerPreferredTab } from '../hooks/useViewerPreferredTab';
+import { useTranslation } from 'react-i18next';
+import { translateRuntimeMessage } from '../../../i18n/statusMessages';
 
 type VideoViewerTab = 'details' | 'metadata' | 'workflow';
 
@@ -85,6 +87,7 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
     canNavigateNext = true,
     canNavigatePrevious = true,
 }) => {
+    const { t } = useTranslation();
     const metadataDisclosure = useMetadataDisclosureState();
     const { addToast } = useToast();
     const collections = useCollectionStore(state => state.collections);
@@ -250,20 +253,20 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
             const displayPath = result.outputPath
                 .replace(/^\/\/\?\/UNC\//i, '//')
                 .replace(/^\/\/\?\//, '');
-            addToast(`Exported ${displayPath}`, 'success');
+            addToast(t('Exported {{displayPath}}', { displayPath: displayPath }), 'success');
         } catch (error) {
-            addToast(`Could not export original: ${String(error)}`, 'error');
+            addToast(t('Could not export original: {{v0}}', { v0: String(error) }), 'error');
         }
     };
 
     const handleOpenExternal = async () => {
         const result = await openFileInDefaultApp(video.id);
-        if (result.status === 'error') addToast(result.error, 'error');
+        if (result.status === 'error') addToast(t(result.error), 'error');
     };
 
     if (!revealed && !video.isMissing) {
         return (
-            <div role="dialog" aria-modal="true" aria-label="Hidden video" className="fixed inset-0 z-[100] flex bg-black text-white">
+            <div role="dialog" aria-modal="true" aria-label={t('Hidden video')} className="fixed inset-0 z-[100] flex bg-black text-white">
                 <MaskedViewerGate
                     mediaLabel="video"
                     onReveal={() => setRevealedVideoId(video.id)}
@@ -274,24 +277,24 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
     }
 
     return (
-        <div role="dialog" aria-modal="true" aria-label={`Video viewer: ${video.filename}`} className="fixed inset-0 z-[100] flex bg-black text-white">
+        <div role="dialog" aria-modal="true" aria-label={t('Video viewer: {{filename}}', { filename: video.filename })} className="fixed inset-0 z-[100] flex bg-black text-white">
             <main
                 className="relative flex min-w-0 flex-1 items-center justify-center bg-black"
                 onClick={event => { if (event.target === event.currentTarget) onClose(); }}
             >
                 <ViewerToolbarFrame filename={video.filename} actions={<>
                     {!video.isMissing && (
-                        <ViewerToolbarButton label="Open in Default App" onClick={() => void handleOpenExternal()}>
+                        <ViewerToolbarButton label={t('Open in Default App')} onClick={() => void handleOpenExternal()}>
                             <ExternalLink />
                         </ViewerToolbarButton>
                     )}
                     {!video.isMissing && (
-                        <ViewerToolbarButton label="Export Original" onClick={() => void handleExport()}>
+                        <ViewerToolbarButton label={t('Export Original')} onClick={() => void handleExport()}>
                             <Save />
                         </ViewerToolbarButton>
                     )}
                     {onToggleFavorite && <ViewerToolbarButton
-                        label={video.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+                        label={video.isFavorite ? t('Remove from Favorites') : t('Add to Favorites')}
                         aria-pressed={video.isFavorite}
                         onClick={() => onToggleFavorite(video.id)}
                     >
@@ -299,7 +302,7 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
                     </ViewerToolbarButton>}
                     {onTogglePin && (
                         <ViewerToolbarButton
-                            label={video.isPinned ? 'Unpin' : 'Pin to Top'}
+                            label={video.isPinned ? t('Unpin') : t('Pin to Top')}
                             aria-pressed={Boolean(video.isPinned)}
                             onClick={() => onTogglePin(video.id, !video.isPinned)}
                             className={video.isPinned ? 'border-sage-500/50 text-sage-400' : ''}
@@ -309,30 +312,30 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
                     )}
                     {onDelete && (
                         <ViewerToolbarButton
-                            label="Remove from Library"
+                            label={t('Remove from Library')}
                             onClick={() => onDelete(video.id)}
                             className="hover:border-red-500/30 hover:bg-red-500/20 hover:text-red-400"
                         >
                             <Trash2 />
                         </ViewerToolbarButton>
                     )}
-                    <ViewerToolbarButton label="Close Viewer (Esc)" onClick={onClose}>
+                    <ViewerToolbarButton label={t('Close Viewer (Esc)')} onClick={onClose}>
                         <X />
                     </ViewerToolbarButton>
                 </>} />
 
                 {video.isMissing ? (
                     <div className="flex max-w-md flex-col items-center rounded-2xl border border-red-500/30 bg-zinc-900 p-8 text-center shadow-2xl">
-                        <h2 className="text-xl font-bold">Source file missing</h2>
-                        <p className="mt-2 text-sm text-zinc-400">Ambit still keeps this library record. Restore the file at its original location or remove the record.</p>
+                        <h2 className="text-xl font-bold">{t('Source file missing')}</h2>
+                        <p className="mt-2 text-sm text-zinc-400">{t('Dvoyna Vault still keeps this library record. Restore the file at its original location or remove the record.')}</p>
                     </div>
                 ) : playbackStatus === 'external_required' ? (
                     <div className="flex max-w-md flex-col items-center rounded-2xl border border-white/10 bg-zinc-900 p-8 text-center">
-                        <h2 className="text-xl font-bold">Playback unavailable here</h2>
-                        <p className="mt-2 text-sm text-zinc-400">The file is still in your library and can be opened with your default video app.</p>
+                        <h2 className="text-xl font-bold">{t('Playback unavailable here')}</h2>
+                        <p className="mt-2 text-sm text-zinc-400">{t('The file is still in your library and can be opened with your default video app.')}</p>
                         <div className="mt-6 flex gap-3">
-                            <button onClick={() => { setPlaybackState({ videoId: video.id, status: 'unknown', url: null }); setPlayerKey(key => key + 1); }} className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2"><RotateCcw className="h-4 w-4" /> Retry</button>
-                            <button onClick={() => void handleOpenExternal()} className="rounded-lg bg-sage-500 px-4 py-2 font-bold">Open externally</button>
+                            <button onClick={() => { setPlaybackState({ videoId: video.id, status: 'unknown', url: null }); setPlayerKey(key => key + 1); }} className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2"><RotateCcw className="h-4 w-4" /> {t('Retry')}</button>
+                            <button onClick={() => void handleOpenExternal()} className="rounded-lg bg-sage-500 px-4 py-2 font-bold">{t('Open externally')}</button>
                         </div>
                     </div>
                 ) : playbackUrl ? (
@@ -353,22 +356,21 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
                             className="max-h-[calc(100vh-8rem)] max-w-full bg-black"
                         />
                         <div className="flex items-center gap-3 text-xs text-zinc-400">
-                            <button type="button" aria-label="Back 10 seconds" onClick={() => seekBy(-10)} className="flex items-center gap-1.5 rounded border border-white/10 bg-zinc-900 px-2.5 py-1.5 text-white hover:bg-white/10">
+                            <button type="button" aria-label={t('Back 10 seconds')} onClick={() => seekBy(-10)} className="flex items-center gap-1.5 rounded border border-white/10 bg-zinc-900 px-2.5 py-1.5 text-white hover:bg-white/10">
                                 <RotateCcw className="h-3.5 w-3.5" /> 10s
                             </button>
                             <label className="flex items-center gap-2">
-                                Playback speed
-                                <select defaultValue="1" onChange={event => { if (playerRef.current) playerRef.current.playbackRate = Number(event.target.value); }} className="rounded border border-white/10 bg-zinc-900 px-2 py-1 text-white">
+                                {t('Playback speed')}<select defaultValue="1" onChange={event => { if (playerRef.current) playerRef.current.playbackRate = Number(event.target.value); }} className="rounded border border-white/10 bg-zinc-900 px-2 py-1 text-white">
                                     <option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="1">1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option><option value="2">2×</option>
                                 </select>
                             </label>
-                            <button type="button" aria-label="Forward 10 seconds" onClick={() => seekBy(10)} className="flex items-center gap-1.5 rounded border border-white/10 bg-zinc-900 px-2.5 py-1.5 text-white hover:bg-white/10">
+                            <button type="button" aria-label={t('Forward 10 seconds')} onClick={() => seekBy(10)} className="flex items-center gap-1.5 rounded border border-white/10 bg-zinc-900 px-2.5 py-1.5 text-white hover:bg-white/10">
                                 10s <RotateCw className="h-3.5 w-3.5" />
                             </button>
                         </div>
                     </div>
                 ) : (
-                    <div role="status" className="text-sm text-zinc-400">Preparing secure playback…</div>
+                    <div role="status" className="text-sm text-zinc-400">{t('Preparing secure playback…')}</div>
                 )}
             </main>
 
@@ -432,15 +434,15 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
                         source={metadataVideo.metadata.fieldSources?.negativePrompt}
                         readOnly={!onUpdateNegativePrompt}
                     />
-                    <MetadataField label="Generation mode" icon={Film} source={metadataVideo.metadata.fieldSources?.generationMode}>
-                        <select aria-label="Generation mode" value={metadataVideo.metadata.generationMode ?? 'unknown'} disabled={!onUpdateGenerationMode} onChange={event => onUpdateGenerationMode?.(video.id, event.target.value as VideoGenerationMode)} className="w-full rounded-lg border border-gray-200 bg-white p-2.5 text-gray-900 disabled:cursor-default disabled:opacity-80 dark:border-white/10 dark:bg-black dark:text-white">
-                            <option value="unknown">Unknown</option>
-                            <option value="text_to_video">Text to video</option>
-                            <option value="image_to_video">Image to video</option>
-                            <option value="first_last_frame_to_video">First/last frame</option>
-                            <option value="video_editing">Video editing</option>
-                            <option value="audio_lip_sync">Audio / lip sync</option>
-                            <option value="guided_video">Guided video</option>
+                    <MetadataField label={t('Generation mode')} icon={Film} source={metadataVideo.metadata.fieldSources?.generationMode}>
+                        <select aria-label={t('Generation mode')} value={metadataVideo.metadata.generationMode ?? 'unknown'} disabled={!onUpdateGenerationMode} onChange={event => onUpdateGenerationMode?.(video.id, event.target.value as VideoGenerationMode)} className="w-full rounded-lg border border-gray-200 bg-white p-2.5 text-gray-900 disabled:cursor-default disabled:opacity-80 dark:border-white/10 dark:bg-black dark:text-white">
+                            <option value="unknown">{t('Unknown')}</option>
+                            <option value="text_to_video">{t('Text to video')}</option>
+                            <option value="image_to_video">{t('Image to video')}</option>
+                            <option value="first_last_frame_to_video">{t('First/last frame')}</option>
+                            <option value="video_editing">{t('Video editing')}</option>
+                            <option value="audio_lip_sync">{t('Audio / lip sync')}</option>
+                            <option value="guided_video">{t('Guided video')}</option>
                         </select>
                     </MetadataField>
                     <MetadataGeneratorField
@@ -474,14 +476,14 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
                         expanded={metadataDisclosure.isExpanded('resources')}
                         onExpandedChange={expanded => metadataDisclosure.setExpanded('resources', expanded)}
                     />
-                    {metadataVideo.metadata.conflicts && metadataVideo.metadata.conflicts.length > 0 && <section className="rounded-lg border border-ember-200 bg-ember-50 p-3 text-xs dark:border-ember-500/30 dark:bg-ember-500/10"><h3 className="font-bold text-ember-600 dark:text-ember-300">Conflicting evidence</h3>{metadataVideo.metadata.conflicts.map((conflict, index) => <p key={`${conflict.field}:${index}`} className="mt-2 text-gray-700 dark:text-zinc-300">{conflict.field}: ignored {conflict.ignoredValue} from {formatSource(conflict.ignoredSource)}</p>)}</section>}
-                    {metadataVideo.metadata.diagnostics && metadataVideo.metadata.diagnostics.length > 0 && <section className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-xs dark:border-white/10 dark:bg-black"><h3 className="font-bold">Diagnostics</h3>{metadataVideo.metadata.diagnostics.map(diagnostic => <p key={diagnostic.code} className="mt-2 text-gray-600 dark:text-zinc-400">{diagnostic.message}</p>)}</section>}
-                    {onRevertMetadata && hasUserOverrides ? <button type="button" onClick={() => onRevertMetadata(video.id)} className="w-full rounded-lg border border-gray-200 px-3 py-2 font-bold hover:bg-gray-100 dark:border-white/10 dark:hover:bg-white/10">Revert user overrides</button> : null}
+                    {metadataVideo.metadata.conflicts && metadataVideo.metadata.conflicts.length > 0 && <section className="rounded-lg border border-ember-200 bg-ember-50 p-3 text-xs dark:border-ember-500/30 dark:bg-ember-500/10"><h3 className="font-bold text-ember-600 dark:text-ember-300">{t('Conflicting evidence')}</h3>{metadataVideo.metadata.conflicts.map((conflict, index) => <p key={`${conflict.field}:${index}`} className="mt-2 text-gray-700 dark:text-zinc-300">{conflict.field}{t(': ignored')} {conflict.ignoredValue} from {formatSource(conflict.ignoredSource)}</p>)}</section>}
+                    {metadataVideo.metadata.diagnostics && metadataVideo.metadata.diagnostics.length > 0 && <section className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-xs dark:border-white/10 dark:bg-black"><h3 className="font-bold">{t('Diagnostics')}</h3>{metadataVideo.metadata.diagnostics.map(diagnostic => <p key={diagnostic.code} className="mt-2 text-gray-600 dark:text-zinc-400">{translateRuntimeMessage(diagnostic.message)}</p>)}</section>}
+                    {onRevertMetadata && hasUserOverrides ? <button type="button" onClick={() => onRevertMetadata(video.id)} className="w-full rounded-lg border border-gray-200 px-3 py-2 font-bold hover:bg-gray-100 dark:border-white/10 dark:hover:bg-white/10">{t('Revert user overrides')}</button> : null}
                 </div>}
 
                 {activeTab === 'workflow' && (metadataVideo.metadata.workflowJson
                     ? <WorkflowInspector key={metadataVideo.id} image={metadataVideo} />
-                    : <p className="p-5 text-sm text-gray-500 dark:text-zinc-400">No trusted workflow evidence was found for this video.</p>)}
+                    : <p className="p-5 text-sm text-gray-500 dark:text-zinc-400">{t('No trusted workflow evidence was found for this video.')}</p>)}
             </ViewerSidebarShell>
         </div>
     );

@@ -1477,7 +1477,7 @@ describe('collectionRepo membership helpers', () => {
         expect(upsertSql).toContain('scoped_collections');
     });
 
-    it('refreshes Invoke board identity without overwriting Ambit collection customizations', async () => {
+    it('refreshes Invoke board identity without overwriting Dvoyna Vault collection customizations', async () => {
         const { upsertInvokeBoardCollection } = await import('../collectionRepo');
 
         await upsertInvokeBoardCollection({

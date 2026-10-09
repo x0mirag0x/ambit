@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import { ChevronDown, ChevronRight, Check, Search, X, LucideIcon, ArrowDownWideNarrow } from 'lucide-react';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
+import { useTranslation } from 'react-i18next';
 
 // --- Section Header ---
 interface SectionHeaderProps {
@@ -202,7 +203,7 @@ interface SearchInputProps {
     className?: string;
 }
 
-export const SearchInput: React.FC<SearchInputProps> = ({ value, onChange, placeholder = "Search...", className }) => (
+export const SearchInput: React.FC<SearchInputProps> = ({ value, onChange, placeholder = "Search...", className }) => { const { t } = useTranslation(); return ((
     <div className={`${className}`}>
         <div className="relative group size-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 group-focus-within:text-sage-500 transition-colors pointer-events-none" />
@@ -216,7 +217,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({ value, onChange, place
             {value && (
                 <button
                     type="button"
-                    aria-label={`Clear ${placeholder}`}
+                    aria-label={t('Clear {{placeholder}}', { placeholder: placeholder })}
                     onClick={() => onChange('')}
                     className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1.5 hover:bg-gray-200 dark:hover:bg-white/10 rounded-lg transition-all"
                 >
@@ -225,7 +226,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({ value, onChange, place
             )}
         </div>
     </div>
-);
+)); };
 
 // --- Sort Dropdown ---
 export interface SortOptionItem {
@@ -253,6 +254,7 @@ export const SortDropdown: React.FC<SortDropdownProps> = ({
     triggerClassName,
     align = 'right'
 }) => {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -273,8 +275,8 @@ export const SortDropdown: React.FC<SortDropdownProps> = ({
     return (
         <div className={`relative ${className}`} ref={dropdownRef}>
             <TooltipButton
-                label={title ?? 'Sort Options'}
-                content={title ?? 'Sort Options'}
+                label={title ?? t('Sort Options')}
+                content={title ?? t('Sort Options')}
                 aria-expanded={isOpen}
                 onClick={() => setIsOpen(!isOpen)}
                 className={resolvedTriggerClass}
@@ -305,7 +307,7 @@ export const SortDropdown: React.FC<SortDropdownProps> = ({
                         >
                             <div className="flex items-center gap-2 font-medium">
                                 {opt.icon && <opt.icon className="w-3 h-3" />}
-                                {opt.label}
+                                {t(opt.label)}
                             </div>
                             {currentValue === opt.id && <Check className="w-3 h-3" />}
                         </button>
@@ -334,6 +336,7 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
     onChange,
     placeholder = "Search..."
 }) => {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -414,7 +417,7 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
                         onClick={handleClear}
                         className="text-[10px] text-sage-600 dark:text-sage-300 hover:text-sage-600 dark:hover:text-sage-300 transition-colors"
                     >
-                        Clear ({selected.length})
+                        {t('Clear (')}{selected.length})
                     </button>
                 )}
             </div>
@@ -426,10 +429,10 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
                 >
                     <span className="truncate">
                         {selected.length === 0
-                            ? 'Select...'
+                            ? t('Select...')
                             : selected.length === 1
                                 ? selected[0]
-                                : `${selected.length} selected`}
+                                : t('{{length}} selected', { length: selected.length })}
                     </span>
                     <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
                 </button>
@@ -448,11 +451,11 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
 
                         <div className="max-h-60 overflow-y-auto space-y-0.5 pr-1">
                             {!hasGroups && filteredOptions.length === 0 && (
-                                <div className="text-xs text-center py-4 text-gray-400 italic">No matches found</div>
+                                <div className="text-xs text-center py-4 text-gray-400 italic">{t('No matches found')}</div>
                             )}
 
                             {hasGroups && filteredGroups.length === 0 && (
-                                <div className="text-xs text-center py-4 text-gray-400 italic">No matches found</div>
+                                <div className="text-xs text-center py-4 text-gray-400 italic">{t('No matches found')}</div>
                             )}
 
                             {/* Render Flat List */}
@@ -462,7 +465,7 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
                             {hasGroups && filteredGroups.map(group => (
                                 <div key={group.label} className="mb-2 last:mb-0">
                                     <div className="px-2 py-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50 dark:bg-white/5 rounded mb-0.5 sticky top-0 backdrop-blur-sm z-10">
-                                        {group.label}
+                                        {t(group.label)}
                                     </div>
                                     <div className="space-y-0.5 pl-1">
                                         {group.items.map(opt => renderOption(opt))}
@@ -557,6 +560,7 @@ interface IconButtonSelectProps {
 }
 
 export const IconButtonSelect: React.FC<IconButtonSelectProps> = ({ label, options, selected, onChange }) => {
+    const { t } = useTranslation();
     const toggleOption = (id: string) => {
         if (selected.includes(id)) {
             onChange(selected.filter(s => s !== id));
@@ -585,7 +589,7 @@ export const IconButtonSelect: React.FC<IconButtonSelectProps> = ({ label, optio
                             <div className={`p-1.5 rounded-lg transition-colors ${isSelected ? 'bg-sage-500/20' : 'bg-gray-100 dark:bg-white/5'}`}>
                                 <Icon className={`w-4 h-4 ${isSelected ? 'text-sage-600 dark:text-sage-300' : 'text-gray-400 dark:text-zinc-500'}`} />
                             </div>
-                            <span className="text-[10px] font-semibold truncate w-full text-center">{opt.label}</span>
+                            <span className="text-[10px] font-semibold truncate w-full text-center">{t(opt.label)}</span>
                         </button>
                     )
                 })}

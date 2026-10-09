@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Code, FileText, Pencil } from 'lucide-react';
 import { MetadataSourceBadge } from './MetadataSourceBadge';
 import { MetadataSectionHeader } from './MetadataSectionHeader';
+import { useTranslation } from 'react-i18next';
 
 type MetadataTextAreaKind = 'positivePrompt' | 'negativePrompt' | 'notes';
 
@@ -63,6 +64,7 @@ export const MetadataTextAreaField: React.FC<MetadataTextAreaFieldProps> = ({
     readContent,
     onCancelEdit,
 }) => {
+    const { t } = useTranslation();
     const field = FIELD_PRESENTATION[kind];
     const Icon = field.icon;
     const textareaId = React.useId();
@@ -116,7 +118,7 @@ export const MetadataTextAreaField: React.FC<MetadataTextAreaFieldProps> = ({
     return (
         <div className={className}>
             <MetadataSectionHeader
-                title={field.label}
+                title={t(field.label)}
                 icon={Icon}
                 iconClassName={field.iconClassName}
                 labelFor={showsReadSurface ? undefined : textareaId}
@@ -136,19 +138,19 @@ export const MetadataTextAreaField: React.FC<MetadataTextAreaFieldProps> = ({
                         aria-labelledby={textareaId + '-heading'}
                         className={'w-full overflow-y-auto whitespace-pre-wrap break-words rounded-xl border p-3 font-sans text-sm text-gray-800 outline-none focus-visible:ring-2 focus-visible:ring-sage-500/50 dark:text-zinc-200 ' + field.heightClassName + ' ' + field.textareaClassName + ' ' + dirtyClassName + (readOnly ? ' cursor-default opacity-80' : '')}
                     >
-                        {value ? readContent : <span className="text-gray-400">{field.placeholder}</span>}
+                        {value ? readContent : <span className="text-gray-400">{t(field.placeholder)}</span>}
                     </div>
                 ) : (
                     <textarea
                         id={textareaId}
-                        aria-label={field.label}
+                        aria-label={t(field.label)}
                         value={value}
                         onChange={onChange}
                         onBlur={handleBlur}
                         onKeyDown={handleKeyDown}
                         autoFocus={readContent !== undefined}
                         readOnly={readOnly}
-                        placeholder={field.placeholder}
+                        placeholder={t(field.placeholder)}
                         className={`w-full resize-none rounded-xl border p-3 font-sans text-sm text-gray-800 outline-none transition-colors placeholder:text-gray-400 dark:text-zinc-200 ${field.heightClassName} ${field.textareaClassName} ${dirtyClassName} ${readOnly ? 'cursor-default opacity-80' : ''}`}
                     />
                 )}

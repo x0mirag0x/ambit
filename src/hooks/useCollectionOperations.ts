@@ -21,6 +21,7 @@ import {
 } from '../services/db/collectionRepo';
 import { useInvokeOwnerScopeStore } from '../stores/invokeOwnerScopeStore';
 import { normalizeCollectionScope } from '../utils/filterState';
+import { useTranslation } from 'react-i18next';
 
 interface UseCollectionOperationsProps {
   collections: Collection[];
@@ -41,6 +42,7 @@ export const useCollectionOperations = ({
   setImages,
   activeCollectionId
 }: UseCollectionOperationsProps) => {
+  const { t } = useTranslation();
   const { addToast } = useToast();
   const queryClient = useQueryClient();
   const maskedKeywords = useSettingsStore(s => getEffectiveMaskedKeywords(s.settings));
@@ -111,18 +113,18 @@ export const useCollectionOperations = ({
     } catch (e) {
       // Rollback
       setAllCollections(prev => prev.filter(c => c.id !== id));
-      addToast("Failed to create collection", "error");
+      addToast(t('Failed to create collection'), "error");
       return;
     }
 
-    addToast(`Collection "${name}" created`, 'success');
+    addToast(t('Collection "{{name}}" created', { name: name }), 'success');
     try {
       await refreshCollections(false, {
         consistency: 'authoritative',
       });
     } catch (error) {
       console.error('[Collections] Failed to refresh after creating collection', error);
-      addToast('Collection created, but the collection list may need a refresh.', 'warning');
+      addToast(t('Collection created, but the collection list may need a refresh.'), 'warning');
     }
   }, [setAllCollections, refreshCollections, addToast, invokeOwnerScope]);
 
@@ -148,7 +150,7 @@ export const useCollectionOperations = ({
     try {
       // If we are clearing filters (filters === undefined), we pass null/undefined to upsert
       await upsertCollection({ ...col, filters: cleanFilters });
-      addToast(cleanFilters ? "Filters updated" : "Collection converted to static", "success");
+      addToast(cleanFilters ? t("Filters updated") : t("Collection converted to static"), "success");
       await refreshCollections();
       if (cleanFilters) {
         void useCollectionStore.getState().refreshSmartCounts({
@@ -160,9 +162,9 @@ export const useCollectionOperations = ({
     } catch (e) {
       // Rollback
       setAllCollections(prev => prev.map(c => c.id === id ? col : c));
-      addToast("Failed to update filters", "error");
+      addToast(t('Failed to update filters'), "error");
     }
-  }, [collections, smartCollections, setAllCollections, refreshCollections, addToast]);
+  }, [collections, smartCollections, setAllCollections, refreshCollections, addToast, t]);
 
   const updateCollectionScope = useCallback(async (
     id: string,
@@ -189,14 +191,14 @@ export const useCollectionOperations = ({
         queryClient.invalidateQueries({ queryKey: ['libraryStats'] }),
         queryClient.invalidateQueries({ queryKey: ['parameterRanges'] }),
       ]);
-      addToast('Collection visibility updated', 'success');
+      addToast(t('Collection visibility updated'), 'success');
       return true;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      addToast(message || 'Failed to update collection visibility', 'error');
+      addToast(message || t('Failed to update collection visibility'), 'error');
       return false;
     }
-  }, [addToast, collections, queryClient, refreshCollections, setFilters, smartCollections]);
+  }, [addToast, collections, queryClient, refreshCollections, setFilters, smartCollections, t]);
 
   const deleteCollection = useCallback(async (id: string) => {
     const original = [...collections, ...smartCollections].find(c => c.id === id);
@@ -205,7 +207,7 @@ export const useCollectionOperations = ({
     try {
       await deleteCollectionFromDb(id);
     } catch (e) {
-      addToast(original.source === 'invoke' ? "Failed to hide collection" : "Failed to delete collection", "error");
+      addToast(original.source === 'invoke' ? t("Failed to hide collection") : t("Failed to delete collection"), "error");
       return false;
     }
 
@@ -213,15 +215,15 @@ export const useCollectionOperations = ({
     if (activeCollectionId === id) {
       setFilters((prev) => ({ ...prev, collectionId: null }));
     }
-    addToast(original.source === 'invoke' ? "Collection hidden" : "Collection deleted", "success");
+    addToast(original.source === 'invoke' ? t("Collection hidden") : t("Collection deleted"), "success");
     try {
       await refreshCollections();
     } catch (e) {
       console.error("[Collections] Failed to refresh after deleting collection", e);
-      addToast("Collection deleted, but the collection list may need a refresh.", "warning");
+      addToast(t('Collection deleted, but the collection list may need a refresh.'), "warning");
     }
     return true;
-  }, [collections, smartCollections, activeCollectionId, setFilters, setAllCollections, refreshCollections, addToast]);
+  }, [collections, smartCollections, activeCollectionId, setFilters, setAllCollections, refreshCollections, addToast, t]);
 
   const resetInvokeCollection = useCallback(async (id: string): Promise<boolean> => {
     const collection = [...collections, ...smartCollections].find(item => item.id === id);
@@ -234,14 +236,14 @@ export const useCollectionOperations = ({
         queryClient.invalidateQueries({ queryKey: ['images'] }),
         queryClient.invalidateQueries({ queryKey: ['libraryStats'] }),
       ]);
-      addToast('InvokeAI collection reset', 'success');
+      addToast(t('InvokeAI collection reset'), 'success');
       return true;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      addToast(message || 'Failed to reset InvokeAI collection', 'error');
+      addToast(message || t('Failed to reset InvokeAI collection'), 'error');
       return false;
     }
-  }, [addToast, collections, queryClient, refreshCollections, smartCollections]);
+  }, [addToast, collections, queryClient, refreshCollections, smartCollections, t]);
 
   const renameCollection = useCallback(async (id: string, newName: string) => {
     const col = [...collections, ...smartCollections].find(c => c.id === id);
@@ -252,14 +254,14 @@ export const useCollectionOperations = ({
 
     try {
       await upsertCollection({ ...col, name: newName });
-      addToast("Collection renamed", "success");
+      addToast(t('Collection renamed'), "success");
       await refreshCollections();
     } catch (e) {
       // Rollback
       setAllCollections(prev => prev.map(c => c.id === id ? col : c));
-      addToast("Failed to rename collection", "error");
+      addToast(t('Failed to rename collection'), "error");
     }
-  }, [collections, smartCollections, setAllCollections, refreshCollections, addToast]);
+  }, [collections, smartCollections, setAllCollections, refreshCollections, addToast, t]);
 
   const setCollectionColor = useCallback(async (id: string, color: string | undefined) => {
     const col = [...collections, ...smartCollections].find(c => c.id === id);
@@ -291,14 +293,14 @@ export const useCollectionOperations = ({
 
     try {
       await upsertCollection({ ...col, isArchived: newState });
-      addToast(newState ? "Collection archived" : "Collection unarchived", "info");
+      addToast(newState ? t("Collection archived") : t("Collection unarchived"), "info");
       refreshCollections(true);
     } catch (e) {
       // Rollback
       setAllCollections(prev => prev.map(c => c.id === id ? col : c));
-      addToast("Failed to update archive status", "error");
+      addToast(t('Failed to update archive status'), "error");
     }
-  }, [collections, smartCollections, activeCollectionId, setFilters, setAllCollections, refreshCollections, addToast]);
+  }, [collections, smartCollections, activeCollectionId, setFilters, setAllCollections, refreshCollections, addToast, t]);
 
   const togglePinCollection = useCallback(async (id: string) => {
     const col = [...collections, ...smartCollections].find(c => c.id === id);
@@ -326,11 +328,11 @@ export const useCollectionOperations = ({
       try {
         await addImgsToCol(collectionId, imageIds);
       } catch (e) {
-        addToast("Failed to add to collection", "error");
+        addToast(t('Failed to add to collection'), "error");
         return false;
       }
 
-      addToast('Added to collection', 'success');
+      addToast(t('Added to collection'), 'success');
       try {
         await Promise.all([
           refreshCollections(),
@@ -358,7 +360,7 @@ export const useCollectionOperations = ({
       try {
         await removeImgsFromCol(collectionId, imageIds);
       } catch (e) {
-        addToast("Failed to remove from collection", "error");
+        addToast(t('Failed to remove from collection'), "error");
         return false;
       }
 
@@ -370,7 +372,7 @@ export const useCollectionOperations = ({
         setImages(prev => prev.filter(img => !imageIds.includes(img.id)));
       }
 
-      addToast("Removed from collection", "info");
+      addToast(t('Removed from collection'), "info");
       try {
         await Promise.all([
           refreshCollections(),
@@ -399,7 +401,7 @@ export const useCollectionOperations = ({
     try {
       await moveImgsBetweenCols(sourceId, targetId, imageIds);
     } catch (e) {
-      addToast("Failed to move images", "error");
+      addToast(t('Failed to move images'), "error");
       return false;
     }
 
@@ -407,7 +409,7 @@ export const useCollectionOperations = ({
       setImages(prev => prev.filter(img => !imageIds.includes(img.id)));
     }
 
-    addToast(`Moved images to ${targetCol.name}`, 'success');
+    addToast(t('Moved images to {{name}}', { name: targetCol.name }), 'success');
     try {
       await Promise.all([
         refreshCollections(),
@@ -416,7 +418,7 @@ export const useCollectionOperations = ({
       ]);
     } catch (e) {
       console.error("[Collections] Failed to refresh after moving images", e);
-      addToast("Images moved, but collection views may need a refresh.", "warning");
+      addToast(t('Images moved, but collection views may need a refresh.'), "warning");
     }
     refreshAffectedCollectionThumbnails([sourceCol, targetCol]);
     return true;
@@ -425,7 +427,7 @@ export const useCollectionOperations = ({
   const setCollectionThumbnail = useCallback(async (collectionId: string, image: AIImage) => {
     const col = [...collections, ...smartCollections].find(c => c.id === collectionId);
     if (!col) {
-      addToast("Collection not found", "error");
+      addToast(t('Collection not found'), "error");
       return;
     }
 
@@ -445,7 +447,7 @@ export const useCollectionOperations = ({
 
     try {
       await setCollectionCustomThumbnail(collectionId, image.id);
-      addToast("Thumbnail updated", "success");
+      addToast(t('Thumbnail updated'), "success");
       void refreshCollections(true).catch((error) => {
         console.error('[Collections] Failed to reconcile collection thumbnail state', error);
       });
@@ -455,14 +457,14 @@ export const useCollectionOperations = ({
     } catch (e) {
       setAllCollections(prev => prev.map(c => c.id === collectionId ? col : c));
       console.error('[Collections] Failed to set collection thumbnail', e);
-      addToast("Failed to update thumbnail", "error");
+      addToast(t('Failed to update thumbnail'), "error");
     }
   }, [collections, smartCollections, setAllCollections, refreshCollections, queryClient, addToast, maskedKeywords]);
 
   const resetCollectionThumbnail = useCallback(async (id: string) => {
     const col = [...collections, ...smartCollections].find(c => c.id === id);
     if (!col) {
-      addToast("Collection not found", "error");
+      addToast(t('Collection not found'), "error");
       return;
     }
 
@@ -477,7 +479,7 @@ export const useCollectionOperations = ({
 
     try {
       await setCollectionCustomThumbnail(id, null);
-      addToast("Thumbnail reset", "info");
+      addToast(t('Thumbnail reset'), "info");
       void refreshCollections(true).catch((error) => {
         console.error('[Collections] Failed to reconcile collection thumbnail reset', error);
       });
@@ -487,7 +489,7 @@ export const useCollectionOperations = ({
     } catch (e) {
       setAllCollections(prev => prev.map(c => c.id === id ? col : c));
       console.error('[Collections] Failed to reset collection thumbnail', e);
-      addToast("Failed to reset thumbnail", "error");
+      addToast(t('Failed to reset thumbnail'), "error");
     }
   }, [collections, smartCollections, setAllCollections, refreshCollections, queryClient, addToast]);
 

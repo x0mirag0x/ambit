@@ -10,6 +10,8 @@ import type { ImportResult } from '../../../services/importService';
 import { isImportSourceCancelled, isImportSourceCompleted } from '../../../utils/importSourceStatus';
 import { areDeveloperFeaturesEnabled } from '../../../utils/settingsUtils';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
+import { useTranslation } from 'react-i18next';
+import { translateRuntimeMessage } from '../../../i18n/statusMessages';
 
 interface TabProps {
     settings: AppSettings;
@@ -37,6 +39,7 @@ const variantToImportTool = (variant?: WebUIVariant): GeneratorTool =>
     variantToGeneratorTool(variant) ?? GeneratorTool.UNKNOWN;
 
 export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings, onScanFolder }) => {
+    const { t } = useTranslation();
     const {
         refreshCollections
     } = useLibraryContext();
@@ -101,7 +104,7 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
         const toLink = candidates.filter(c => selectedPaths.has(c.path));
         if (!onScanFolder) {
             setLocalTestResult({ success: false, message: "Import service is unavailable." });
-            addToast("Import service is unavailable", "error");
+            addToast(t('Import service is unavailable'), "error");
             return;
         }
 
@@ -216,7 +219,7 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
                 }));
             }
             setLocalTestResult({ success: false, message: "Use Check Console for details" });
-            addToast("Import failed", "error");
+            addToast(t('Import failed'), "error");
         } finally {
             setIsDiscovering(false);
             setCandidates([]); // Clear selection
@@ -234,15 +237,13 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
 
             <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6 shadow-sm relative overflow-hidden group">
                 <h4 className="mb-6 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-sage-600 dark:text-sage-300">
-                    <Palette className="w-4 h-4" /> Core Configuration
-                </h4>
+                    <Palette className="w-4 h-4" /> {t('Core Configuration')}</h4>
 
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="relative">
                             <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3 px-1">
-                                Installation or Archive Path
-                            </label>
+                                {t('Installation or Archive Path')}</label>
                             <div className="flex gap-2">
                                 <div className="flex-1 relative group">
                                     <input
@@ -252,14 +253,14 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
                                             const a1111Path = e.target.value;
                                             setSettings(prev => ({ ...prev, a1111Path }));
                                         }}
-                                        placeholder="e.g. C:\\StableDiffusion or C:\\MyArchive"
+                                        placeholder={t('e.g. C:\\\\StableDiffusion or C:\\\\MyArchive')}
                                         className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:border-sage-500 focus:ring-1 focus:ring-sage-500/50 outline-none text-gray-900 dark:text-white font-mono transition-all"
                                     />
                                     <Folder className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-sage-500 transition-colors" />
                                 </div>
                                 <TooltipButton
-                                    label="Browse for Stable Diffusion Folder"
-                                    content="Browse for Stable Diffusion Folder"
+                                    label={t('Browse for Stable Diffusion Folder')}
+                                    content={t('Browse for Stable Diffusion Folder')}
                                     onClick={async () => {
                                         try {
                                             const { open } = await import('@tauri-apps/plugin-dialog');
@@ -279,19 +280,18 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
 
                         <div className="relative">
                             <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3 px-1">
-                                Installation Type
-                            </label>
+                                {t('Installation Type')}</label>
                             <div className="relative">
                                 <select
                                     value={forceVariant}
                                     onChange={(e) => setForceVariant(e.target.value as WebUIVariant | 'Auto')}
                                     className="w-full bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm focus:border-sage-500 focus:ring-1 focus:ring-sage-500/50 outline-none text-gray-900 dark:text-white font-bold transition-all appearance-none"
                                 >
-                                    <option value="Auto">Auto-Detect (Recommended)</option>
-                                    <option value={WebUIVariant.A1111}>SD WebUI (Generic / A1111)</option>
-                                    <option value={WebUIVariant.FORGE}>Stable Diffusion Forge</option>
-                                    <option value={WebUIVariant.SDNEXT}>SD.Next (Vladmandic)</option>
-                                    <option value={WebUIVariant.ANAPNOE}>Anapnoe WebUI</option>
+                                    <option value="Auto">{t('Auto-Detect (Recommended)')}</option>
+                                    <option value={WebUIVariant.A1111}>{t('SD WebUI (Generic / A1111)')}</option>
+                                    <option value={WebUIVariant.FORGE}>{t('Stable Diffusion Forge')}</option>
+                                    <option value={WebUIVariant.SDNEXT}>{t('SD.Next (Vladmandic)')}</option>
+                                    <option value={WebUIVariant.ANAPNOE}>{t('Anapnoe WebUI')}</option>
                                 </select>
                                 <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
                                     <ChevronDown className="w-4 h-4 text-gray-500" />
@@ -301,8 +301,7 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
                     </div>
 
                     <p className="text-[10px] text-gray-500 mt-3 flex items-center gap-1.5 opacity-80 px-1">
-                        <Info className="w-3 h-3" /> Select the root of your SD installation (containing webui.py) or any archive folder.
-                    </p>
+                        <Info className="w-3 h-3" /> {t('Select the root of your SD installation (containing webui.py) or any archive folder.')}</p>
                 </div>
 
                 <div className="pt-6 border-t border-black/5 dark:border-white/5 flex flex-col gap-6">
@@ -319,12 +318,11 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
                             {isDiscovering ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                    Scanning...
-                                </>
+                                    {t('Scanning...')}</>
                             ) : (
                                 <>
                                     <FolderSearch className="w-4 h-4" />
-                                    {forceVariant === 'Auto' ? 'Scan for Folders' : `Scan as ${forceVariant}`}
+                                    {forceVariant === 'Auto' ? t('Scan for Folders') : t('Scan as {{forceVariant}}', { forceVariant: forceVariant })}
                                 </>
                             )}
                         </button>
@@ -341,7 +339,7 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
                             ) : (
                                 <XCircle className="h-4 w-4 shrink-0" />
                             )}
-                            <span>{localTestResult.message}</span>
+                            <span>{translateRuntimeMessage(localTestResult.message)}</span>
                         </div>
                     )}
 
@@ -349,20 +347,19 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
                         <div className="space-y-4 animate-in fade-in duration-150 motion-reduce:animate-none">
                             <div className="flex items-center justify-between px-1">
                                 <div className="flex flex-col gap-1">
-                                    <h5 className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Discovery Results</h5>
+                                    <h5 className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">{t('Discovery Results')}</h5>
                                     {!showAllFolders && hiddenCount > 0 && (
-                                        <span className="text-[9px] text-gray-500 font-medium">Showing standard output folders ({displayedCandidates.length} of {candidates.length})</span>
+                                        <span className="text-[9px] text-gray-500 font-medium">{t('Showing standard output folders (')}{displayedCandidates.length} of {candidates.length})</span>
                                     )}
                                     {candidates.some(c => c.variant && c.variant !== 'Unknown') ? (
                                         <span className="text-[10px] bg-harbor-500/10 text-harbor-600 dark:text-harbor-300 px-2 py-0.5 rounded-md font-bold mt-1 inline-block w-fit">
-                                            Detected: {candidates.find(c => c.variant && c.variant !== 'Unknown')?.variant}
+                                            {t('Detected:')} {candidates.find(c => c.variant && c.variant !== 'Unknown')?.variant}
                                         </span>
                                     ) : (
                                         forceVariant === 'Auto' && (
                                             <span className="text-[10px] bg-ember-500/10 text-ember-600 dark:text-ember-300 px-2 py-0.5 rounded-md font-bold mt-1 inline-block w-fit flex items-center gap-1">
                                                 <Info className="w-3 h-3" />
-                                                Generic WebUI detected. Select specific Installation Type above for correct image tagging.
-                                            </span>
+                                                {t('Generic WebUI detected. Select specific Installation Type above for correct image tagging.')}</span>
                                         )
                                     )}
                                 </div>
@@ -372,13 +369,13 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
                                             <input
                                                 type="checkbox"
                                                 role="switch"
-                                                aria-label="Show Non-Standard Folders"
+                                                aria-label={t('Show Non-Standard Folders')}
                                                 aria-checked={showAllFolders}
                                                 className="peer sr-only"
                                                 checked={showAllFolders}
                                                 onChange={(e) => setShowAllFolders(e.target.checked)}
                                             />
-                                            <span className="text-[10px] font-bold text-gray-500 group-hover:text-sage-600 transition-colors uppercase tracking-tight">Show non-standard folders</span>
+                                            <span className="text-[10px] font-bold text-gray-500 group-hover:text-sage-600 transition-colors uppercase tracking-tight">{t('Show non-standard folders')}</span>
                                             <div
                                                 className={`w-8 h-4 rounded-full relative transition-colors peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-sage-500/50 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-white dark:peer-focus-visible:ring-offset-slate-950 ${showAllFolders ? 'bg-sage-500' : 'bg-gray-300 dark:bg-white/10'}`}
                                             >
@@ -394,10 +391,10 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
                                 <table className="w-full text-left border-collapse">
                                     <thead>
                                         <tr className="border-b border-black/5 dark:border-white/5 bg-gray-100/50 dark:bg-white/5">
-                                            <th className="px-4 py-3 text-[9px] font-black text-gray-400 uppercase tracking-widest w-10">Link</th>
-                                            <th className="px-4 py-3 text-[9px] font-black text-gray-400 uppercase tracking-widest">Folder Name / Path</th>
-                                            <th className="px-4 py-3 text-[9px] font-black text-gray-400 uppercase tracking-widest w-32">Type</th>
-                                            <th className="px-4 py-3 text-[9px] font-black text-gray-400 uppercase tracking-widest w-24 text-right">Images</th>
+                                            <th className="px-4 py-3 text-[9px] font-black text-gray-400 uppercase tracking-widest w-10">{t('Link')}</th>
+                                            <th className="px-4 py-3 text-[9px] font-black text-gray-400 uppercase tracking-widest">{t('Folder Name / Path')}</th>
+                                            <th className="px-4 py-3 text-[9px] font-black text-gray-400 uppercase tracking-widest w-32">{t('Type')}</th>
+                                            <th className="px-4 py-3 text-[9px] font-black text-gray-400 uppercase tracking-widest w-24 text-right">{t('Images')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-black/5 dark:divide-white/5">
@@ -407,7 +404,7 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
                                                     <label className="flex items-center justify-center cursor-pointer">
                                                         <input
                                                             type="checkbox"
-                                                            aria-label={`Select ${c.path}`}
+                                                            aria-label={t('Select {{path}}', { path: c.path })}
                                                             className="peer sr-only"
                                                             checked={selectedPaths.has(c.path)}
                                                             onChange={() => toggleSelection(c.path)}
@@ -425,7 +422,7 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
                                                         <span className="text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
                                                             <Folder className="w-3.5 h-3.5 text-gray-400" />
                                                             {c.name}
-                                                            {c.isAlreadyLinked && <span className="text-[8px] bg-gray-200 dark:bg-white/10 text-gray-500 px-1.5 py-0.5 rounded uppercase font-black">Linked</span>}
+                                                            {c.isAlreadyLinked && <span className="text-[8px] bg-gray-200 dark:bg-white/10 text-gray-500 px-1.5 py-0.5 rounded uppercase font-black">{t('Linked')}</span>}
                                                         </span>
                                                         <span className="text-[10px] text-gray-500 font-mono truncate max-w-md opacity-60">
                                                             {c.path.replace(settings.a1111Path || '', '...')}
@@ -445,10 +442,10 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
                                                     >
                                                         <option value="txt2img">txt2img</option>
                                                         <option value="img2img">img2img</option>
-                                                        <option value="extras">Extras</option>
-                                                        <option value="grid">Grids</option>
-                                                        <option value="saved">Saved</option>
-                                                        <option value="unknown">Unknown</option>
+                                                        <option value="extras">{t('Extras')}</option>
+                                                        <option value="grid">{t('Grids')}</option>
+                                                        <option value="saved">{t('Saved')}</option>
+                                                        <option value="unknown">{t('Unknown')}</option>
                                                     </select>
                                                 </td>
                                                 <td className="px-4 py-3 text-right">
@@ -473,8 +470,8 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
                                 >
                                     <Plus className="w-4 h-4" />
                                     {candidates.some(c => selectedPaths.has(c.path) && c.isAlreadyLinked)
-                                        ? `Link/Sync ${selectedPaths.size} Folders`
-                                        : `Link & Import ${selectedPaths.size} Folders`}
+                                        ? t('Link/Sync {{size}} Folders', { size: selectedPaths.size })
+                                        : t('Link & Import {{size}} Folders', { size: selectedPaths.size })}
                                 </button>
                             </div>
 
@@ -486,8 +483,7 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
                             <details className="group">
                                 <summary className="text-[10px] font-black uppercase tracking-widest text-gray-400 cursor-pointer select-none hover:text-sage-500 transition-colors list-none flex items-center gap-2">
                                     <span className="group-open:rotate-90 transition-transform">â–¸</span>
-                                    View Scan Debug Log ({scanLogs.length} entries)
-                                </summary>
+                                    {t('View Scan Debug Log (')}{scanLogs.length} {t('entries)')}</summary>
                                 <div className="mt-2 max-h-60 overflow-y-auto whitespace-pre-wrap rounded-lg border border-white/10 bg-black/90 p-3 font-mono text-[10px] text-sage-300 shadow-inner">
                                     {scanLogs.join('\n')}
                                 </div>

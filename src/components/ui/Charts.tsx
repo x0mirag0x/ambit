@@ -7,6 +7,7 @@ import { AIImage } from '../../types';
 import { useLibraryContext } from '../../hooks/useLibraryContext';
 import { useLibraryStore } from '../../stores/libraryStore';
 import { WordCloud } from './stats/WordCloud';
+import { useTranslation } from 'react-i18next';
 
 interface ChartsProps {
     images: AIImage[];
@@ -31,12 +32,13 @@ type ModelChartStat = {
 
 const SKELETON_BAR_WIDTHS = ['92%', '76%', '84%', '63%', '71%'];
 
-const formatAnalysisTarget = (globalTotal: number) =>
+const formatAnalysisTarget = (globalTotal: number, translate: (key: string, options?: Record<string, string>) => string) =>
     globalTotal > 0
-        ? `Analyzing ${globalTotal.toLocaleString()} library images`
-        : 'Analyzing library images';
+        ? translate('Analyzing {{total}} library images', { total: globalTotal.toLocaleString() })
+        : translate('Analyzing library images');
 
 export const StatsDashboard: React.FC<ChartsProps> = ({ images, onFilter }) => {
+    const { t } = useTranslation();
     const setKeywordStatsEnabled = useLibraryStore(state => state.setKeywordStatsEnabled);
     // Use DB-backed global stats
     const {
@@ -51,7 +53,7 @@ export const StatsDashboard: React.FC<ChartsProps> = ({ images, onFilter }) => {
     const modelChartStats: ModelChartStat[] = modelStats ?? [];
     const maxModelCount = Math.max(1, ...modelChartStats.map(stat => stat.count));
     const shouldShowWordCloudLoading = isStatsSummaryLoading || (isKeywordStatsLoading && keywordStats.length === 0);
-    const analysisTargetLabel = formatAnalysisTarget(globalTotal);
+    const analysisTargetLabel = formatAnalysisTarget(globalTotal, t);
 
     const [showTip, setShowTip] = useState(true);
 
@@ -73,9 +75,9 @@ export const StatsDashboard: React.FC<ChartsProps> = ({ images, onFilter }) => {
                             <div className="p-2 bg-sage-100 dark:bg-sage-900/30 rounded-lg text-sage-600 dark:text-sage-300">
                                 <BarChart3 className="w-5 h-5" />
                             </div>
-                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Gallery Statistics</h2>
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('Gallery Statistics')}</h2>
                         </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 pl-1">Analyze your generation habits, models, and prompts.</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 pl-1">{t('Analyze your generation habits, models, and prompts.')}</p>
                     </div>
                 </div>
             </div>
@@ -89,10 +91,10 @@ export const StatsDashboard: React.FC<ChartsProps> = ({ images, onFilter }) => {
                                 <Lightbulb className="w-5 h-5" />
                             </div>
                             <div className="flex-1 pr-8">
-                                <h4 className="mb-1 text-sm font-bold text-harbor-600 dark:text-harbor-300">Tip of the Day</h4>
-                                <p className="text-sm text-harbor-600 dark:text-harbor-300">{randomTip}</p>
+                                <h4 className="mb-1 text-sm font-bold text-harbor-600 dark:text-harbor-300">{t('Tip of the Day')}</h4>
+                                <p className="text-sm text-harbor-600 dark:text-harbor-300">{t(randomTip)}</p>
                             </div>
-                            <button type="button" aria-label="Dismiss Tip" onClick={() => setShowTip(false)} className="absolute right-2 top-2 p-1 text-harbor-600 hover:text-harbor-600 dark:text-harbor-300 dark:hover:text-harbor-300">
+                            <button type="button" aria-label={t('Dismiss Tip')} onClick={() => setShowTip(false)} className="absolute right-2 top-2 p-1 text-harbor-600 hover:text-harbor-600 dark:text-harbor-300 dark:hover:text-harbor-300">
                                 <X className="w-4 h-4" />
                             </button>
                         </div>
@@ -100,21 +102,21 @@ export const StatsDashboard: React.FC<ChartsProps> = ({ images, onFilter }) => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
                         <StatCard
-                            label="Total Items"
+                            label={t('Total Items')}
                             value={totalItems ?? totalGenerations}
                             isLoading={isStatsSummaryLoading}
                             loadingText={analysisTargetLabel}
                         />
-                        <StatCard label="Images" value={totalImages} isLoading={isStatsSummaryLoading} />
-                        <StatCard label="Videos" value={totalVideos ?? 0} isLoading={isStatsSummaryLoading} />
+                        <StatCard label={t('Images')} value={totalImages} isLoading={isStatsSummaryLoading} />
+                        <StatCard label={t('Videos')} value={totalVideos ?? 0} isLoading={isStatsSummaryLoading} />
                         <StatCard
-                            label="Avg. Steps"
+                            label={t('Avg. Steps')}
                             value={avgSteps > 0 ? avgSteps : '—'}
                             isLoading={isStatsSummaryLoading}
-                            loadingText="Computing generation summary"
+                            loadingText={t('Computing generation summary')}
                         />
                         <StatCard
-                            label="Storage Used"
+                            label={t('Storage Used')}
                             value={`${estSizeMB} MB`}
                             isLoading={isStatsSummaryLoading}
                             loadingText="Measuring library files"
@@ -124,7 +126,7 @@ export const StatsDashboard: React.FC<ChartsProps> = ({ images, onFilter }) => {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Bar Chart */}
                         <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-white/10 rounded-xl p-6 h-80 shadow-sm flex flex-col">
-                            <h3 className="text-sm font-bold text-gray-400 mb-6 uppercase tracking-wider flex-shrink-0">Generations per Model (Click to Filter)</h3>
+                            <h3 className="text-sm font-bold text-gray-400 mb-6 uppercase tracking-wider flex-shrink-0">{t('Generations per Model (Click to Filter)')}</h3>
                             <div className="flex-1 min-h-0 w-full overflow-y-auto custom-scrollbar pr-1 space-y-3">
                                 {isStatsSummaryLoading ? (
                                     <div className="h-full flex flex-col justify-center gap-4">
@@ -147,10 +149,10 @@ export const StatsDashboard: React.FC<ChartsProps> = ({ images, onFilter }) => {
                                     </div>
                                 ) : modelChartStats.length === 0 ? (
                                     <div className="h-full flex items-center justify-center text-xs uppercase tracking-wider text-gray-400">
-                                        No model stats found
-                                    </div>
+                                        {t('No model stats found')}</div>
                                 ) : modelChartStats.map((stat, index) => {
                                     const widthPercent = Math.max(6, Math.round((stat.count / maxModelCount) * 100));
+                                    const modelLabel = (stat.fullName ?? stat.name) === 'Unknown' ? t('Unknown') : (stat.fullName ?? stat.name);
                                     const colorClass = [
                                         'bg-indigo-500',
                                         'bg-violet-500',
@@ -163,7 +165,7 @@ export const StatsDashboard: React.FC<ChartsProps> = ({ images, onFilter }) => {
                                             key={`${stat.fullName ?? stat.name}-${index}`}
                                             type="button"
                                             className="group w-full text-left rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors focus:outline-none focus:ring-2 focus:ring-sage-500/60"
-                                            title={stat.fullName ?? stat.name}
+                                            title={modelLabel}
                                             onClick={() => {
                                                 if (typeof stat.fullName === 'string') {
                                                     onFilter('model', stat.fullName);
@@ -172,7 +174,7 @@ export const StatsDashboard: React.FC<ChartsProps> = ({ images, onFilter }) => {
                                         >
                                             <div className="flex items-center justify-between gap-3 mb-1">
                                                 <span className="text-xs font-medium text-gray-700 dark:text-gray-200 truncate">
-                                                    {stat.fullName ?? stat.name}
+                                                    {modelLabel}
                                                 </span>
                                                 <span className="text-xs font-mono text-gray-500 dark:text-gray-400 shrink-0">
                                                     {stat.count.toLocaleString()}
@@ -193,7 +195,7 @@ export const StatsDashboard: React.FC<ChartsProps> = ({ images, onFilter }) => {
                         {/* Word Cloud */}
                         <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-white/10 rounded-xl p-6 h-80 shadow-sm flex flex-col relative overflow-hidden group">
                             <h3 className="text-sm font-bold text-gray-400 mb-4 uppercase tracking-wider flex items-center justify-between">
-                                <span>Top Prompt Keywords</span>
+                                <span>{t('Top Prompt Keywords')}</span>
                                 {isFiltering && <div className="h-4 w-4 animate-spin rounded-full border-2 border-sage-500/20 border-t-sage-500" />}
                             </h3>
                             <div className="flex-1 min-h-0">

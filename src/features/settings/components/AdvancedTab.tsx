@@ -9,9 +9,10 @@ import { useLibraryContext } from '../../../hooks/useLibraryContext';
 import { useLibraryStore } from '../../../stores/libraryStore';
 import { BackupSettings } from './BackupSettings';
 import { useToast } from '../../../hooks/useToast';
-import { APP_NAME } from '../../../constants/app';
+import { APP_FULL_NAME } from '../../../constants/app';
 import { AppUpdaterStatus } from '../../../hooks/useAppUpdater';
 import { unwrap } from '../../../utils/spectaUtils';
+import { useTranslation } from 'react-i18next';
 
 interface TabProps {
     settings: AppSettings;
@@ -43,6 +44,7 @@ export const AdvancedTab: React.FC<TabProps> = ({
     onNavigateToMaintenance,
     onClose,
 }) => {
+    const { t } = useTranslation();
     const { cleanLibrary } = useLibraryContext();
     const { addToast } = useToast();
 
@@ -76,7 +78,7 @@ export const AdvancedTab: React.FC<TabProps> = ({
         }
 
         if (updateStatus === 'installing') {
-            return 'Installing update. Ambit may restart or close to finish.';
+            return 'Installing update. Dvoyna Vault may restart or close to finish.';
         }
 
         if (updateStatus === 'error' && updateErrorMessage) {
@@ -87,7 +89,7 @@ export const AdvancedTab: React.FC<TabProps> = ({
             return 'Checking GitHub Releases for a newer build.';
         }
 
-        return 'Automatically checks GitHub Releases once each time Ambit starts.';
+        return 'Automatically checks GitHub Releases once each time Dvoyna Vault starts.';
     })();
 
     const handlePurge = async () => {
@@ -99,13 +101,13 @@ export const AdvancedTab: React.FC<TabProps> = ({
             await cleanLibrary();
             // In production, the app restarts automatically, so this might not be seen.
             // But in case of delay or dev mode:
-            addToast('Purge scheduled. Please restart application manually.', 'success');
+            addToast(t('Purge scheduled. Please restart application manually.'), 'success');
             setIsPurging(false);
             useLibraryStore.getState().setBackgroundHealingPaused(false);
             closeConfirm();
         } catch (e) {
             console.error('[Purge] Failed:', e);
-            addToast('Failed to purge database', 'error');
+            addToast(t('Failed to purge database'), 'error');
             setIsPurging(false);
             useLibraryStore.getState().setBackgroundHealingPaused(false);
             closeConfirm();
@@ -115,7 +117,7 @@ export const AdvancedTab: React.FC<TabProps> = ({
     const handleLogLevelChange = (value: string) => {
         if (!isLogLevel(value)) return;
         setSettings(prev => ({ ...prev, logLevel: value }));
-        addToast(`Console log level set to ${value.toUpperCase()}`, 'success');
+        addToast(t('Console log level set to {{v0}}', { v0: value.toUpperCase() }), 'success');
     };
 
     const handleOpenMaintenance = () => {
@@ -126,10 +128,10 @@ export const AdvancedTab: React.FC<TabProps> = ({
     const handleShowAppLogFolder = async () => {
         try {
             await unwrap(commands.showAppLogFolder());
-            addToast('Opened app logs folder', 'success');
+            addToast(t('Opened app logs folder'), 'success');
         } catch (error) {
             console.error('[Support] Failed to open app logs folder:', error);
-            addToast('Failed to open app logs folder', 'error');
+            addToast(t('Failed to open app logs folder'), 'error');
         }
     };
 
@@ -142,7 +144,7 @@ export const AdvancedTab: React.FC<TabProps> = ({
 
             const version = await getVersion().catch(() => 'unknown');
             const diagnosticsText = [
-                `${APP_NAME} Support Diagnostics`,
+                `${APP_FULL_NAME} Support Diagnostics`,
                 `App version: ${version}`,
                 `Console log level: ${settings.logLevel || 'info'}`,
                 `Active catalog: ${diagnostics.activeDbPath || diagnostics.dbPath}`,
@@ -159,10 +161,10 @@ export const AdvancedTab: React.FC<TabProps> = ({
             ].join('\n');
 
             await navigator.clipboard.writeText(diagnosticsText);
-            addToast('Diagnostics copied to clipboard', 'success');
+            addToast(t('Diagnostics copied to clipboard'), 'success');
         } catch (error) {
             console.error('[Support] Failed to copy diagnostics:', error);
-            addToast('Failed to copy diagnostics', 'error');
+            addToast(t('Failed to copy diagnostics'), 'error');
         }
     };
 
@@ -210,7 +212,7 @@ export const AdvancedTab: React.FC<TabProps> = ({
                     <div className="space-y-4">
                         <div className="flex items-center gap-2 px-1">
                             <Database className="w-4 h-4 text-sage-500" />
-                            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Database & Backups</h4>
+                            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t('Database & Backups')}</h4>
                         </div>
 
                         {/* Backup Settings Component */}
@@ -218,22 +220,21 @@ export const AdvancedTab: React.FC<TabProps> = ({
 
                         <div className="flex items-center gap-2 px-1 pt-2">
                             <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-300" />
-                            <h4 className="text-xs font-bold text-red-600 dark:text-red-300 uppercase tracking-wider">Danger Zone</h4>
+                            <h4 className="text-xs font-bold text-red-600 dark:text-red-300 uppercase tracking-wider">{t('Danger Zone')}</h4>
                         </div>
 
                         {/* Purge Database - Moved here but kept red */}
                         <div className="bg-red-50/50 dark:bg-red-500/5 border border-red-100 dark:border-red-500/10 rounded-xl overflow-hidden p-6 flex items-center justify-between">
                             <div>
-                                <div className="text-sm font-bold text-red-600 dark:text-red-300">Purge Database</div>
-                                <div className="text-xs text-red-600/70 dark:text-red-300/70 mt-1">Remove all imported metadata and reset application state.</div>
+                                <div className="text-sm font-bold text-red-600 dark:text-red-300">{t('Purge Database')}</div>
+                                <div className="text-xs text-red-600/70 dark:text-red-300/70 mt-1">{t('Remove all imported metadata and reset application state.')}</div>
                             </div>
                             <button
                                 type="button"
                                 onClick={() => setConfirmAction({ type: 'purge', isOpen: true })}
                                 className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-2 shadow-sm whitespace-nowrap"
                             >
-                                <Trash2 className="w-3.5 h-3.5" /> Purge Database
-                            </button>
+                                <Trash2 className="w-3.5 h-3.5" /> {t('Purge Database')}</button>
                         </div>
                     </div>
                 </div>
@@ -243,27 +244,26 @@ export const AdvancedTab: React.FC<TabProps> = ({
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 px-1">
                         <Monitor className="w-4 h-4 text-harbor-600 dark:text-harbor-300" />
-                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Interface Settings</h4>
+                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t('Interface Settings')}</h4>
                     </div>
 
                     <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-xl overflow-hidden divide-y divide-gray-100 dark:divide-white/5">
                         <div className="p-6 space-y-5">
                             <div className="flex items-start justify-between gap-4">
                                 <div>
-                                    <div className="text-sm font-bold text-gray-900 dark:text-gray-200">Automatic Updates</div>
+                                    <div className="text-sm font-bold text-gray-900 dark:text-gray-200">{t('Automatic Updates')}</div>
                                     <div className="text-xs text-gray-500 mt-1">
-                                        Check GitHub Releases at startup and install newer public releases only after you confirm the update prompt.
-                                    </div>
+                                        {t('Check GitHub Releases at startup and install newer public releases only after you confirm the update prompt.')}</div>
                                 </div>
                                 <button
                                     type="button"
                                     role="switch"
                                     aria-checked={autoUpdateEnabled}
-                                    aria-label="Automatic Updates"
+                                    aria-label={t('Automatic Updates')}
                                     onClick={() => {
                                         const nextValue = !autoUpdateEnabled;
                                         setSettings((prev) => ({ ...prev, autoCheckForUpdates: nextValue }));
-                                        addToast(nextValue ? 'Automatic update checks enabled' : 'Automatic update checks disabled', 'success');
+                                        addToast(nextValue ? t('Automatic update checks enabled') : t('Automatic update checks disabled'), 'success');
                                     }}
                                     className={`w-12 h-7 rounded-full relative transition-colors ${autoUpdateEnabled ? 'bg-sage-600' : 'bg-gray-200 dark:bg-white/10'}`}
                                 >
@@ -293,7 +293,7 @@ export const AdvancedTab: React.FC<TabProps> = ({
                                     className="px-4 py-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-700 dark:text-gray-200 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                                 >
                                     {isCheckingForUpdates || isInstallingUpdate ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-                                    {hasPendingUpdate ? 'View Update' : 'Check for Updates'}
+                                    {hasPendingUpdate ? t('View Update') : t('Check for Updates')}
                                 </button>
                             </div>
                         </div>
@@ -306,63 +306,60 @@ export const AdvancedTab: React.FC<TabProps> = ({
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 px-1">
                         <AlertTriangle className="w-4 h-4 text-ember-600" />
-                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Support Diagnostics</h4>
+                        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t('Support Diagnostics')}</h4>
                     </div>
 
                     <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-xl overflow-hidden divide-y divide-gray-100 dark:divide-white/5">
                         <div className="p-6 flex items-center justify-between gap-4">
                             <div>
-                                <div className="text-sm font-bold text-gray-900 dark:text-gray-200">Console Log Level</div>
-                                <div className="text-xs text-gray-500 mt-1">Choose how much diagnostic detail Ambit writes to the developer console.</div>
+                                <div className="text-sm font-bold text-gray-900 dark:text-gray-200">{t('Console Log Level')}</div>
+                                <div className="text-xs text-gray-500 mt-1">{t('Choose how much diagnostic detail Dvoyna Vault writes to the developer console.')}</div>
                             </div>
                             <select
                                 value={settings.logLevel || 'info'}
                                 onChange={(e) => handleLogLevelChange(e.target.value)}
                                 className="bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg px-3 py-1.5 text-xs font-bold font-mono text-gray-700 dark:text-gray-300 outline-none focus:ring-2 focus:ring-sage-500/50 cursor-pointer"
                             >
-                                <option value="debug">DEBUG</option>
-                                <option value="info">INFO</option>
-                                <option value="warn">WARN</option>
-                                <option value="error">ERROR</option>
-                                <option value="none">NONE</option>
+                                <option value="debug">{t('DEBUG')}</option>
+                                <option value="info">{t('INFO')}</option>
+                                <option value="warn">{t('WARN')}</option>
+                                <option value="error">{t('ERROR')}</option>
+                                <option value="none">{t('NONE')}</option>
                             </select>
                         </div>
 
                         {settings.logLevel === 'debug' && (
                             <div className="p-4 bg-ember-50 dark:bg-ember-500/10 text-ember-600 dark:text-ember-300 text-xs font-medium leading-relaxed">
-                                Debug logging can be noisy. Use it when collecting information for an issue, then switch back to Info or Warn.
-                            </div>
+                                {t('Debug logging can be noisy. Use it when collecting information for an issue, then switch back to Info or Warn.')}</div>
                         )}
 
                         <div className="p-6 space-y-3">
                             <div>
-                                <div className="text-sm font-bold text-gray-900 dark:text-gray-200">Library Database Location</div>
+                                <div className="text-sm font-bold text-gray-900 dark:text-gray-200">{t('Library Database Location')}</div>
                                 <div className="text-xs text-gray-500 mt-1">
-                                    Ambit stores the library catalog in Local AppData. This is separate from the folder where the app itself is installed.
-                                </div>
+                                    {t('Dvoyna Vault stores the library catalog in Local AppData. This is separate from the folder where the app itself is installed.')}</div>
                             </div>
 
                             {dbDiagnostics ? (
                                 <div className="space-y-2 text-xs">
                                     {dbDiagnostics.isUsingRoamingFallback && (
                                         <div className="rounded-lg border border-ember-200 bg-ember-50 p-3 font-medium text-ember-600 dark:border-ember-400/20 dark:bg-ember-500/10 dark:text-ember-300">
-                                            Ambit is using the legacy Roaming AppData database because no Local AppData database is available.
-                                        </div>
+                                            {t('Dvoyna Vault is using the legacy Roaming AppData database because no Local AppData database is available.')}</div>
                                     )}
                                     <div className="rounded-lg bg-gray-50 p-3 dark:bg-black/20">
-                                        <div className="font-bold uppercase tracking-wider text-gray-400">Active catalog</div>
+                                        <div className="font-bold uppercase tracking-wider text-gray-400">{t('Active catalog')}</div>
                                         <div className="mt-1 break-all font-mono text-gray-700 dark:text-gray-300">
                                             {dbDiagnostics.activeDbPath || dbDiagnostics.dbPath}
                                         </div>
                                     </div>
                                     <div className="rounded-lg bg-gray-50 p-3 dark:bg-black/20">
-                                        <div className="font-bold uppercase tracking-wider text-gray-400">Local AppData target</div>
+                                        <div className="font-bold uppercase tracking-wider text-gray-400">{t('Local AppData target')}</div>
                                         <div className="mt-1 break-all font-mono text-gray-700 dark:text-gray-300">
                                             {dbDiagnostics.localDbPath}
                                         </div>
                                     </div>
                                     <div className="rounded-lg bg-gray-50 p-3 dark:bg-black/20">
-                                        <div className="font-bold uppercase tracking-wider text-gray-400">Legacy Roaming fallback</div>
+                                        <div className="font-bold uppercase tracking-wider text-gray-400">{t('Legacy Roaming fallback')}</div>
                                         <div className="mt-1 break-all font-mono text-gray-700 dark:text-gray-300">
                                             {dbDiagnostics.roamingDbPath}
                                         </div>
@@ -370,23 +367,21 @@ export const AdvancedTab: React.FC<TabProps> = ({
                                 </div>
                             ) : dbDiagnosticsError ? (
                                 <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs font-medium text-red-600 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">
-                                    Could not load database location: {dbDiagnosticsError}
+                                    {t('Could not load database location:')} {dbDiagnosticsError}
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
                                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                    Loading database location...
-                                </div>
+                                    {t('Loading database location...')}</div>
                             )}
                         </div>
 
                         <div className="p-6 space-y-3">
                             <div className="flex items-start justify-between gap-4">
                                 <div>
-                                    <div className="text-sm font-bold text-gray-900 dark:text-gray-200">App Logs</div>
+                                    <div className="text-sm font-bold text-gray-900 dark:text-gray-200">{t('App Logs')}</div>
                                     <div className="text-xs text-gray-500 mt-1">
-                                        Runtime logs are written to Ambit's app log folder for support investigations.
-                                    </div>
+                                        {t('Runtime logs are written to Dvoyna Vault\'s app log folder for support investigations.')}</div>
                                 </div>
                                 <div className="flex flex-col gap-2 sm:flex-row">
                                     <button
@@ -394,50 +389,46 @@ export const AdvancedTab: React.FC<TabProps> = ({
                                         onClick={() => void handleShowAppLogFolder()}
                                         className="px-3 py-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-700 dark:text-gray-200 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 whitespace-nowrap"
                                     >
-                                        <FolderOpen className="w-3.5 h-3.5" /> Show Logs Folder
-                                    </button>
+                                        <FolderOpen className="w-3.5 h-3.5" /> {t('Show Logs Folder')}</button>
                                     <button
                                         type="button"
                                         onClick={() => void handleCopyDiagnostics()}
                                         disabled={!dbDiagnostics}
                                         className="px-3 py-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-700 dark:text-gray-200 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                                     >
-                                        <Copy className="w-3.5 h-3.5" /> Copy Diagnostics
-                                    </button>
+                                        <Copy className="w-3.5 h-3.5" /> {t('Copy Diagnostics')}</button>
                                 </div>
                             </div>
 
                             {dbDiagnostics ? (
                                 <div className="rounded-lg bg-gray-50 p-3 text-xs dark:bg-black/20">
-                                    <div className="font-bold uppercase tracking-wider text-gray-400">App log file</div>
+                                    <div className="font-bold uppercase tracking-wider text-gray-400">{t('App log file')}</div>
                                     <div className="mt-1 break-all font-mono text-gray-700 dark:text-gray-300">
                                         {dbDiagnostics.appLogPath}
                                     </div>
                                 </div>
                             ) : dbDiagnosticsError ? (
                                 <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs font-medium text-red-600 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">
-                                    Could not load app log location: {dbDiagnosticsError}
+                                    {t('Could not load app log location:')} {dbDiagnosticsError}
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
                                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                                    Loading app log location...
-                                </div>
+                                    {t('Loading app log location...')}</div>
                             )}
                         </div>
 
                         <div className="p-6 flex items-center justify-between gap-4">
                             <div>
-                                <div className="text-sm font-bold text-gray-900 dark:text-gray-200">Maintenance</div>
-                                <div className="text-xs text-gray-500 mt-1">Open library repair tools for missing files, thumbnails, duplicates, and removed items.</div>
+                                <div className="text-sm font-bold text-gray-900 dark:text-gray-200">{t('Maintenance')}</div>
+                                <div className="text-xs text-gray-500 mt-1">{t('Open library repair tools for missing files, thumbnails, duplicates, and removed items.')}</div>
                             </div>
                             <button
                                 type="button"
                                 onClick={handleOpenMaintenance}
                                 className="px-3 py-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-700 dark:text-gray-200 rounded-lg text-xs font-bold transition-all flex items-center gap-2 disabled:opacity-50 whitespace-nowrap"
                             >
-                                <ExternalLink className="w-3.5 h-3.5" /> Open Maintenance
-                            </button>
+                                <ExternalLink className="w-3.5 h-3.5" /> {t('Open Maintenance')}</button>
                         </div>
                     </div>
                 </div>
@@ -445,9 +436,9 @@ export const AdvancedTab: React.FC<TabProps> = ({
 
             <ConfirmDialog
                 isOpen={confirmAction.isOpen && confirmAction.type === 'purge'}
-                title="Purge Application Database?"
-                message={`DANGER: This will delete ALL images and metadata, AND disconnect all Linked Folders. Your actual image files on disk will NOT be touched, but the application will be reset to a factory-fresh state. Are you sure?`}
-                confirmLabel="Purge & Reset"
+                title={t('Purge Application Database?')}
+                message={t('DANGER: This will delete ALL images and metadata, AND disconnect all Linked Folders. Your actual image files on disk will NOT be touched, but the application will be reset to a factory-fresh state. Are you sure?')}
+                confirmLabel={t('Purge & Reset')}
                 isDangerous={true}
                 onConfirm={handlePurge}
                 isLoading={isPurging}

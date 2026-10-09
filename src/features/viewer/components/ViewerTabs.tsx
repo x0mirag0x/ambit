@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export interface ViewerTabDefinition<T extends string> {
     id: T;
@@ -20,6 +21,7 @@ export function ViewerTabs<T extends string>({
     ariaLabel,
     className = '',
 }: ViewerTabsProps<T>) {
+    const { t } = useTranslation();
     const tabRefs = React.useRef<Array<HTMLButtonElement | null>>([]);
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
@@ -62,7 +64,7 @@ export function ViewerTabs<T extends string>({
                             : 'text-gray-500 hover:bg-white hover:text-gray-800 dark:text-zinc-400 dark:hover:bg-white/10 dark:hover:text-zinc-200'
                             }`}
                     >
-                        {tab.label}
+                        {t(tab.label)}
                     </button>
                 );
             })}

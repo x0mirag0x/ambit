@@ -3,6 +3,7 @@ import { X, Wand2, Shuffle, Copy, Check, Sparkles, LayoutPanelLeft, Lightbulb, C
 import ReactMarkdown, { type Components } from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../../utils/cn';
+import { useTranslation } from 'react-i18next';
 
 interface AIResultModalProps {
     isOpen: boolean;
@@ -21,6 +22,7 @@ export const AIResultModal: React.FC<AIResultModalProps> = ({
     content,
     onCopy
 }) => {
+    const { t } = useTranslation();
     const [copiedAll, setCopiedAll] = React.useState(false);
     const [activeTab, setActiveTab] = React.useState(0);
     // New state for Analysis tabs: 0 = Analysis Report, 1 = Applied Example
@@ -91,11 +93,10 @@ export const AIResultModal: React.FC<AIResultModalProps> = ({
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-gray-900 dark:text-white text-sm">
-                                        {type === 'analysis' ? 'Prompt Analysis' : 'Creative Variations'}
+                                        {type === 'analysis' ? t('Prompt Analysis') : t('Creative Variations')}
                                     </h3>
                                     <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">
-                                        Gemini AI
-                                    </p>
+                                        {t('Gemini AI')}</p>
                                 </div>
                             </div>
 
@@ -106,12 +107,12 @@ export const AIResultModal: React.FC<AIResultModalProps> = ({
                                         className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-gray-500 hover:text-amethyst-600 dark:text-gray-400 dark:hover:text-amethyst-300 hover:bg-amethyst-500/5 transition-all"
                                     >
                                         {copiedAll ? <Check className="w-3.5 h-3.5" /> : <LayoutPanelLeft className="w-3.5 h-3.5" />}
-                                        {copiedAll ? 'Copied' : 'Copy All'}
+                                        {copiedAll ? t('Copied') : t('Copy All')}
                                     </button>
                                 )}
                                 <button
                                     type="button"
-                                    aria-label="Close AI Result"
+                                    aria-label={t('Close AI Result')}
                                     onClick={onClose}
                                     className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-400 transition-colors"
                                 >
@@ -136,8 +137,7 @@ export const AIResultModal: React.FC<AIResultModalProps> = ({
                                                     : "bg-white dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:text-amethyst-600 dark:hover:text-amethyst-300 border border-gray-200 dark:border-white/10 hover:border-amethyst-300"
                                             )}
                                         >
-                                            <Sparkles className="w-3.5 h-3.5" /> Analysis Report
-                                        </button>
+                                            <Sparkles className="w-3.5 h-3.5" /> {t('Analysis Report')}</button>
                                         {masteredPrompt && (
                                             <button
                                                 onClick={() => setActiveAnalysisTab(1)}
@@ -148,8 +148,7 @@ export const AIResultModal: React.FC<AIResultModalProps> = ({
                                                         : "bg-white dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:text-amethyst-600 dark:hover:text-amethyst-300 border border-gray-200 dark:border-white/10 hover:border-amethyst-300"
                                                 )}
                                             >
-                                                <Wand2 className="w-3.5 h-3.5" /> Applied Example
-                                            </button>
+                                                <Wand2 className="w-3.5 h-3.5" /> {t('Applied Example')}</button>
                                         )}
                                     </div>
 
@@ -188,7 +187,7 @@ export const AIResultModal: React.FC<AIResultModalProps> = ({
                                                         : "bg-white dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:text-amethyst-600 dark:hover:text-amethyst-300 border border-gray-200 dark:border-white/10 hover:border-amethyst-300"
                                                 )}
                                             >
-                                                Variation {i + 1}
+                                                {t('Variation')} {i + 1}
                                             </button>
                                         ))}
                                     </div>
@@ -212,14 +211,13 @@ export const AIResultModal: React.FC<AIResultModalProps> = ({
                         {/* Footer */}
                         <div className="px-6 py-3 bg-gray-50/50 dark:bg-white/[0.02] border-t border-gray-100 dark:border-white/5 flex items-center justify-between shrink-0">
                             <span className="text-[10px] font-medium uppercase tracking-wider text-gray-400">
-                                {type === 'analysis' ? 'Semantic Analysis' : `Viewing ${activeTab + 1} of ${variations.length}`}
+                                {type === 'analysis' ? t('Semantic Analysis') : t('Viewing {{v0}} of {{length}}', { v0: activeTab + 1, length: variations.length })}
                             </span>
                             <button
                                 onClick={onClose}
                                 className="text-xs font-semibold text-amethyst-600 hover:text-amethyst-600 dark:text-amethyst-300 dark:hover:text-amethyst-300 transition-colors"
                             >
-                                Close
-                            </button>
+                                {t('Close')}</button>
                         </div>
                     </motion.div>
                 </div>
@@ -230,6 +228,7 @@ export const AIResultModal: React.FC<AIResultModalProps> = ({
 
 /* Mastered Prompt Card Component */
 const MasteredPromptCard: React.FC<{ prompt: string; onCopy: (text: string) => void }> = ({ prompt, onCopy }) => {
+    const { t } = useTranslation();
     const [copied, setCopied] = React.useState(false);
 
     const handleCopy = () => {
@@ -251,7 +250,7 @@ const MasteredPromptCard: React.FC<{ prompt: string; onCopy: (text: string) => v
                     )}
                 >
                     {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    {copied ? 'Copied' : 'Copy'}
+                    {copied ? t('Copied') : t('Copy')}
                 </button>
             </div>
             <p className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed font-mono pr-20 selection:bg-amethyst-500/30">
@@ -282,6 +281,7 @@ interface VariationDisplayProps {
 }
 
 const VariationDisplay: React.FC<VariationDisplayProps> = ({ text, index, onCopy, onPrev, onNext, hasPrev, hasNext }) => {
+    const { t } = useTranslation();
     const [copied, setCopied] = React.useState(false);
 
     const handleCopy = () => {
@@ -298,7 +298,7 @@ const VariationDisplay: React.FC<VariationDisplayProps> = ({ text, index, onCopy
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2">
                     <button
                         type="button"
-                        aria-label="Previous Result"
+                        aria-label={t('Previous Result')}
                         onClick={onPrev}
                         disabled={!hasPrev}
                         className={cn(
@@ -312,7 +312,7 @@ const VariationDisplay: React.FC<VariationDisplayProps> = ({ text, index, onCopy
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2">
                     <button
                         type="button"
-                        aria-label="Next Result"
+                        aria-label={t('Next Result')}
                         onClick={onNext}
                         disabled={!hasNext}
                         className={cn(
@@ -342,7 +342,7 @@ const VariationDisplay: React.FC<VariationDisplayProps> = ({ text, index, onCopy
                     )}
                 >
                     {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                    {copied ? 'Copied!' : 'Copy This Variation'}
+                    {copied ? t('Copied!') : t('Copy This Variation')}
                 </button>
             </div>
         </div>

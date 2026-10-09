@@ -2,10 +2,10 @@
 name = "app"
 version = "0.14.0"
 default-run = "app"
-description = "High-performance local AI image manager for large AI-generated image libraries."
+description = "Dvoyna Vault is a local-first manager for large AI-generated image libraries, based on Ambit."
 authors = ["AsuraAce"]
 license = "GPL-3.0-only"
-repository = "https://github.com/AsuraAce/ambit"
+repository = "https://github.com/x0mirag0x/ambit"
 edition = "2021"
 rust-version = "1.88.0"
 

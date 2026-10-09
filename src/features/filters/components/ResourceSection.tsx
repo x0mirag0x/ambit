@@ -12,6 +12,7 @@ import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import { commands } from '../../../bindings';
 import { uniqueAssetAliases } from '../../../utils/assetIdentity';
 import type { ResourceThumbnailSource } from '../../../services/db/searchRepo';
+import { useTranslation } from 'react-i18next';
 
 export type { AssetScope };
 
@@ -95,6 +96,7 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
     validNames,
     assetScope = 'used'
 }) => {
+    const { t, i18n } = useTranslation();
     const { settings, setSettings } = useSettings();
     const [searchQuery, setSearchQuery] = useState('');
     const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -230,6 +232,11 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
                     : type === 'ipAdapters'
                         ? 'IP-Adapter'
                         : 'Hypernetwork';
+    const nounKey = `resourceNoun.${type}`;
+    const localizedNoun = i18n.exists(nounKey) ? t(nounKey) : singularType;
+    const displayResourceName = (name: string) => (
+        name === 'Unknown' ? t('Unknown') : (type === 'checkpoints' ? formatModelName(name) : name)
+    );
 
     const visibleItems = filteredItems.slice(0, renderLimit);
     const hasMore = filteredItems.length > renderLimit;
@@ -340,7 +347,7 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
                 key={`${item.name}-${item.hash || 'no-hash'}`}
                 onClick={() => toggleItem(item)}
                 onContextMenu={(e) => handleContextMenu(e, item)}
-                title={isInventoryOnly ? `${item.name} has no indexed library images` : item.name}
+                title={isInventoryOnly ? t('{{name}} has no indexed library images', { name: item.name }) : item.name}
                 className={`group relative aspect-square rounded-xl overflow-hidden border transition-all duration-300 ease-spring ${isInventoryOnly ? 'cursor-default' : 'cursor-pointer'} ${isSelected
                     ? 'border-sage-500 ring-2 ring-sage-500/20 shadow-lg shadow-sage-500/10'
                     : 'border-gray-200 dark:border-white/10 hover:border-sage-400/50 hover:shadow-md'
@@ -369,7 +376,7 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
                 {/* Overlay Info - Single Line Truncated */}
                 <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
                     <p className="text-[10px] font-medium text-white truncate leading-tight drop-shadow-sm">
-                        {type === 'checkpoints' ? formatModelName(item.name) : item.name}
+                        {displayResourceName(item.name)}
                     </p>
                 </div>
 
@@ -386,7 +393,7 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
                         <div
                             role={isInventoryOnly ? 'img' : undefined}
                             aria-label={isInventoryOnly ? localOnlyTitle : undefined}
-                            title={isInventoryOnly ? localOnlyTitle : `${item.count.toLocaleString()} total images`}
+                            title={isInventoryOnly ? localOnlyTitle : t('{{v0}} total images', { v0: item.count.toLocaleString() })}
                             className={`px-1.5 py-0.5 rounded-md backdrop-blur-sm text-[9px] font-bold shadow-sm ${isInventoryOnly ? 'bg-harbor-500/80 text-white' : 'bg-black/40 text-white/90'}`}
                         >
                             {isInventoryOnly ? <ImageOff className="h-3 w-3" aria-hidden="true" /> : formatCountCompact(item.count)}
@@ -456,14 +463,14 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
                         )}
                     </div>
 
-                    <span className="truncate" title={item.name}>{type === 'checkpoints' ? formatModelName(item.name) : item.name}</span>
+                    <span className="truncate" title={displayResourceName(item.name)}>{displayResourceName(item.name)}</span>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                     <span
                         role={isInventoryOnly ? 'img' : undefined}
                         aria-label={isInventoryOnly ? localOnlyTitle : undefined}
                         className={`text-[10px] px-1.5 py-0.5 rounded-md transition-opacity group-hover:opacity-100 ${isInventoryOnly ? 'bg-harbor-50 dark:bg-harbor-500/15 text-harbor-600 dark:text-harbor-300 opacity-100' : `bg-gray-100 dark:bg-white/10 ${validNames != null ? 'opacity-30' : 'opacity-60'}`}`}
-                        title={isInventoryOnly ? localOnlyTitle : `${item.count.toLocaleString()} total images`}
+                        title={isInventoryOnly ? localOnlyTitle : t('{{v0}} total images', { v0: item.count.toLocaleString() })}
                     >
                         {isInventoryOnly ? <ImageOff className="h-3 w-3" aria-hidden="true" /> : formatCountCompact(item.count)}
                     </span>
@@ -498,7 +505,7 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
                     {/* Toolbar Row */}
                     <div className="flex items-center gap-1.5 px-2">
                         <SortDropdown
-                            title={`Sort ${singularType}s`}
+                            title={t('Sort {{singularType}}s', { singularType: localizedNoun })}
                             options={[
                                 { id: 'count_desc', label: 'Usage (High)', icon: SortDesc },
                                 { id: 'count_asc', label: 'Usage (Low)', icon: SortAsc },
@@ -513,8 +520,8 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
                             triggerClassName={(isOpen) => `transition-colors p-1.5 rounded-lg border ${isOpen ? 'text-sage-600 dark:text-sage-400 bg-sage-50 dark:bg-sage-900/40 border-sage-200 dark:border-sage-500/30' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/5'}`}
                         />
                         <TooltipButton
-                            label={viewMode === 'list' ? 'Switch to Grid View' : 'Switch to List View'}
-                            content={viewMode === 'list' ? 'Switch to Grid View' : 'Switch to List View'}
+                            label={viewMode === 'list' ? t('Switch to Grid View') : t('Switch to List View')}
+                            content={viewMode === 'list' ? t('Switch to Grid View') : t('Switch to List View')}
                             aria-pressed={viewMode === 'grid'}
                             onClick={toggleViewMode}
                             className={`transition-colors p-1.5 rounded-lg border ${viewMode === 'grid' ? 'text-sage-600 dark:text-sage-400 bg-sage-50 dark:bg-sage-900/40 border-sage-200 dark:border-sage-500/30' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/5'}`}
@@ -523,10 +530,12 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
                         </TooltipButton>
                         {supportsMatchMode && (
                             <TooltipButton
-                                label={`${title} match mode: ${isAllMode ? 'Match All' : 'Match Any'}. Activate to use ${isAllMode ? 'Match Any' : 'Match All'}.`}
+                                label={t(isAllMode
+                                    ? '{{title}} match mode: Match All. Activate to use Match Any.'
+                                    : '{{title}} match mode: Match Any. Activate to use Match All.', { title })}
                                 content={isAllMode
-                                    ? 'Match All: Show images containing every selected item.'
-                                    : 'Match Any: Show images containing at least one selected item.'}
+                                    ? t('Match All: Show images containing every selected item.')
+                                    : t('Match Any: Show images containing at least one selected item.')}
                                 aria-pressed={isAllMode}
                                 onClick={() => {
                                     const nextMode = isAllMode ? 'any' : 'all';
@@ -546,8 +555,8 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
                             </TooltipButton>
                         )}
                         <TooltipButton
-                            label={`Search ${singularType}s`}
-                            content={`Search ${singularType}s`}
+                            label={t('Search {{singularType}}s', { singularType: localizedNoun })}
+                            content={t('Search {{singularType}}s', { singularType: localizedNoun })}
                             aria-expanded={isSearchOpen}
                             onClick={() => { setIsSearchOpen(!isSearchOpen); if (isSearchOpen) setSearchQuery(''); }}
                             className={`transition-colors p-1.5 rounded-lg border ${isSearchOpen ? 'text-sage-600 dark:text-sage-400 bg-sage-50 dark:bg-sage-900/40 border-sage-200 dark:border-sage-500/30' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/5'}`}
@@ -560,7 +569,7 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
                         <SearchInput
                             value={searchQuery}
                             onChange={setSearchQuery}
-                            placeholder={`Search ${singularType}s...`}
+                            placeholder={t('Search {{singularType}}s...', { singularType: localizedNoun })}
                             className="px-1"
                         />
                     )}
@@ -590,20 +599,19 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
                                 onClick={() => setRenderLimit(prev => prev + 30)}
                                 className={`w-full py-2 text-xs font-medium text-sage-600 dark:text-sage-400 bg-sage-50 dark:bg-sage-900/20 hover:bg-sage-100 dark:hover:bg-sage-900/40 rounded-lg transition-colors border border-sage-200 dark:border-sage-500/30 ${viewMode === 'grid' ? 'col-span-3' : ''}`}
                             >
-                                Show More ({filteredItems.length - renderLimit} remaining)
-                            </button>
+                                {t('Show More (')}{filteredItems.length - renderLimit} {t('remaining)')}</button>
                         )}
 
                         {filteredItems.length === 0 && !isLoading && (
                             <div className={`${viewMode === 'grid' ? 'col-span-3' : ''} text-xs text-gray-400 text-center py-8 italic border border-dashed border-gray-200 dark:border-white/10 rounded-xl`}>
-                                {data.length === 0 ? `No ${singularType}s found` : `No matching ${singularType}s`}
+                                {data.length === 0 ? t('No {{singularType}}s found', { singularType: localizedNoun }) : t('No matching {{singularType}}s', { singularType: localizedNoun })}
                             </div>
                         )}
 
                         {filteredItems.length === 0 && isLoading && (
                             <div className={`${viewMode === 'grid' ? 'col-span-3' : ''} flex flex-col items-center justify-center py-8 space-y-3 border border-dashed border-gray-200 dark:border-white/10 rounded-xl`}>
                                 <div className="w-4 h-4 border-2 border-sage-500/30 border-t-sage-500 rounded-full animate-spin" />
-                                <span className="text-[10px] text-gray-400 font-medium animate-pulse">Loading {singularType}s...</span>
+                                <span className="text-[10px] text-gray-400 font-medium animate-pulse">{t('Loading {{singularType}}s...', { singularType: localizedNoun })}</span>
                             </div>
                         )}
                     </div>
@@ -617,7 +625,7 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
                 >
                     <div className="p-1">
                         <div className="px-2 py-1.5 text-xs font-medium text-gray-500 dark:text-zinc-500 border-b border-gray-100 dark:border-white/5 mb-1 truncate">
-                            {type === 'checkpoints' ? formatModelName(contextMenu.item.name) : contextMenu.item.name}
+                            {displayResourceName(contextMenu.item.name)}
                         </div>
                         {/* Use Preview - enabled if User Override OR (In Dynamic AND Sidecar available) */}
                         <button
@@ -627,11 +635,10 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
                                 ? 'text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-white/10'
                                 : 'text-gray-400 cursor-not-allowed opacity-50'
                                 }`}
-                            title={contextMenu.item.isUserOverride ? "Clear user override" : "Use sidecar preview"}
+                            title={contextMenu.item.isUserOverride ? t('Clear user override') : t('Use sidecar preview')}
                         >
                             <Puzzle className="w-3.5 h-3.5" />
-                            Use Preview
-                        </button>
+                            {t('Use Preview')}</button>
                         {/* Use Dynamic - disabled if already in dynamic mode (isManual = 0) */}
                         <button
                             onClick={() => handleUseDynamic(contextMenu.item)}
@@ -640,11 +647,10 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
                                 ? 'text-ember-600 dark:text-ember-300 hover:bg-ember-50 dark:hover:bg-ember-900/20'
                                 : 'text-gray-400 cursor-not-allowed opacity-50'
                                 }`}
-                            title="Clear sidecar and override, use pinned/recent image"
+                            title={t('Clear sidecar and override, use pinned/recent image')}
                         >
                             <Pin className="w-3.5 h-3.5" />
-                            Use Dynamic
-                        </button>
+                            {t('Use Dynamic')}</button>
                         <div className="h-px bg-gray-100 dark:bg-white/5 my-1" />
                         <button
                             onClick={() => handleThumbnailSensitivity(contextMenu.item, true)}
@@ -653,11 +659,10 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
                                 ? 'text-gray-400 cursor-not-allowed opacity-50'
                                 : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-white/10'
                                 }`}
-                            title="Always mask this resource thumbnail"
+                            title={t('Always mask this resource thumbnail')}
                         >
                             <EyeOff className="w-3.5 h-3.5" />
-                            Mask Thumbnail
-                        </button>
+                            {t('Mask Thumbnail')}</button>
                         <button
                             onClick={() => handleThumbnailSensitivity(contextMenu.item, false)}
                             disabled={contextMenu.item.thumbnailSensitivityOverride === 0}
@@ -665,11 +670,10 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
                                 ? 'text-gray-400 cursor-not-allowed opacity-50'
                                 : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-white/10'
                                 }`}
-                            title="Always show this resource thumbnail"
+                            title={t('Always show this resource thumbnail')}
                         >
                             <Eye className="w-3.5 h-3.5" />
-                            Always Show Thumbnail
-                        </button>
+                            {t('Always Show Thumbnail')}</button>
                         <button
                             onClick={() => handleThumbnailSensitivity(contextMenu.item, null)}
                             disabled={contextMenu.item.thumbnailSensitivityOverride === null || contextMenu.item.thumbnailSensitivityOverride === undefined}
@@ -677,11 +681,10 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
                                 ? 'text-gray-400 cursor-not-allowed opacity-50'
                                 : 'text-gray-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-white/10'
                                 }`}
-                            title="Return thumbnail privacy to automatic detection"
+                            title={t('Return thumbnail privacy to automatic detection')}
                         >
                             <RotateCcw className="w-3.5 h-3.5" />
-                            Reset Thumbnail Privacy
-                        </button>
+                            {t('Reset Thumbnail Privacy')}</button>
                     </div>
                 </div>,
                 document.body

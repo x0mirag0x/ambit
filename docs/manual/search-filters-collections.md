@@ -2,11 +2,11 @@
 
 [Back to manual index](index.md)
 
-Ambit combines search text, metadata filters, asset facets, date ranges, favorites, pins, and collections to narrow large local libraries. Most filters combine with AND, so each extra filter tightens the result set. Some asset sections also let you choose whether selected assets should match any selected item or every selected item.
+Dvoyna Vault combines search text, metadata filters, asset facets, date ranges, favorites, pins, and collections to narrow large local libraries. Most filters combine with AND, so each extra filter tightens the result set. Some asset sections also let you choose whether selected assets should match any selected item or every selected item.
 
 ## Search Bar
 
-The search bar matches the positive prompt by default. In Grid and Timeline, Ambit updates about half a second after typing pauses, while pressing Enter finishes immediately and closes the expanded search. The focused standard search leaves the current results visible. In Statistics and Maintenance, typing stays in the search field until you press Enter or choose a recent search; Ambit then opens Grid to show the matching images.
+The search bar matches the positive prompt by default. In Grid and Timeline, Dvoyna Vault updates about half a second after typing pauses, while pressing Enter finishes immediately and closes the expanded search. The focused standard search leaves the current results visible. In Statistics and Maintenance, typing stays in the search field until you press Enter or choose a recent search; Dvoyna Vault then opens Grid to show the matching images.
 
 Search bar tools include:
 
@@ -62,7 +62,7 @@ Supported operators include:
 - `w:>1024`, `width:1024`, `h:<768`, or `height:768` filter dimensions.
 - `upscaled:true` shows upscaled images; `upscaled:false` shows images marked not upscaled.
 
-Use ISO dates such as `2026-04-15` to avoid country-specific date ambiguity. While structured syntax is unfinished or malformed, Ambit keeps the last applied results visible and does not run the draft. Complete quotes and operator values, use whole numbers for steps and dimensions, a decimal number for CFG, digits for seeds, `true` or `false` for `upscaled:`, and put `OR` between two positive-prompt terms. Correcting the draft restarts the normal half-second update.
+Use ISO dates such as `2026-04-15` to avoid country-specific date ambiguity. While structured syntax is unfinished or malformed, Dvoyna Vault keeps the last applied results visible and does not run the draft. Complete quotes and operator values, use whole numbers for steps and dimensions, a decimal number for CFG, digits for seeds, `true` or `false` for `upscaled:`, and put `OR` between two positive-prompt terms. Correcting the draft restarts the normal half-second update.
 
 ## Date Filters
 
@@ -103,11 +103,11 @@ The Library filter panel is organized into tabs:
 
 Dirty dots on tab buttons show where active filters live. Active filter chips appear above the library; chips from a smart collection are locked rules, while manual chips can be removed directly. Use Reset All to clear active filters and collection selection.
 
-When you select a smart collection and then add manual refinements, Ambit can show Update. Update saves the refinement back to that smart collection's rules, then clears the manual refinements while keeping the collection selected.
+When you select a smart collection and then add manual refinements, Dvoyna Vault can show Update. Update saves the refinement back to that smart collection's rules, then clears the manual refinements while keeping the collection selected.
 
 ## Assets Tab
 
-The Assets tab filters by resources that Ambit has indexed from image metadata. It can also show local disk inventory when resource folders are configured.
+The Assets tab filters by resources that Dvoyna Vault has indexed from image metadata. It can also show local disk inventory when resource folders are configured.
 
 The Assets tab can switch between:
 
@@ -124,7 +124,7 @@ For LoRAs, embeddings, hypernetworks, ControlNet, and IP-Adapter resources:
 
 Checkpoints do not show the Match Any or Match All toggle because each image has one main checkpoint or model.
 
-Local markers mean Ambit found the asset on disk. A local-only inventory item has no indexed image count yet, so it is inventory only and does not filter images until Ambit matches it to image metadata. If Local on Disk is empty, add resource folders from Settings > Connections > Resources. For setup details, sidecar preview behavior, broad `models` root warnings, and local-only inventory limits, see [Assets And Resource Discovery](assets-resource-discovery.md).
+Local markers mean Dvoyna Vault found the asset on disk. A local-only inventory item has no indexed image count yet, so it is inventory only and does not filter images until Dvoyna Vault matches it to image metadata. If Local on Disk is empty, add resource folders from Settings > Connections > Resources. For setup details, sidecar preview behavior, broad `models` root warnings, and local-only inventory limits, see [Assets And Resource Discovery](assets-resource-discovery.md).
 
 ## Filters Tab
 
@@ -134,14 +134,14 @@ Library scope is controlled from the header rather than the generation-metadata 
 
 Generator filters show detected generator tools. When another active filter leaves no matching images for a tool, that tool can appear unavailable until the surrounding filter context changes.
 
-Parameters appear when Ambit has matching metadata for them:
+Parameters appear when Dvoyna Vault has matching metadata for them:
 
 - Steps slider filters generation step ranges.
 - CFG Scale slider filters CFG ranges.
 - Sampler groups organize sampler names by family.
 - Generation Type chips can filter text-to-image, image-to-image, extras/upscale, grid, saved, and unknown generations.
 
-Guidance filters group detected ControlNet and IP-Adapter usage by subtype when Ambit can classify it. ControlNet groups can include Canny, Depth, Pose, Scribble, Lineart, Normal, Inpaint, Tile, MLSD, Seg, Instruct, Shuffle, Recolor, and Other. IP-Adapter groups can include FaceID Plus, FaceID, Plus Face, Plus, Portrait, Full Face, Light, Comp, Style, Standard, and Other.
+Guidance filters group detected ControlNet and IP-Adapter usage by subtype when Dvoyna Vault can classify it. ControlNet groups can include Canny, Depth, Pose, Scribble, Lineart, Normal, Inpaint, Tile, MLSD, Seg, Instruct, Shuffle, Recolor, and Other. IP-Adapter groups can include FaceID Plus, FaceID, Plus Face, Plus, Portrait, Full Face, Light, Comp, Style, Standard, and Other.
 
 ## Collections
 

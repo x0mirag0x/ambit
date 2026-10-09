@@ -68,6 +68,7 @@ import {
 import { commands } from '../bindings';
 import type { InvokeScopeCacheBuildClaim, InvokeScopeCacheRepairPlan } from '../bindings';
 import { unwrap } from '../utils/spectaUtils';
+import { useTranslation } from 'react-i18next';
 
 export type { InvokeOwnerScopeState } from '../stores/invokeOwnerScopeStore';
 
@@ -232,6 +233,7 @@ export const SyncProvider: React.FC<{
     onSyncComplete?: (scope: MetadataRefreshScope) => void | Promise<void>;
     onInvokeContentChanged?: () => void | Promise<void>;
 }> = ({ children, onSyncComplete, onInvokeContentChanged }) => {
+    const { t } = useTranslation();
     const { settings, settingsRef, setSettings, isLoaded: settingsLoaded } = useSettings();
     const { addToast } = useToast();
     const queryClient = useQueryClient();
@@ -756,7 +758,7 @@ export const SyncProvider: React.FC<{
                         rootPath,
                         allowed: false,
                         scope: offlineScope,
-                        reason: 'InvokeAI is unavailable while Ambit is using the last verified local view.',
+                        reason: 'InvokeAI is unavailable while Dvoyna Vault is using the last verified local view.',
                         offline: true,
                     };
                     ownerScopeAdmissionRef.current = admission;
@@ -891,7 +893,7 @@ export const SyncProvider: React.FC<{
 
     const selectInvokeOwnerScope = useCallback(async (selection: InvokeOwnerSelection): Promise<boolean> => {
         if (activeInvokeSyncScopeRef.current || syncStatus === 'syncing') {
-            addToast('Wait for the active InvokeAI sync before changing owner scope.', 'warning');
+            addToast(t('Wait for the active InvokeAI sync before changing owner scope.'), 'warning');
             return false;
         }
         const discovery = invokeOwnerScopeState.discovery;
@@ -900,7 +902,7 @@ export const SyncProvider: React.FC<{
             || !isSameInvokePath(discovery.dbPath, selection.dbPath)
             || !currentRoot
             || ownerScopeAdmissionRef.current?.rootPath !== currentRoot) {
-            addToast('Refresh the InvokeAI owner list before changing scope.', 'warning');
+            addToast(t('Refresh the InvokeAI owner list before changing scope.'), 'warning');
             return false;
         }
         if (ownerScopePromiseRef.current || ownerTransitionRef.current) return false;
@@ -967,7 +969,7 @@ export const SyncProvider: React.FC<{
                 discovery,
                 warning: admission.boardScopeWarning,
             });
-            addToast('Your InvokeAI view is ready.', 'success');
+            addToast(t('Your InvokeAI view is ready.'), 'success');
             return true;
         } catch (error) {
             let failure = error;
@@ -985,7 +987,7 @@ export const SyncProvider: React.FC<{
                     if (rollbackAdmission.allowed) {
                         const message = error instanceof Error ? error.message : String(error);
                         addToast(
-                            `Could not change InvokeAI owner scope: ${message.replace(/[.!?]+$/, '')}. The previous view was restored.`,
+                            t('Could not change InvokeAI owner scope: {{v0}}. The previous view was restored.', { v0: message.replace(/[.!?]+$/, '') }),
                             'error'
                         );
                         return false;
@@ -1005,7 +1007,7 @@ export const SyncProvider: React.FC<{
                 error: message,
                 failure: { kind: 'preparation_failed', details: message },
             });
-            addToast(`Could not update InvokeAI owner scope: ${message}`, 'error');
+            addToast(t('Could not update InvokeAI owner scope: {{message}}', { message: message }), 'error');
             return false;
         } finally {
             if (ownerScopePromiseRef.current?.promise === promise) {
@@ -1069,7 +1071,7 @@ export const SyncProvider: React.FC<{
 
     const runInvokeSync = useCallback(async (optionsInput?: RunInvokeSyncOptions): Promise<InvokeSyncOutcome> => {
         if (isBrowserMockMode()) {
-            addToast('Unavailable in browser mock mode.', 'info');
+            addToast(t('Unavailable in browser mock mode.'), 'info');
             return { status: 'blocked', message: 'Unavailable in browser mock mode.' };
         }
 
@@ -1145,13 +1147,13 @@ export const SyncProvider: React.FC<{
             const catchesUpBoards = options.syncBoards !== false;
             const message = outcome === 'catchup'
                 ? catchesUpBoards
-                    ? 'Your InvokeAI view is ready. Ambit is catching up images and boards in the background. You can use your library now.'
-                    : 'Your InvokeAI view is ready. Ambit is catching up images in the background. You can use your library now.'
+                    ? 'Your InvokeAI view is ready. Dvoyna Vault is catching up images and boards in the background. You can use your library now.'
+                    : 'Your InvokeAI view is ready. Dvoyna Vault is catching up images in the background. You can use your library now.'
                 : outcome === 'current'
                     ? 'Your InvokeAI view is ready. You can use your library now.'
                     : 'Your saved InvokeAI view is available, but catch-up could not start because the InvokeAI database file is unavailable.';
             addToast(
-                message,
+                t(message),
                 outcome === 'unavailable' ? 'warning' : 'success'
             );
         };
@@ -1642,7 +1644,7 @@ export const SyncProvider: React.FC<{
                     setSyncProgress(clearedMessageProgress);
 
                     // Trigger complete routines
-                    addToast(`Synchronization complete: ${totalProcessed} items processed.`, 'success');
+                    addToast(t('Synchronization complete: {{totalProcessed}} items processed.', { totalProcessed: totalProcessed }), 'success');
                     
                     if (options.mode !== 'startup') {
                         await onSyncComplete?.('full');
@@ -1725,7 +1727,7 @@ export const SyncProvider: React.FC<{
             await persistInvokeSnapshot(snapshotCursor);
 
             if (totalProcessed === 0 && options.mode === 'manual') {
-                addToast('Synchronization complete: No new changes.', 'info');
+                addToast(t('Synchronization complete: No new changes.'), 'info');
             }
 
             syncOutcome = { status: 'completed' };
@@ -1744,7 +1746,7 @@ export const SyncProvider: React.FC<{
                 setSyncStatus('error');
                 const isOwnerTransitionStartup = options.mode === 'startup' && !!options.ownerTransitionToken;
                 if (options.mode === 'manual' || (options.mode === 'startup' && !isOwnerTransitionStartup)) {
-                    addToast('Sync failed: ' + message, 'error');
+                    addToast(t('Sync failed: {{message}}', { message }), 'error');
                 }
             }
         } finally {
@@ -1786,7 +1788,7 @@ export const SyncProvider: React.FC<{
             finishActiveRun(syncOutcome);
         }
         return syncOutcome;
-    }, [syncStatus, addToast, ensureInvokeOwnerScope, onSyncComplete, onInvokeContentChanged, queryClient, queueLiveFacetRefresh, incrementFacetCacheVersion, refreshAfterOwnerScopeChange, setSettings, setCollections, refreshCollections, refreshCollectionThumbnails, refreshSmartCounts, setSyncStatus, setSyncProgress, setInvokeOwnerScopeState, setInvokeSyncActivityKind, setIsLiveSyncing, startLiveWatchSession, startPendingInvokeLiveRerun, updateLiveWatchSession, reportLiveImagesReceived]);
+    }, [syncStatus, addToast, ensureInvokeOwnerScope, onSyncComplete, onInvokeContentChanged, queryClient, queueLiveFacetRefresh, incrementFacetCacheVersion, refreshAfterOwnerScopeChange, setSettings, setCollections, refreshCollections, refreshCollectionThumbnails, refreshSmartCounts, setSyncStatus, setSyncProgress, setInvokeOwnerScopeState, setInvokeSyncActivityKind, setIsLiveSyncing, startLiveWatchSession, startPendingInvokeLiveRerun, updateLiveWatchSession, reportLiveImagesReceived, t]);
 
     runInvokeSyncRef.current = runInvokeSync;
 
@@ -1978,7 +1980,7 @@ export const SyncProvider: React.FC<{
 
     const cleanLibrary = useCallback(async () => {
         if (isBrowserMockMode()) {
-            addToast('Unavailable in browser mock mode.', 'info');
+            addToast(t('Unavailable in browser mock mode.'), 'info');
             return;
         }
 
@@ -2038,7 +2040,7 @@ export const SyncProvider: React.FC<{
                         console.error('[Purge] Post-schedule UI cleanup failed; restart is still required:', cleanupError);
                     }
 
-                    addToast(scheduled.message, 'success');
+                    addToast(t(scheduled.message), 'success');
                     console.log('[Purge] Factory reset committed; startup recovery will materialize library.json.');
                 } catch (error) {
                     libraryState.setBackgroundHealingPaused(healingWasPaused);
@@ -2053,9 +2055,9 @@ export const SyncProvider: React.FC<{
         } catch (e: unknown) {
             const message = e instanceof Error ? e.message : String(e);
             console.error("[Purge] Purge failed:", e);
-            addToast('Purge failed: ' + message, 'error');
+            addToast(t('Purge failed: {{message}}', { message }), 'error');
         }
-    }, [addToast, cancelSyncAction, queryClient]);
+    }, [addToast, cancelSyncAction, queryClient, t]);
 
     return (
         <SyncContext.Provider value={{

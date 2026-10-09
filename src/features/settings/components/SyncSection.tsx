@@ -1,12 +1,13 @@
 import * as React from 'react';
 import { RefreshCw, Zap, ZapOff, XCircle } from 'lucide-react';
-import { APP_NAME } from '../../../constants/app';
+import { APP_FULL_NAME } from '../../../constants/app';
 import { AppSettings } from '../../../types';
 import { useLibrary } from '../../../contexts/LibraryContext';
 import { useToast } from '../../../hooks/useToast';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { upsertInvokeDbSnapshot } from '../../../services/invoke/dbSnapshot';
 import { isSameInvokePath } from '../../../services/invoke/pathIdentity';
+import { useTranslation } from 'react-i18next';
 
 
 interface SyncSectionProps {
@@ -19,6 +20,7 @@ const STARRED_AS_VALUES = ['favorite', 'pin', 'both', 'none'] as const satisfies
 const isStarredAs = (value: string): value is StarredAs => (STARRED_AS_VALUES as readonly string[]).includes(value);
 
 export const SyncSection: React.FC<SyncSectionProps> = React.memo(({ settings, setSettings }) => {
+    const { t } = useTranslation();
     const { syncState, startInvokeSync, cancelSync, isInvokeSyncActive, isLiveSyncing, invokeOwnerScopeState } = useLibrary();
     const { status } = syncState;
     const { addToast } = useToast();
@@ -41,41 +43,41 @@ export const SyncSection: React.FC<SyncSectionProps> = React.memo(({ settings, s
     const handleStarredAsChange = (value: string) => {
         if (!isStarredAs(value)) return;
         setSettings(prev => ({ ...prev, starredAs: value }));
-        addToast(`Starred images mapped to ${value}`, 'success');
+        addToast(t('Starred images mapped to {{value}}', { value: value }), 'success');
     };
 
     const handleSyncBoardsToggle = (checked: boolean) => {
         setSettings(prev => ({ ...prev, syncBoardsToCollections: checked }));
-        addToast(checked ? 'Boards will sync to collections' : 'Board sync disabled', 'success');
+        addToast(checked ? t('Boards will sync to collections') : t('Board sync disabled'), 'success');
     };
 
     const handleInvokeSyncFavoritesToggle = (checked: boolean) => {
         setSettings(prev => ({ ...prev, invokeSyncFavorites: checked }));
-        addToast(checked ? 'Invoke favorites will sync' : 'Invoke favorites sync disabled', 'success');
+        addToast(checked ? t('Invoke favorites will sync') : t('Invoke favorites sync disabled'), 'success');
     };
 
     const handleInvokeSyncBoardsToggle = (checked: boolean) => {
         setSettings(prev => ({ ...prev, invokeSyncBoards: checked }));
-        addToast(checked ? 'Invoke boards will sync' : 'Invoke boards sync disabled', 'success');
+        addToast(checked ? t('Invoke boards will sync') : t('Invoke boards sync disabled'), 'success');
     };
 
     const handleImportIntermediatesToggle = (checked: boolean) => {
         setSettings(prev => ({ ...prev, importIntermediates: checked }));
-        addToast(checked ? 'Intermediates import enabled' : 'Intermediates import disabled', 'success');
+        addToast(checked ? t('Intermediates import enabled') : t('Intermediates import disabled'), 'success');
     };
 
     const handleImportOrphansToggle = (checked: boolean) => {
         setSettings(prev => ({ ...prev, importOrphans: checked }));
-        addToast(checked ? 'Orphan recovery enabled' : 'Orphan recovery disabled', 'success');
+        addToast(checked ? t('Orphan recovery enabled') : t('Orphan recovery disabled'), 'success');
     };
 
 
     const handleSync = () => {
         if (anyInvokeSyncActive) {
-            addToast('Wait for the current InvokeAI sync to finish before starting another sync.', 'warning');
+            addToast(t('Wait for the current InvokeAI sync to finish before starting another sync.'), 'warning');
             return;
         }
-        addToast('Synchronization started...', 'success');
+        addToast(t('Synchronization started...'), 'success');
         startInvokeSync({
             syncFavorites,
             syncBoards,
@@ -88,7 +90,7 @@ export const SyncSection: React.FC<SyncSectionProps> = React.memo(({ settings, s
 
     const handleOpenForceFullResync = () => {
         if (anyInvokeSyncActive) {
-            addToast('Wait for the current InvokeAI sync to finish before forcing a full resync.', 'warning');
+            addToast(t('Wait for the current InvokeAI sync to finish before forcing a full resync.'), 'warning');
             return;
         }
         setIsFullResyncConfirmOpen(true);
@@ -97,7 +99,7 @@ export const SyncSection: React.FC<SyncSectionProps> = React.memo(({ settings, s
     const handleForceFullResync = () => {
         if (anyInvokeSyncActive) {
             setIsFullResyncConfirmOpen(false);
-            addToast('Wait for the current InvokeAI sync to finish before forcing a full resync.', 'warning');
+            addToast(t('Wait for the current InvokeAI sync to finish before forcing a full resync.'), 'warning');
             return;
         }
 
@@ -115,7 +117,7 @@ export const SyncSection: React.FC<SyncSectionProps> = React.memo(({ settings, s
             };
         });
         setIsFullResyncConfirmOpen(false);
-        addToast('InvokeAI full resync queued. Start sync to scan from the beginning.', 'success');
+        addToast(t('InvokeAI full resync queued. Start sync to scan from the beginning.'), 'success');
     };
 
     if (!settings.invokeAiPath) return null;
@@ -124,44 +126,42 @@ export const SyncSection: React.FC<SyncSectionProps> = React.memo(({ settings, s
         <>
         <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6 shadow-sm relative overflow-hidden group">
             <h4 className="text-[10px] font-black text-sage-600 dark:text-sage-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
-                <RefreshCw className="w-4 h-4" /> Synchronization
-            </h4>
+                <RefreshCw className="w-4 h-4" /> {t('Synchronization')}</h4>
 
             <div className="mb-8 space-y-6 relative z-10">
                 <p className="text-sm text-gray-500 font-medium">
-                    Automate the bridge between InvokeAI and your {APP_NAME} library.
+                    {t('Automate the bridge between InvokeAI and your')} {APP_FULL_NAME} library.
                 </p>
 
                 {ownerSyncBlocked && (
                     <div className="p-3 rounded-xl bg-ember-500/10 border border-ember-500/20 text-[10px] text-ember-600 dark:text-ember-300">
-                        Resolve the InvokeAI owner scope above before synchronization can run.
-                    </div>
+                        {t('Resolve the InvokeAI owner scope above before synchronization can run.')}</div>
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Favorites Group */}
                     <div className={`p-4 rounded-xl border transition-all duration-300 ${syncFavorites ? 'bg-sage-50 dark:bg-sage-500/5 border-sage-500/20' : 'bg-transparent border-gray-100 dark:border-white/5 opacity-60'}`}>
                         <label className="flex items-center gap-3 cursor-pointer group/label mb-3">
-                            <input type="checkbox" role="switch" aria-label="Sync Favorites" aria-checked={syncFavorites} className="peer sr-only" checked={syncFavorites} onChange={e => handleInvokeSyncFavoritesToggle(e.target.checked)} />
+                            <input type="checkbox" role="switch" aria-label={t('Sync Favorites')} aria-checked={syncFavorites} className="peer sr-only" checked={syncFavorites} onChange={e => handleInvokeSyncFavoritesToggle(e.target.checked)} />
                             <div className={`w-5 h-5 rounded-lg border flex items-center justify-center transition-all relative peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-sage-500/50 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-white dark:peer-focus-visible:ring-offset-slate-950 ${syncFavorites ? 'bg-sage-600 border-sage-600 shadow-lg shadow-sage-500/30' : 'border-gray-300 dark:border-white/20 bg-white/5'}`}>
                                 {syncFavorites && <div className="w-2 h-2 bg-white rounded-sm" />}
                             </div>
-                            <span className="text-sm font-bold text-gray-700 dark:text-gray-200">Sync Favorites</span>
+                            <span className="text-sm font-bold text-gray-700 dark:text-gray-200">{t('Sync Favorites')}</span>
                         </label>
 
                         {syncFavorites && (
                             <div className="pl-8 animate-in fade-in duration-150 motion-reduce:animate-none">
                                 <div className="flex items-center gap-3 p-2 bg-white/50 dark:bg-black/20 rounded-xl border border-black/5 dark:border-white/5">
-                                    <span className="text-[10px] uppercase font-black text-gray-400 tracking-tighter">Map to</span>
+                                    <span className="text-[10px] uppercase font-black text-gray-400 tracking-tighter">{t('Map to')}</span>
                                     <select
                                         value={settings.starredAs || 'favorite'}
                                         onChange={(e) => handleStarredAsChange(e.target.value)}
                                         className="flex-1 bg-gray-100 dark:bg-zinc-800 text-xs font-bold outline-none text-sage-600 dark:text-sage-300 cursor-pointer py-1.5 px-2 rounded-lg"
                                     >
-                                        <option value="favorite">Favorites</option>
-                                        <option value="pin">Pins</option>
-                                        <option value="both">Both</option>
-                                        <option value="none">None (Ignore)</option>
+                                        <option value="favorite">{t('Favorites')}</option>
+                                        <option value="pin">{t('Pins')}</option>
+                                        <option value="both">{t('Both')}</option>
+                                        <option value="none">{t('None (Ignore)')}</option>
                                     </select>
                                 </div>
                             </div>
@@ -171,21 +171,21 @@ export const SyncSection: React.FC<SyncSectionProps> = React.memo(({ settings, s
                     {/* Boards Group */}
                     <div className={`p-4 rounded-xl border transition-all duration-300 ${syncBoards ? 'bg-sage-50 dark:bg-sage-500/5 border-sage-500/20' : 'bg-transparent border-gray-100 dark:border-white/5 opacity-60'}`}>
                         <label className="flex items-center gap-3 cursor-pointer group/label mb-3">
-                            <input type="checkbox" role="switch" aria-label="Sync Boards" aria-checked={syncBoards} className="peer sr-only" checked={syncBoards} onChange={e => handleInvokeSyncBoardsToggle(e.target.checked)} />
+                            <input type="checkbox" role="switch" aria-label={t('Sync Boards')} aria-checked={syncBoards} className="peer sr-only" checked={syncBoards} onChange={e => handleInvokeSyncBoardsToggle(e.target.checked)} />
                             <div className={`w-5 h-5 rounded-lg border flex items-center justify-center transition-all relative peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-sage-500/50 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-white dark:peer-focus-visible:ring-offset-slate-950 ${syncBoards ? 'bg-sage-600 border-sage-600 shadow-lg shadow-sage-500/30' : 'border-gray-300 dark:border-white/20 bg-white/5'}`}>
                                 {syncBoards && <div className="w-2 h-2 bg-white rounded-sm" />}
                             </div>
-                            <span className="text-sm font-bold text-gray-700 dark:text-gray-200">Sync Boards</span>
+                            <span className="text-sm font-bold text-gray-700 dark:text-gray-200">{t('Sync Boards')}</span>
                         </label>
 
                         {syncBoards && (
                             <div className="pl-8 animate-in fade-in duration-150 motion-reduce:animate-none">
                                 <label className="flex items-center gap-2 cursor-pointer group/sub">
-                                    <input type="checkbox" role="switch" aria-label="Persist Synced Boards as Collections" aria-checked={settings.syncBoardsToCollections || false} className="peer sr-only" checked={settings.syncBoardsToCollections || false} onChange={e => handleSyncBoardsToggle(e.target.checked)} />
+                                    <input type="checkbox" role="switch" aria-label={t('Persist Synced Boards as Collections')} aria-checked={settings.syncBoardsToCollections || false} className="peer sr-only" checked={settings.syncBoardsToCollections || false} onChange={e => handleSyncBoardsToggle(e.target.checked)} />
                                     <div className={`w-8 h-4 rounded-full relative transition-colors peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-sage-500/50 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-white dark:peer-focus-visible:ring-offset-slate-950 ${settings.syncBoardsToCollections ? 'bg-sage-600' : 'bg-gray-300 dark:bg-white/10'}`}>
                                         <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full pointer-events-none transition-transform ${settings.syncBoardsToCollections ? 'translate-x-4' : 'translate-x-0'}`} />
                                     </div>
-                                    <span className="text-[10px] font-bold text-gray-500 group-hover/sub:text-sage-600 transition-colors">Persistent Collections</span>
+                                    <span className="text-[10px] font-bold text-gray-500 group-hover/sub:text-sage-600 transition-colors">{t('Persistent Collections')}</span>
                                 </label>
                             </div>
                         )}
@@ -194,31 +194,31 @@ export const SyncSection: React.FC<SyncSectionProps> = React.memo(({ settings, s
 
                 {/* Advanced Options */}
                 <div className="p-5 bg-black/[0.03] dark:bg-black/20 rounded-2xl border border-black/5 dark:border-white/5 space-y-4">
-                    <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">Advanced Control</div>
+                    <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">{t('Advanced Control')}</div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <label className="flex items-start gap-3 cursor-pointer group/toggle">
-                            <input type="checkbox" role="switch" aria-label="Import Intermediates" aria-checked={settings.importIntermediates || false} className="peer sr-only" checked={settings.importIntermediates || false} onChange={e => handleImportIntermediatesToggle(e.target.checked)} />
+                            <input type="checkbox" role="switch" aria-label={t('Import Intermediates')} aria-checked={settings.importIntermediates || false} className="peer sr-only" checked={settings.importIntermediates || false} onChange={e => handleImportIntermediatesToggle(e.target.checked)} />
                             <div className={`mt-1 w-10 h-5 rounded-full relative transition-colors shrink-0 peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-sage-500/50 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-white dark:peer-focus-visible:ring-offset-slate-950 ${settings.importIntermediates ? 'bg-sage-600' : 'bg-gray-200 dark:bg-white/10'}`}>
                                 <div className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full pointer-events-none transition-transform ${settings.importIntermediates ? 'translate-x-5' : 'translate-x-0'}`} />
                             </div>
                             <div>
-                                <span className="text-[11px] font-bold text-gray-700 dark:text-gray-200 block">Import Intermediates</span>
-                                <span className="text-[9px] text-gray-500 leading-tight">Sync background generation steps.</span>
+                                <span className="text-[11px] font-bold text-gray-700 dark:text-gray-200 block">{t('Import Intermediates')}</span>
+                                <span className="text-[9px] text-gray-500 leading-tight">{t('Sync background generation steps.')}</span>
                             </div>
                         </label>
 
                         <label className={`flex items-start gap-3 group/toggle ${selectedOwnerMode ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
-                            <input type="checkbox" role="switch" aria-label="Orphan Recovery" aria-checked={orphanRecoveryEnabled} className="peer sr-only" checked={orphanRecoveryEnabled} disabled={selectedOwnerMode} onChange={e => handleImportOrphansToggle(e.target.checked)} />
+                            <input type="checkbox" role="switch" aria-label={t('Orphan Recovery')} aria-checked={orphanRecoveryEnabled} className="peer sr-only" checked={orphanRecoveryEnabled} disabled={selectedOwnerMode} onChange={e => handleImportOrphansToggle(e.target.checked)} />
                             <div className={`mt-1 w-10 h-5 rounded-full relative transition-colors shrink-0 peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-sage-500/50 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-white dark:peer-focus-visible:ring-offset-slate-950 ${orphanRecoveryEnabled ? 'bg-sage-600' : 'bg-gray-200 dark:bg-white/10'}`}>
                                 <div className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full pointer-events-none transition-transform ${orphanRecoveryEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
                             </div>
                             <div>
-                                <span className="text-[11px] font-bold text-gray-700 dark:text-gray-200 block">Orphan Recovery</span>
+                                <span className="text-[11px] font-bold text-gray-700 dark:text-gray-200 block">{t('Orphan Recovery')}</span>
                                 <span className="text-[9px] text-gray-500 leading-tight">
                                     {selectedOwnerMode
-                                        ? 'Unavailable for one owner because output files do not carry reliable ownership. Your saved preference is preserved.'
-                                        : 'Manual full output-folder recovery sweep.'}
+                                        ? t('Unavailable for one owner because output files do not carry reliable ownership. Your saved preference is preserved.')
+                                        : t('Manual full output-folder recovery sweep.')}
                                 </span>
                             </div>
                         </label>
@@ -226,23 +226,21 @@ export const SyncSection: React.FC<SyncSectionProps> = React.memo(({ settings, s
 
                     <div className="mt-6 pt-5 border-t border-black/10 dark:border-white/10">
                         <div className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">
-                            Sync Recovery
-                        </div>
+                            {t('Sync Recovery')}</div>
                         <div className="flex items-center justify-between gap-6">
                             <div>
-                                <div className="text-[11px] font-bold text-gray-700 dark:text-gray-200">Force Full InvokeAI Resync</div>
-                                <div className="text-[9px] text-gray-500 leading-tight mt-1">Clear the sync cursor so the next manual sync checks the full InvokeAI database.</div>
+                                <div className="text-[11px] font-bold text-gray-700 dark:text-gray-200">{t('Force Full InvokeAI Resync')}</div>
+                                <div className="text-[9px] text-gray-500 leading-tight mt-1">{t('Clear the sync cursor so the next manual sync checks the full InvokeAI database.')}</div>
                             </div>
                             <button
                                 type="button"
                                 onClick={handleOpenForceFullResync}
                                 disabled={foregroundInvokeSyncActive}
                                 aria-disabled={anyInvokeSyncActive}
-                                title={anyInvokeSyncActive ? 'Wait for the current InvokeAI sync to finish' : 'Clear the sync cursor for the next manual sync'}
+                                title={anyInvokeSyncActive ? t('Wait for the current InvokeAI sync to finish') : t('Clear the sync cursor for the next manual sync')}
                                 className="px-3 py-2 bg-ember-500/10 hover:bg-ember-500/20 text-ember-600 dark:text-ember-300 rounded-lg text-[10px] font-black transition-all flex items-center gap-2 border border-ember-500/20 whitespace-nowrap shrink-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-ember-500/10"
                             >
-                                <RefreshCw className="w-3.5 h-3.5" /> Force Full Resync
-                            </button>
+                                <RefreshCw className="w-3.5 h-3.5" /> {t('Force Full Resync')}</button>
                         </div>
                     </div>
                 </div>
@@ -258,21 +256,20 @@ export const SyncSection: React.FC<SyncSectionProps> = React.memo(({ settings, s
                                 aria-disabled={ownerSyncBlocked || anyInvokeSyncActive}
                                 className="px-8 py-3 bg-sage-600 hover:bg-sage-500 text-white rounded-xl text-sm font-black transition-all shadow-xl shadow-sage-500/20 active:scale-95 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-sage-600"
                                 title={ownerSyncBlocked
-                                    ? 'Resolve owner scope before synchronization'
-                                    : (anyInvokeSyncActive ? 'Wait for the current InvokeAI sync to finish' : 'Start synchronization with InvokeAI')}
+                                    ? t('Resolve owner scope before synchronization')
+                                    : (anyInvokeSyncActive ? t('Wait for the current InvokeAI sync to finish') : t('Start synchronization with InvokeAI'))}
                             >
                                 {status === 'error' ? <ZapOff className="w-4 h-4" /> : <Zap className="w-4 h-4" />}
-                                {status === 'error' ? 'Retry Sync' : 'Initiate Sync'}
+                                {status === 'error' ? t('Retry Sync') : t('Initiate Sync')}
                             </button>
                         </div>
                     ) : (
                         <button
                             onClick={cancelSync}
                             className="px-6 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-300 rounded-xl text-sm font-black transition-all flex items-center gap-3 active:scale-95"
-                            title="Abort the current synchronization"
+                            title={t('Abort the current synchronization')}
                         >
-                            <XCircle className="w-5 h-5" /> Terminate Sync
-                        </button>
+                            <XCircle className="w-5 h-5" /> {t('Terminate Sync')}</button>
                     )}
                 </div>
 
@@ -282,9 +279,9 @@ export const SyncSection: React.FC<SyncSectionProps> = React.memo(({ settings, s
         </section>
         <ConfirmDialog
             isOpen={isFullResyncConfirmOpen}
-            title="Force Full InvokeAI Resync?"
-            message="This clears the InvokeAI sync cursor. The next sync will scan the full InvokeAI database. Existing Ambit records, files, and InvokeAI snapshots stay untouched."
-            confirmLabel="Force Full Resync"
+            title={t('Force Full InvokeAI Resync?')}
+            message={t('This clears the InvokeAI sync cursor. The next sync will scan the full InvokeAI database. Existing Dvoyna Vault records, files, and InvokeAI snapshots stay untouched.')}
+            confirmLabel={t('Force Full Resync')}
             onConfirm={handleForceFullResync}
             onCancel={() => setIsFullResyncConfirmOpen(false)}
             zIndex={220}

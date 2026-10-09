@@ -1953,7 +1953,7 @@ describe('Library Integration (Provider Stack)', () => {
         });
 
         expect(screen.getByText(
-            'Your InvokeAI view is ready. Ambit is catching up images and boards in the background. You can use your library now.'
+            'Your InvokeAI view is ready. Dvoyna Vault is catching up images and boards in the background. You can use your library now.'
         )).toBeTruthy();
 
         expect(mocks.getInvokeDbSnapshot).toHaveBeenCalled();
@@ -3237,7 +3237,7 @@ describe('Library Integration (Provider Stack)', () => {
         expect(mocks.rebuildFacetCacheStrict).toHaveBeenCalledOnce();
         expect(mocks.clearLibraryStatsCache).toHaveBeenCalledOnce();
         expect(screen.queryByText(
-            'Your InvokeAI view is ready. Ambit is catching up images and boards in the background. You can use your library now.'
+            'Your InvokeAI view is ready. Dvoyna Vault is catching up images and boards in the background. You can use your library now.'
         )).toBeNull();
     });
 

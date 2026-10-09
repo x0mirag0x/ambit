@@ -1717,7 +1717,7 @@ describe('App orchestration', () => {
             expect(await requireProbe(captured.viewer, 'ImageViewer').onOpenReferencedImage('missing')).toBe(false);
         });
         expect(captured.viewer?.image.id).toBe('two');
-        expect(mocks.addToast).toHaveBeenCalledWith('The referenced image is no longer available in Ambit.', 'error');
+        expect(mocks.addToast).toHaveBeenCalledWith('The referenced image is no longer available in Dvoyna Vault.', 'error');
     });
 
     it('moves visible reference navigation onto the current gallery session', async () => {

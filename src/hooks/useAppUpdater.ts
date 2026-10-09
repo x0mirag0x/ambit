@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { check, type Update } from '@tauri-apps/plugin-updater';
+import { useTranslation } from 'react-i18next';
 
 export type AppUpdaterStatus = 'idle' | 'checking' | 'available' | 'downloading' | 'installing' | 'error';
 type ToastType = 'success' | 'error' | 'info' | 'warning';
@@ -17,7 +18,7 @@ interface CheckForUpdatesOptions {
 }
 
 const RELEASE_FEED_UNAVAILABLE_MESSAGE =
-  'Update checks require Ambit release assets to be publicly reachable. The current GitHub Releases feed is unavailable, which is expected while the repository or release is private.';
+  'Update checks require Dvoyna Vault release assets to be publicly reachable. The current GitHub Releases feed is unavailable, which is expected while the repository or release is private.';
 
 const isLikelyReleaseFeedAccessError = (message: string) => {
   const normalized = message.toLowerCase();
@@ -47,7 +48,7 @@ const getCheckForUpdatesErrorMessage = (error: unknown) => {
   const rawMessage = getRawUpdaterErrorMessage(error);
 
   if (isLikelyReleaseFeedAccessError(rawMessage)) {
-    return `${RELEASE_FEED_UNAVAILABLE_MESSAGE} Once releases are public, this check will report either an available update or that Ambit is already up to date.`;
+    return `${RELEASE_FEED_UNAVAILABLE_MESSAGE} Once releases are public, this check will report either an available update or that Dvoyna Vault is already up to date.`;
   }
 
   return rawMessage;
@@ -59,6 +60,7 @@ export const useAppUpdater = ({
   isSettingsLoaded,
   isDevBuild = import.meta.env.DEV,
 }: UseAppUpdaterOptions) => {
+  const { t } = useTranslation();
   const [status, setStatus] = useState<AppUpdaterStatus>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [update, setUpdate] = useState<Update | null>(null);
@@ -71,7 +73,7 @@ export const useAppUpdater = ({
     async ({ manual = false }: CheckForUpdatesOptions = {}) => {
       if (!canCheckForUpdates) {
         if (manual) {
-          addToast('Auto-update checks are disabled in development builds.', 'info');
+          addToast(t('Auto-update checks are disabled in development builds.'), 'info');
         }
 
         return null;
@@ -89,7 +91,7 @@ export const useAppUpdater = ({
           setStatus('idle');
 
           if (manual) {
-            addToast('Ambit is already up to date.', 'success');
+            addToast(t('Dvoyna Vault is already up to date.'), 'success');
           }
 
           return null;
@@ -106,7 +108,7 @@ export const useAppUpdater = ({
         setErrorMessage(message);
 
         if (manual) {
-          addToast(`Failed to check for updates: ${message}`, 'error');
+          addToast(t('Failed to check for updates: {{message}}', { message: message }), 'error');
         } else {
           console.error('[Updater] Startup check failed:', error);
         }
@@ -143,7 +145,7 @@ export const useAppUpdater = ({
       const message = getRawUpdaterErrorMessage(error);
       setStatus('error');
       setErrorMessage(message);
-      addToast(`Failed to install update: ${message}`, 'error');
+      addToast(t('Failed to install update: {{message}}', { message: message }), 'error');
     }
   }, [addToast, update]);
 

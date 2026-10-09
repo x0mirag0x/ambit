@@ -9,6 +9,7 @@ import { AppUpdaterStatus } from '../../../hooks/useAppUpdater';
 import { useAppVersion } from '../../../hooks/useAppVersion';
 import type { ImportResult } from '../../../services/importService';
 import { isDevelopmentBuild } from '../../../utils/settingsUtils';
+import { useTranslation } from 'react-i18next';
 
 /* istanbul ignore next -- import.meta.env.DEV is fixed for a given build. */
 const DevTab = import.meta.env.DEV
@@ -62,7 +63,7 @@ const TabButton: React.FC<TabButtonProps> = ({ id, label, icon, isActive, onClic
   <button
     type="button"
     onClick={() => onClick(id)}
-    className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl border transition-colors duration-150 cursor-pointer mb-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sage-300/70 ${isActive
+    className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl border transition-colors duration-150 cursor-pointer mb-1 min-w-0 text-left leading-snug focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sage-300/70 ${isActive
       ? 'bg-white/10 text-white shadow-inner border-white/10'
       : 'border-transparent text-gray-400 hover:bg-white/5 hover:text-white'
       }`}
@@ -93,6 +94,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = React.memo(({
   onNavigateToMaintenance,
   onResetFirstRunOnboarding
 }) => {
+  const { t } = useTranslation();
   const appVersion = useAppVersion();
   const showDevTools = isDevelopmentBuild();
   const prefersReducedMotion = useReducedMotion();
@@ -173,7 +175,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = React.memo(({
           >
 
             {/* Sidebar */}
-            <div className="w-64 bg-gradient-to-b from-gray-900 to-sage-950 flex flex-col p-4 shrink-0 relative overflow-hidden">
+            <div className="w-72 bg-gradient-to-b from-gray-900 to-sage-950 flex flex-col p-4 shrink-0 relative overflow-hidden">
               {/* Noise Texture Overlay - inline SVG to prevent network-related flash */}
               <div
                 className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay"
@@ -183,25 +185,25 @@ export const SettingsModal: React.FC<SettingsModalProps> = React.memo(({
               />
 
               <div className="relative z-10">
-                <h2 className="text-lg font-bold text-white mb-8 px-4 mt-2 tracking-tight">{APP_NAME} Preferences</h2>
+                <h2 className="text-lg font-bold text-white mb-8 px-4 mt-2 tracking-tight">{APP_NAME} {t('Preferences')}</h2>
                 <nav className="space-y-6">
                   <div>
-                    <h4 className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] px-4 mb-2">Application</h4>
-                    <TabButton id="general" label="General" icon={<Monitor className="w-4 h-4" />} isActive={activeTab === 'general'} onClick={setActiveTab} />
-                    <TabButton id="connections" label="Connections" icon={<Link className="w-4 h-4" />} isActive={activeTab === 'connections'} onClick={setActiveTab} />
-                    <TabButton id="intelligence" label="Intelligence" icon={<Sparkles className="w-4 h-4" />} isActive={activeTab === 'intelligence'} onClick={setActiveTab} />
+                    <h4 className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] px-4 mb-2">{t('Application')}</h4>
+                    <TabButton id="general" label={t('General')} icon={<Monitor className="w-4 h-4" />} isActive={activeTab === 'general'} onClick={setActiveTab} />
+                    <TabButton id="connections" label={t('Connections')} icon={<Link className="w-4 h-4" />} isActive={activeTab === 'connections'} onClick={setActiveTab} />
+                    <TabButton id="intelligence" label={t('Intelligence')} icon={<Sparkles className="w-4 h-4" />} isActive={activeTab === 'intelligence'} onClick={setActiveTab} />
                   </div>
 
                   <div>
-                    <h4 className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] px-4 mb-2">Security</h4>
-                    <TabButton id="privacy" label="Privacy" icon={<Shield className="w-4 h-4" />} isActive={activeTab === 'privacy'} onClick={setActiveTab} />
+                    <h4 className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] px-4 mb-2">{t('Security')}</h4>
+                    <TabButton id="privacy" label={t('Privacy')} icon={<Shield className="w-4 h-4" />} isActive={activeTab === 'privacy'} onClick={setActiveTab} />
                   </div>
 
                   <div>
-                    <h4 className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] px-4 mb-2">Advanced</h4>
-                    <TabButton id="advanced" label="Advanced" icon={<Shield className="w-4 h-4" />} isActive={activeTab === 'advanced'} onClick={setActiveTab} />
+                    <h4 className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] px-4 mb-2">{t('Advanced')}</h4>
+                    <TabButton id="advanced" label={t('Advanced')} icon={<Shield className="w-4 h-4" />} isActive={activeTab === 'advanced'} onClick={setActiveTab} />
                     {showDevTools && (
-                      <TabButton id="dev" label="Dev Tools" icon={<Terminal className="w-4 h-4" />} isActive={activeTab === 'dev'} onClick={setActiveTab} />
+                      <TabButton id="dev" label={t('Dev Tools')} icon={<Terminal className="w-4 h-4" />} isActive={activeTab === 'dev'} onClick={setActiveTab} />
                     )}
                   </div>
                 </nav>
@@ -217,14 +219,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = React.memo(({
               <div className="flex items-center justify-between p-8 pb-4 shrink-0">
                 <div className="flex flex-col">
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {TAB_LABELS[activeTab]}
+                    {t(TAB_LABELS[activeTab])}
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage your application preferences and connections.</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('Manage your application preferences and connections.')}</p>
                 </div>
                 <button
                   ref={closeButtonRef}
                   type="button"
-                  aria-label="Close Settings"
+                  aria-label={t('Close Settings')}
                   onClick={onClose}
                   className="p-2 bg-gray-200 dark:bg-white/5 rounded-full text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
                 >

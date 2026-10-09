@@ -9,6 +9,8 @@ import { VirtualGrid } from '../../library/components/VirtualGrid';
 import { type SyncProgress } from '../../../stores/libraryStore';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import type { ExactDuplicateResolution, FileHashBackfillResult } from '../../../bindings';
+import { useTranslation } from 'react-i18next';
+import { translateRuntimeMessage } from '../../../i18n/statusMessages';
 
 // --- Sub-Component for Individual Duplicate Image in a Group ---
 const DuplicateItem: React.FC<{
@@ -21,6 +23,7 @@ const DuplicateItem: React.FC<{
     canCompare: boolean;
     disabled?: boolean;
 }> = ({ img, onKeepOnly, onView, onCompare, maskedKeywords, isLatestModified, canCompare, disabled = false }) => {
+    const { t } = useTranslation();
     const privacyEnabled = useSettingsStore(s => s.privacyEnabled);
     const [isRevealed, setRevealed] = useState(false);
     const effectiveMasked = isImageMasked(img, privacyEnabled, maskedKeywords);
@@ -53,8 +56,7 @@ const DuplicateItem: React.FC<{
                             }}
                             className="px-3 py-1 bg-black/50 hover:bg-black/70 text-white text-[10px] font-bold uppercase tracking-wider rounded-full backdrop-blur-md transition-colors flex items-center gap-1"
                         >
-                            <Eye className="w-3 h-3" /> Reveal
-                        </button>
+                            <Eye className="w-3 h-3" /> {t('Reveal')}</button>
                     </div>
                 )}
 
@@ -64,8 +66,7 @@ const DuplicateItem: React.FC<{
                         {isLatestModified && (
                             <div className="bg-sage-500 text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded shadow-lg flex items-center gap-1">
                                 <Clock className="w-2.5 h-2.5" />
-                                Latest Modified
-                            </div>
+                                {t('Latest Modified')}</div>
                         )}
                     </div>
                     <div className="bg-black/60 backdrop-blur-md text-[10px] font-mono text-white px-2 py-0.5 rounded border border-white/10 shadow-sm">
@@ -78,16 +79,16 @@ const DuplicateItem: React.FC<{
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 backdrop-blur-[1px] z-30">
                         <div className="flex items-center gap-2">
                             <TooltipButton
-                                label="Open in Viewer"
-                                content="Open in Viewer"
+                                label={t('Open in Viewer')}
+                                content={t('Open in Viewer')}
                                 onClick={() => onView(img, effectiveMasked && isRevealed)}
                                 className="p-2 bg-white/90 hover:bg-white text-gray-900 rounded-full shadow-lg transform hover:scale-105 transition-all"
                             >
                                 <Eye className="w-4 h-4" />
                             </TooltipButton>
                             <TooltipButton
-                                label="Compare with Another Copy"
-                                content="Compare with Another Copy"
+                                label={t('Compare with Another Copy')}
+                                content={t('Compare with Another Copy')}
                                 onClick={() => onCompare(img)}
                                 disabled={!canCompare}
                                 className="p-2 bg-white/90 hover:bg-white disabled:opacity-40 disabled:hover:scale-100 text-gray-900 rounded-full shadow-lg transform hover:scale-105 transition-all"
@@ -100,8 +101,7 @@ const DuplicateItem: React.FC<{
                             disabled={disabled}
                             className="px-4 py-2 bg-sage-600 hover:bg-sage-500 disabled:opacity-50 disabled:hover:scale-100 text-white rounded-full font-bold text-xs shadow-lg transform hover:scale-105 transition-all flex items-center gap-2"
                         >
-                            <Check className="w-3 h-3" /> Keep Only This
-                        </button>
+                            <Check className="w-3 h-3" /> {t('Keep Only This')}</button>
                     </div>
                 )}
             </div>
@@ -130,6 +130,7 @@ const DuplicateGroupCard: React.FC<{
     isResolving: boolean;
     style?: React.CSSProperties;
 }> = React.memo(({ group, latestModifiedId, onResolve, onViewImage, onCompareImages, maskedKeywords, isResolving, style }) => {
+    const { t } = useTranslation();
     const getComparePeer = (img: AIImage) => {
         if (isVideoAsset(img)) return undefined;
         return group.images.find(candidate => !isVideoAsset(candidate) && candidate.id === latestModifiedId && candidate.id !== img.id)
@@ -143,8 +144,7 @@ const DuplicateGroupCard: React.FC<{
                     <div className="flex items-center gap-2">
                         <Fingerprint className="w-4 h-4 text-sage-500" />
                         <span className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                            Exact Duplicate Group
-                        </span>
+                            {t('Exact Duplicate Group')}</span>
                     </div>
                             <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${group.images.length > 2 ? 'border border-ember-200 bg-ember-100 text-ember-600 dark:border-ember-500/30 dark:bg-ember-500/15 dark:text-ember-300' : 'text-gray-400'}`}>
                         {group.images.length} copies
@@ -182,8 +182,7 @@ const DuplicateGroupCard: React.FC<{
                     </div>
                     <div className="flex-1">
                         <p className="text-[10px] text-gray-500 dark:text-gray-400">
-                            SHA-256 content hashes match. Other records move to Removed; files stay on disk.
-                        </p>
+                            {t('SHA-256 content hashes match. Other records move to Removed; files stay on disk.')}</p>
                     </div>
                 </div>
             </div>
@@ -196,6 +195,7 @@ const DuplicateScanStatus: React.FC<{
     onCancel?: () => void;
     compact?: boolean;
 }> = ({ progress, onCancel, compact = false }) => {
+    const { t } = useTranslation();
     const current = progress?.current ?? 0;
     const total = progress?.total ?? 0;
     const percent = total > 0 ? Math.round((current / total) * 100) : 0;
@@ -208,9 +208,9 @@ const DuplicateScanStatus: React.FC<{
                         <Fingerprint className="w-4 h-4" />
                     </div>
                     <div className="min-w-0">
-                        <p className="text-xs font-black uppercase tracking-widest text-sage-700 dark:text-sage-300">Duplicate Scan Running</p>
+                        <p className="text-xs font-black uppercase tracking-widest text-sage-700 dark:text-sage-300">{t('Duplicate Scan Running')}</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                            {progress?.message || 'Preparing exact duplicate detection...'}
+                            {progress?.message ? translateRuntimeMessage(progress.message) : t('Preparing exact duplicate detection...')}
                         </p>
                     </div>
                 </div>
@@ -219,8 +219,7 @@ const DuplicateScanStatus: React.FC<{
                         onClick={onCancel}
                         className="shrink-0 px-3 py-1.5 text-[10px] font-bold text-red-500 hover:text-red-700 dark:hover:text-red-400 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors uppercase tracking-wider flex items-center gap-1"
                     >
-                        <X className="w-3 h-3" /> Cancel
-                    </button>
+                        <X className="w-3 h-3" /> {t('Cancel')}</button>
                 )}
             </div>
             <div className="mt-4">
@@ -231,8 +230,8 @@ const DuplicateScanStatus: React.FC<{
                     />
                 </div>
                 <div className="mt-1 flex justify-between text-[10px] font-mono text-gray-400">
-                    <span>{total > 0 ? `${current.toLocaleString()} / ${total.toLocaleString()}` : 'Scanning candidates'}</span>
-                    <span>{total > 0 ? `${percent}%` : ''}</span>
+                    <span>{total > 0 ? t('{{v0}} / {{v1}}', { v0: current.toLocaleString(), v1: total.toLocaleString() }) : t('Scanning candidates')}</span>
+                    <span>{total > 0 ? t('{{percent}}%', { percent: percent }) : ''}</span>
                 </div>
             </div>
         </div>
@@ -271,6 +270,7 @@ export const DuplicateFinder: React.FC<DuplicateFinderProps> = React.memo(({
     onRangeSelection,
     onBackgroundClick
 }) => {
+    const { t } = useTranslation();
     const { groups, totalRedundantCount, isResolving, handleResolve, handleBulkResolve } = useDuplicateFinder(images, onResolve);
     const scanIncomplete = !isScanning && Boolean(
         scanResult && (scanResult.wasCancelled || scanResult.errors > 0 || scanResult.remaining > 0)
@@ -294,14 +294,16 @@ export const DuplicateFinder: React.FC<DuplicateFinderProps> = React.memo(({
                     )}
                 </div>
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-                    {isScanning ? 'Scanning for Duplicates' : scanIncomplete ? 'Scan Incomplete' : 'Library is Clean'}
+                    {isScanning ? t('Scanning for Duplicates') : scanIncomplete ? t('Scan Incomplete') : t('Library is Clean')}
                 </h2>
                 <p className="max-w-md text-center text-gray-500 dark:text-gray-400 mb-6">
                     {isScanning
-                        ? 'Exact duplicate detection is hashing candidate files across the entire library.'
+                        ? t('Exact duplicate detection is hashing candidate files across the entire library.')
                         : scanIncomplete
-                            ? `Some candidates remain unchecked${scanResult?.errors ? ` (${scanResult.errors} scan ${scanResult.errors === 1 ? 'error' : 'errors'})` : ''}. Run the global scan again to complete exact duplicate detection.`
-                            : 'No exact SHA-256 duplicate groups were found in the entire library.'}
+                            ? scanResult?.errors
+                                ? t('duplicates.uncheckedWithErrors', { count: scanResult.errors })
+                                : t('duplicates.unchecked')
+                            : t('No exact SHA-256 duplicate groups were found in the entire library.')}
                 </p>
                 {onRefresh && (
                     <div className="flex flex-col items-center gap-4">
@@ -310,8 +312,7 @@ export const DuplicateFinder: React.FC<DuplicateFinderProps> = React.memo(({
                             disabled={isScanning || isResolving}
                             className="px-6 py-2 bg-sage-500 hover:bg-sage-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold transition-all shadow-lg shadow-sage-500/20 flex items-center gap-2"
                         >
-                            <Zap className="w-4 h-4" /> Run Global Scan
-                        </button>
+                            <Zap className="w-4 h-4" /> {t('Run Global Scan')}</button>
                     </div>
                 )}
             </div>
@@ -335,14 +336,12 @@ export const DuplicateFinder: React.FC<DuplicateFinderProps> = React.memo(({
                     </div>
                     <div>
                         <div className="flex items-center gap-2">
-                            <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200">Duplicate Detection</h3>
+                            <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200">{t('Duplicate Detection')}</h3>
                             <span className="px-1.5 py-0.5 bg-sage-500/20 text-sage-600 dark:text-sage-400 rounded text-[9px] font-bold uppercase tracking-tighter">
-                                Global Scan
-                            </span>
+                                {t('Global Scan')}</span>
                         </div>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                            Found {groups.length} exact groups ({totalRedundantCount} redundant records) across your library. Files stay on disk.
-                        </p>
+                            {t('Found')} {groups.length} {t('exact groups (')}{totalRedundantCount} {t('redundant records) across your library. Files stay on disk.')}</p>
                     </div>
                 </div>
 
@@ -352,18 +351,17 @@ export const DuplicateFinder: React.FC<DuplicateFinderProps> = React.memo(({
                             onClick={() => onRefresh()}
                             disabled={isScanning || isResolving}
                             className="px-3 py-2 text-xs font-bold text-gray-500 hover:text-sage-500 hover:bg-white dark:hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all border border-transparent hover:border-sage-200/50 flex items-center gap-2"
-                            title="Rescan entire library"
+                            title={t('Rescan entire library')}
                         >
                             <RefreshCw className={`w-4 h-4 ${isScanning ? 'animate-spin' : ''}`} />
-                            Rescan
-                        </button>
+                            {t('Rescan')}</button>
                     )}
 
                     {totalRedundantCount > 0 && (
                         <div className="flex items-center gap-2 p-1 bg-white/50 dark:bg-black/20 border border-sage-200/50 dark:border-white/5 rounded-2xl shadow-sm">
                             <div className="px-3 py-1 flex items-center gap-2 border-r border-sage-200/50 dark:border-white/5 mr-1">
                                 <Zap className="w-3.5 h-3.5 text-sage-500" />
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">Exact Bulk</span>
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">{t('Exact Bulk')}</span>
                             </div>
                             <button
                                 onClick={() => {
@@ -373,8 +371,7 @@ export const DuplicateFinder: React.FC<DuplicateFinderProps> = React.memo(({
                                 className="px-4 py-2 bg-sage-500 hover:bg-sage-600 disabled:opacity-50 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 group shadow-md shadow-sage-500/20"
                             >
                                 <Clock className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform" />
-                                Keep Latest Modified
-                                <span className="px-1.5 py-0.5 bg-white/20 rounded-md text-[9px]">{totalRedundantCount}</span>
+                                {t('Keep Latest Modified')}<span className="px-1.5 py-0.5 bg-white/20 rounded-md text-[9px]">{totalRedundantCount}</span>
                             </button>
                             <button
                                 onClick={() => {
@@ -384,8 +381,7 @@ export const DuplicateFinder: React.FC<DuplicateFinderProps> = React.memo(({
                                 className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-white/5 disabled:opacity-50 text-gray-600 dark:text-gray-400 rounded-xl text-xs font-bold transition-all flex items-center gap-2 group"
                             >
                                 <Clock className="w-3.5 h-3.5 opacity-40 group-hover:-rotate-12 transition-transform" />
-                                Keep Earliest Modified
-                            </button>
+                                {t('Keep Earliest Modified')}</button>
                         </div>
                     )}
                 </div>

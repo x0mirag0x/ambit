@@ -63,6 +63,7 @@ interface ImageViewerProps {
 import { AIResultModal } from './AIResultModal';
 import { ViewerToolbar } from './ViewerToolbar';
 import { VersionSelector } from './VersionSelector';
+import { useTranslation } from 'react-i18next';
 
 interface ViewerStatusHudProps {
     isFavorite: boolean;
@@ -148,6 +149,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
     searchHighlights,
     onOpenReferencedImage
 }) => {
+    const { t } = useTranslation();
     const metadataDisclosure = useMetadataDisclosureState();
     const settings = useSettingsStore(s => s.settings);
     const privacyExposureBlocked = useSettingsStore(state => (
@@ -262,7 +264,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
         aiThinkingMode: getEffectiveAiThinkingMode(settings),
         enableAI: settings.enableAI,
         prompts: getEffectiveSystemPrompts(settings),
-        onError: (msg) => addToast(msg, 'error')
+        onError: (msg) => addToast(t(msg), 'error')
     });
 
     // --- UI State ---
@@ -400,7 +402,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
             <motion.div
                 role="dialog"
                 aria-modal="true"
-                aria-label="Hidden image"
+                aria-label={t('Hidden image')}
                 initial={false}
                 animate={{ opacity: 1 }}
                 className="fixed inset-0 z-[100] flex bg-gray-950/95 backdrop-blur-md"
@@ -431,7 +433,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
     const handleOpenExternal = async () => {
         const result = await openFileInDefaultApp(displayImage.id);
         if (result.status === 'error') {
-            addToast(result.error, isOsOpenUnavailable(result.error) ? 'info' : 'error');
+            addToast(t(result.error), isOsOpenUnavailable(result.error) ? 'info' : 'error');
         }
     };
 
@@ -445,7 +447,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
         <motion.div
             role="dialog"
             aria-modal="true"
-            aria-label={`Image viewer: ${displayImage.filename}`}
+            aria-label={t('Image viewer: {{filename}}', { filename: displayImage.filename })}
             initial={false}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.2 } }}

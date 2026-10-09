@@ -5,6 +5,7 @@ import { X, Play, Pause, ChevronLeft, ChevronRight, Shuffle, Clock, Maximize2, I
 import { AIImage } from '../../../types';
 import { SmartImage } from '../../../features/library/components/SmartImage';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
+import { useTranslation } from 'react-i18next';
 
 interface SlideshowModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export const SlideshowModal: React.FC<SlideshowModalProps> = ({
   isShuffleDefault = false
 }) => {
   // Playback State
+  const { t } = useTranslation();
   const [isPlaying, setIsPlaying] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isShuffle, setIsShuffle] = useState(isShuffleDefault);
@@ -167,7 +169,7 @@ export const SlideshowModal: React.FC<SlideshowModalProps> = ({
       ref={dialogRef}
       role="dialog"
       aria-modal="true"
-      aria-label="Slideshow"
+      aria-label={t('Slideshow')}
       tabIndex={-1}
       className={`fixed inset-0 z-[100] bg-black flex items-center justify-center overflow-hidden ${!showHud ? 'cursor-none' : ''}`}
       onMouseMove={handleMouseMove}
@@ -227,7 +229,7 @@ export const SlideshowModal: React.FC<SlideshowModalProps> = ({
         }}
       >
         <div className="absolute top-0 left-0 right-0 p-6 flex justify-end bg-gradient-to-b from-black/60 to-transparent pointer-events-auto z-50">
-          <button type="button" aria-label="Close Slideshow" onClick={onClose} className="p-3 hover:bg-white/10 rounded-full text-white/80 hover:text-white transition-colors">
+          <button type="button" aria-label={t('Close Slideshow')} onClick={onClose} className="p-3 hover:bg-white/10 rounded-full text-white/80 hover:text-white transition-colors">
             <X className="w-8 h-8" />
           </button>
         </div>
@@ -238,8 +240,8 @@ export const SlideshowModal: React.FC<SlideshowModalProps> = ({
           onClick={(e) => e.stopPropagation()}
         >
           <TooltipButton
-            label={isShuffle ? "Disable Shuffle" : "Enable Shuffle"}
-            content={isShuffle ? "Disable Shuffle" : "Enable Shuffle"}
+            label={isShuffle ? t('Disable Shuffle') : t('Enable Shuffle')}
+            content={isShuffle ? t('Disable Shuffle') : t('Enable Shuffle')}
             aria-pressed={isShuffle}
             onClick={() => setIsShuffle(s => !s)}
             className={`p-2 rounded-full transition-colors ${isShuffle ? 'text-sage-400' : 'text-white/50 hover:text-white'}`}
@@ -247,13 +249,13 @@ export const SlideshowModal: React.FC<SlideshowModalProps> = ({
             <Shuffle className="w-5 h-5" />
           </TooltipButton>
 
-          <button type="button" aria-label="Previous Image" onClick={prevImage} className="p-2 hover:bg-white/10 rounded-full text-white transition-colors">
+          <button type="button" aria-label={t('Previous Image')} onClick={prevImage} className="p-2 hover:bg-white/10 rounded-full text-white transition-colors">
             <ChevronLeft className="w-6 h-6" />
           </button>
 
           <button
             type="button"
-            aria-label={isPlaying ? "Pause Slideshow" : "Play Slideshow"}
+            aria-label={isPlaying ? t('Pause Slideshow') : t('Play Slideshow')}
             aria-pressed={isPlaying}
             onClick={() => setIsPlaying(p => !p)}
             className="p-3 bg-white text-black hover:scale-105 transition-transform rounded-full shadow-lg shadow-white/20"
@@ -261,16 +263,16 @@ export const SlideshowModal: React.FC<SlideshowModalProps> = ({
             {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-1" />}
           </button>
 
-          <button type="button" aria-label="Next Image" onClick={nextImage} className="p-2 hover:bg-white/10 rounded-full text-white transition-colors">
+          <button type="button" aria-label={t('Next Image')} onClick={nextImage} className="p-2 hover:bg-white/10 rounded-full text-white transition-colors">
             <ChevronRight className="w-6 h-6" />
           </button>
 
           <button
             type="button"
-            aria-label={`Change Slideshow Duration (${getDurationLabel(duration)})`}
+            aria-label={t('Change Slideshow Duration ({{v0}})', { v0: getDurationLabel(duration) })}
             onClick={cycleDuration}
             className="flex items-center gap-1 text-xs font-mono text-white/70 hover:text-white w-12 justify-center"
-            title="Toggle Duration"
+            title={t('Toggle Duration')}
           >
             <Clock className="w-3 h-3" />
             {getDurationLabel(duration)}

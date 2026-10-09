@@ -4,6 +4,8 @@ import { AppSettings } from '../../../types';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
 import { ResourceDiscoverySection } from './ResourceDiscoverySection';
 import { useResourcesTabLogic } from '../hooks/useResourcesTabLogic';
+import { useTranslation } from 'react-i18next';
+import { translateRuntimeMessage } from '../../../i18n/statusMessages';
 
 interface TabProps {
     settings: AppSettings;
@@ -11,6 +13,7 @@ interface TabProps {
 }
 
 export const ResourcesTab: React.FC<TabProps> = React.memo(({ settings, setSettings }) => {
+    const { t } = useTranslation();
     const {
         resourceFolders,
         isScanningDiscovery,
@@ -67,18 +70,18 @@ export const ResourcesTab: React.FC<TabProps> = React.memo(({ settings, setSetti
                             <FolderSearch className="w-5 h-5 text-harbor-600 dark:text-harbor-300" />
                         </div>
                         <div>
-                            <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100">Online Model Hash Resolution</h4>
-                            <p className="text-xs text-gray-500">Optional CivitAI lookup for unresolved model hashes</p>
+                            <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100">{t('Online Model Hash Resolution')}</h4>
+                            <p className="text-xs text-gray-500">{t('Optional CivitAI lookup for unresolved model hashes')}</p>
                         </div>
                     </div>
                     {isResolving ? (
                         <div className="flex items-center gap-3 rounded-lg border border-harbor-200 bg-harbor-50 px-3 py-1.5 dark:border-harbor-500/20 dark:bg-harbor-500/10">
                             <RefreshCw className="w-3.5 h-3.5 animate-spin text-harbor-600 dark:text-harbor-300" />
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-harbor-600 dark:text-harbor-300">Resolving...</span>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-harbor-600 dark:text-harbor-300">{t('Resolving...')}</span>
                             <div className="h-3 w-px bg-harbor-300 dark:bg-harbor-500/30" />
                             <button
                                 type="button"
-                                aria-label="Cancel Online Model Resolution"
+                                aria-label={t('Cancel Online Model Resolution')}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     void cancelResolveOnline();
@@ -92,10 +95,10 @@ export const ResourcesTab: React.FC<TabProps> = React.memo(({ settings, setSetti
                         <button
                             onClick={requestResolveOnline}
                             disabled={isHashResolutionBlocked}
-                            title={isHashResolutionBlocked ? 'Wait for the current library task to finish' : undefined}
+                            title={isHashResolutionBlocked ? t('Wait for the current library task to finish') : undefined}
                             className="inline-flex min-h-10 items-center justify-center rounded-lg bg-sage-600 px-4 text-sm font-semibold text-white transition-colors hover:bg-sage-500 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500 dark:disabled:bg-white/10"
                         >
-                            {isHashResolutionBlocked ? 'Library Busy' : 'Resolve Online'}
+                            {isHashResolutionBlocked ? t('Library Busy') : t('Resolve Online')}
                         </button>
                     )}
                 </div>
@@ -103,7 +106,7 @@ export const ResourcesTab: React.FC<TabProps> = React.memo(({ settings, setSetti
                 {isResolving && resolutionProgress && (
                     <div className="mb-6 space-y-2">
                         <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-harbor-600 dark:text-harbor-300">
-                            <span>{resolutionProgress.message}</span>
+                            <span>{translateRuntimeMessage(resolutionProgress.message ?? '')}</span>
                             <span>{resolutionProgressPercent} %</span>
                         </div>
                         <div className="h-1.5 w-full overflow-hidden rounded-full bg-harbor-100 dark:bg-harbor-500/10">
@@ -123,9 +126,9 @@ export const ResourcesTab: React.FC<TabProps> = React.memo(({ settings, setSetti
                         {resolutionResult.success ? <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" /> : <Info className="w-5 h-5 flex-shrink-0 mt-0.5" />}
                         <div className="min-w-0">
                             <span className="block text-[10px] font-black uppercase tracking-widest opacity-60 mb-0.5">
-                                {resolutionResult.success ? 'Success' : 'Resolution Partial'}
+                                {resolutionResult.success ? t('Success') : t('Resolution Partial')}
                             </span>
-                            <p className="text-sm font-medium leading-relaxed">{resolutionResult.message}</p>
+                            <p className="text-sm font-medium leading-relaxed">{translateRuntimeMessage(resolutionResult.message)}</p>
                         </div>
                     </div>
                 )}
@@ -135,9 +138,9 @@ export const ResourcesTab: React.FC<TabProps> = React.memo(({ settings, setSetti
                 isOpen={isResolveConfirmOpen}
                 onCancel={cancelResolveConfirmation}
                 onConfirm={confirmResolveOnline}
-                title="Resolve Online?"
-                message="Search CivitAI for metadata for unresolved model hashes? This sends hash strings to CivitAI, not image files. It requires internet access and may take some time."
-                confirmLabel="Resolve Online"
+                title={t('Resolve Online?')}
+                message={t('Search CivitAI for metadata for unresolved model hashes? This sends hash strings to CivitAI, not image files. It requires internet access and may take some time.')}
+                confirmLabel={t('Resolve Online')}
             />
         </div>
     );

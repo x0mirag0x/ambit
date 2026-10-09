@@ -2,7 +2,7 @@
 
 [Back to manual index](index.md)
 
-The library is the main place to review images after Ambit has scanned folders or files.
+The library is the main place to review images after Dvoyna Vault has scanned folders or files.
 
 ## Views
 
@@ -33,7 +33,7 @@ Dropdown counts load independently after the gallery is ready. A dash means the 
 
 ## Grid Browsing
 
-Grid View is designed for large libraries. Ambit uses virtualized rendering so it can browse many images without drawing every record at once.
+Grid View is designed for large libraries. Dvoyna Vault uses virtualized rendering so it can browse many images without drawing every record at once.
 
 Typical grid actions:
 
@@ -60,7 +60,7 @@ Statistics follow the active library filters. Avg. Steps is the rounded mean for
 
 ## Selection
 
-Ambit supports common selection patterns:
+Dvoyna Vault supports common selection patterns:
 
 - `Ctrl + Click` toggles individual selection.
 - `Shift + Click` selects a range.

@@ -202,7 +202,7 @@ describe('useAppUpdater', () => {
 
         await act(async () => result.current.checkForUpdates({ manual: true }));
 
-        expect(mockAddToast).toHaveBeenCalledWith('Ambit is already up to date.', 'success');
+        expect(mockAddToast).toHaveBeenCalledWith('Dvoyna Vault is already up to date.', 'success');
     });
 
     it.each(['401', '403', 'forbidden', 'not found', 'unauthorized']) (

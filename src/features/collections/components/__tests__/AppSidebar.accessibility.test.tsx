@@ -88,7 +88,7 @@ describe('AppSidebar tooltips', () => {
     it('hands focus from the Support tooltip into its modal and restores it on close', () => {
         render(<SidebarModalHarness />);
 
-        const launcher = screen.getByRole('button', { name: 'Support Ambit' });
+        const launcher = screen.getByRole('button', { name: 'Support Dvoyna Vault' });
         act(() => launcher.focus());
         expect(screen.getByRole('tooltip')).toBeTruthy();
         fireEvent.click(launcher);

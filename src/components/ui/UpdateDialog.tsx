@@ -5,6 +5,7 @@ import ReactMarkdown, { type Components } from 'react-markdown';
 import { AppUpdaterStatus } from '../../hooks/useAppUpdater';
 import { RELEASES_URL } from '../../constants/support';
 import { openExternalUrl } from '../../utils/externalLinks';
+import { useTranslation } from 'react-i18next';
 
 interface UpdateDialogProps {
   availableVersion: string;
@@ -59,6 +60,7 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
   onClose,
   onInstall,
 }) => {
+  const { t } = useTranslation();
   const isBusy = status === 'downloading' || status === 'installing';
   const publishedLabel = formatPublishedDate(publishedAt);
 
@@ -101,13 +103,12 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
                     {isBusy ? <RefreshCw className="h-6 w-6 animate-spin" /> : <Download className="h-6 w-6" />}
                   </div>
                   <div>
-                    <p className="text-xs font-black uppercase tracking-[0.22em] text-sage-600 dark:text-sage-300">Update Available</p>
+                    <p className="text-xs font-black uppercase tracking-[0.22em] text-sage-600 dark:text-sage-300">{t('Update Available')}</p>
                     <h3 id="update-dialog-title" className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-                      Ambit {availableVersion}
+                      {t('Dvoyna Vault')} {availableVersion}
                     </h3>
                     <p id="update-dialog-description" className="mt-2 max-w-md text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                      A newer build is ready to install. After you confirm, Ambit will download the update and then restart or close to finish the installation.
-                    </p>
+                      {t('A newer build is ready to install. After you confirm, Dvoyna Vault will download the update and then restart or close to finish the installation.')}</p>
                   </div>
                 </div>
 
@@ -115,7 +116,7 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
                   type="button"
                   onClick={onClose}
                   disabled={isBusy}
-                  aria-label="Close update dialog"
+                  aria-label={t('Close update dialog')}
                   className={`rounded-full p-2 text-slate-400 transition-colors hover:bg-black/5 hover:text-slate-700 dark:hover:bg-white/5 dark:hover:text-white ${isBusy ? 'pointer-events-none opacity-0' : ''}`}
                 >
                   <X className="h-4 w-4" />
@@ -124,13 +125,13 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
 
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-white/10 dark:bg-white/5">
-                  <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Current</div>
-                  <div className="mt-2 text-lg font-semibold text-slate-900 dark:text-white">{currentVersion ?? 'Loading...'}</div>
+                  <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{t('Current')}</div>
+                  <div className="mt-2 text-lg font-semibold text-slate-900 dark:text-white">{currentVersion ?? t('Loading...')}</div>
                 </div>
                 <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-white/10 dark:bg-white/5">
-                  <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">Available</div>
+                  <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{t('Available')}</div>
                   <div className="mt-2 text-lg font-semibold text-slate-900 dark:text-white">{availableVersion}</div>
-                  {publishedLabel && <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">Published {publishedLabel}</div>}
+                  {publishedLabel && <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">{t('Published')} {publishedLabel}</div>}
                 </div>
               </div>
 
@@ -138,28 +139,26 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                   <p>
-                    Windows installers may close the app automatically while the update is applied. macOS and Linux typically restart after the install completes.
-                  </p>
+                    {t('Windows installers may close the app automatically while the update is applied. macOS and Linux typically restart after the install completes.')}</p>
                 </div>
               </div>
 
               <div className="mt-6">
                 <div className="flex items-center justify-between gap-4">
-                  <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">What's New</div>
+                  <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">{t('What\'s New')}</div>
                   <button
                     type="button"
                     onClick={() => void openExternalUrl(RELEASES_URL)}
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-sage-700 transition-colors hover:text-sage-900 dark:text-sage-300 dark:hover:text-sage-100"
                   >
-                    View release on GitHub
-                    <ExternalLink className="h-3.5 w-3.5" />
+                    {t('View release on GitHub')}<ExternalLink className="h-3.5 w-3.5" />
                   </button>
                 </div>
                 <div className="mt-2 max-h-56 overflow-y-auto rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-sm leading-relaxed text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
                   {notes && notes.trim().length > 0 ? (
                     <ReactMarkdown components={releaseNotesComponents}>{notes.trim()}</ReactMarkdown>
                   ) : (
-                    <p>No release notes were included with this update.</p>
+                    <p>{t('No release notes were included with this update.')}</p>
                   )}
                 </div>
               </div>
@@ -186,8 +185,7 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
                   disabled={isBusy}
                   className={`inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 text-sm font-semibold text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white sm:w-auto ${isBusy ? 'cursor-not-allowed opacity-50' : ''}`}
                 >
-                  Later
-                </button>
+                  {t('Later')}</button>
               </div>
             </div>
           </motion.div>

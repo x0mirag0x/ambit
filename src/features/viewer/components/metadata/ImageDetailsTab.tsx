@@ -5,6 +5,7 @@ import { CollectionMembershipPicker } from '../CollectionMembershipPicker';
 import { AssetTechnicalDetails } from './AssetTechnicalDetails';
 import { MetadataTextAreaField } from './MetadataTextAreaField';
 import { MetadataSectionHeader } from './MetadataSectionHeader';
+import { useTranslation } from 'react-i18next';
 
 interface ImageDetailsTabProps {
     image: AIImage;
@@ -36,6 +37,7 @@ export const ImageDetailsTab: React.FC<ImageDetailsTabProps> = ({
     palette,
     isPaletteLoading,
 }) => {
+    const { t } = useTranslation();
     const [copiedColor, setCopiedColor] = React.useState<string | null>(null);
     const [isKindSaving, setIsKindSaving] = React.useState(false);
     const kindHelpId = React.useId();
@@ -62,9 +64,9 @@ export const ImageDetailsTab: React.FC<ImageDetailsTabProps> = ({
             ]} />
 
             {onSetImageKind ? <section className="mt-6">
-                <MetadataSectionHeader title="Image kind" icon={ImageIcon} />
+                <MetadataSectionHeader title={t('Image kind')} icon={ImageIcon} />
                 <select
-                    aria-label="Image kind"
+                    aria-label={t('Image kind')}
                     aria-describedby={kindHelpId}
                     value={image.sourceKindOverride ?? 'automatic'}
                     disabled={isKindSaving}
@@ -76,16 +78,16 @@ export const ImageDetailsTab: React.FC<ImageDetailsTabProps> = ({
                     }}
                     className="mt-2 w-full rounded-lg border border-gray-200 bg-white p-2 text-xs text-gray-900 outline-none focus:border-sage-500 disabled:opacity-60 dark:border-white/10 dark:bg-zinc-900 dark:text-white"
                 >
-                    <option value="automatic">Automatic ({detectedSourceKind === 'photograph' ? 'Photo' : detectedSourceKind === 'generated' ? 'Generated' : 'Other'})</option>
-                    <option value="generated">Generated</option>
-                    <option value="photograph">Photo</option>
-                    <option value="other">Other</option>
+                    <option value="automatic">{t('Automatic (')}{detectedSourceKind === 'photograph' ? t('Photo') : detectedSourceKind === 'generated' ? t('Generated') : t('Other')})</option>
+                    <option value="generated">{t('Generated')}</option>
+                    <option value="photograph">{t('Photo')}</option>
+                    <option value="other">{t('Other')}</option>
                 </select>
-                <p id={kindHelpId} className="mt-2 text-[11px] leading-relaxed text-gray-400">Automatic follows metadata detection. Manual choices survive rescanning.</p>
+                <p id={kindHelpId} className="mt-2 text-[11px] leading-relaxed text-gray-400">{t('Automatic follows metadata detection. Manual choices survive rescanning.')}</p>
             </section> : null}
 
             <section className="mt-6">
-                <MetadataSectionHeader title="Color palette" icon={Palette} />
+                <MetadataSectionHeader title={t('Color palette')} icon={Palette} />
                 {isPaletteLoading ? (
                     <div className="mt-3 flex gap-2 animate-pulse">
                         {[1, 2, 3, 4, 5].map(item => <div key={item} className="h-10 w-10 rounded-lg bg-gray-200 dark:bg-white/5" />)}
@@ -95,7 +97,7 @@ export const ImageDetailsTab: React.FC<ImageDetailsTabProps> = ({
                         {palette.map(color => (
                             <button
                                 type="button"
-                                aria-label={`Copy Color ${color}`}
+                                aria-label={t('Copy Color {{color}}', { color: color })}
                                 key={color}
                                 onClick={() => {
                                     void navigator.clipboard.writeText(color);
@@ -109,7 +111,7 @@ export const ImageDetailsTab: React.FC<ImageDetailsTabProps> = ({
                             </button>
                         ))}
                     </div>
-                ) : <p className="mt-3 text-xs italic text-zinc-500">No palette extracted</p>}
+                ) : <p className="mt-3 text-xs italic text-zinc-500">{t('No palette extracted')}</p>}
             </section>
 
             <MetadataTextAreaField

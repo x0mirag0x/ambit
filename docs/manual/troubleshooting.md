@@ -2,9 +2,9 @@
 
 [Back to manual index](index.md)
 
-This page lists common first-run and library issues. When in doubt, prefer actions that rescan or refresh Ambit's catalog before actions that remove records or delete files.
+This page lists common first-run and library issues. When in doubt, prefer actions that rescan or refresh Dvoyna Vault's catalog before actions that remove records or delete files.
 
-## I Installed Ambit But Do Not See Images
+## I Installed Dvoyna Vault But Do Not See Images
 
 Confirm that you added image sources:
 
@@ -52,15 +52,15 @@ For the full repair workflow, see [Maintenance](maintenance.md#thumbnails).
 
 ## Images Show As Missing
 
-Missing usually means Ambit has a catalog record but the source file path is not currently available.
+Missing usually means Dvoyna Vault has a catalog record but the source file path is not currently available.
 
 Check whether:
 
 - the folder or drive is connected
-- the file was moved or renamed outside Ambit
+- the file was moved or renamed outside Dvoyna Vault
 - the monitored folder path changed
 
-If the file is intentionally gone, use Maintenance > Missing to run File Link Audit or Re-Scan Files, then remove the missing record from Ambit's library. This cleans the catalog entry but does not restore the deleted file.
+If the file is intentionally gone, use Maintenance > Missing to run File Link Audit or Re-Scan Files, then remove the missing record from Dvoyna Vault's library. This cleans the catalog entry but does not restore the deleted file.
 
 ## Search Does Not Find What I Expected
 
@@ -85,7 +85,7 @@ Confirm that:
 - you are running an explicit AI action
 - your network allows the request
 
-Gemini is not required for core Ambit browsing, search, metadata parsing, or maintenance.
+Gemini is not required for core Dvoyna Vault browsing, search, metadata parsing, or maintenance.
 
 ## Online Model Resolution Is Disabled Or Busy
 
@@ -95,7 +95,7 @@ Online model resolution sends unresolved model hash strings to CivitAI. It does 
 
 ## I Want To Start Over
 
-Open Settings > Advanced > Database and use Purge Database only if you intentionally want to reset Ambit's catalog and linked folders. Read the confirmation carefully. Source image files are not touched, but imported metadata and application state are reset.
+Open Settings > Advanced > Database and use Purge Database only if you intentionally want to reset Dvoyna Vault's catalog and linked folders. Read the confirmation carefully. Source image files are not touched, but imported metadata and application state are reset.
 
 ## Reporting Issues
 

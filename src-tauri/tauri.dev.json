@@ -1,8 +1,8 @@
 {
     "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-    "productName": "Ambit (Dev)",
+    "productName": "Dvoyna Vault (Dev)",
     "version": "0.14.0",
-    "identifier": "com.ambit.dev",
+    "identifier": "com.dvoyna.vault.dev",
     "build": {
         "frontendDist": "../dist",
         "devUrl": "http://localhost:1422",
@@ -12,7 +12,7 @@
     "app": {
         "windows": [
             {
-                "title": "Ambit (DEV) | Local AI Workspace",
+                "title": "DV (DEV) | Local AI Workspace",
                 "width": 800,
                 "height": 600,
                 "resizable": true,

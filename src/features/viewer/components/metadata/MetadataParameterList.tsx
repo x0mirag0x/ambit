@@ -2,6 +2,7 @@ import * as React from 'react';
 import { SlidersHorizontal } from 'lucide-react';
 import { MetadataSourceBadge } from './MetadataSourceBadge';
 import { MetadataDisclosureSection } from './MetadataDisclosureSection';
+import { useTranslation } from 'react-i18next';
 
 export interface MetadataParameterRow {
     label: string;
@@ -26,6 +27,7 @@ export const MetadataParameterList: React.FC<MetadataParameterListProps> = ({
     expanded,
     onExpandedChange,
 }) => {
+    const { t } = useTranslation();
     const visibleRows = rows.filter(row => !row.optional || (row.value && row.value !== 'Unknown'));
     if (visibleRows.length === 0) return null;
 
@@ -35,8 +37,8 @@ export const MetadataParameterList: React.FC<MetadataParameterListProps> = ({
                     key={row.label}
                     className={`grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-center gap-x-3 rounded px-1 py-0.5 ${row.modified ? 'bg-ember-500/5' : ''}`}
                 >
-                    <dt className={row.modified ? 'text-ember-600 dark:text-ember-300' : 'text-gray-500 dark:text-zinc-500'}>{row.label}</dt>
-                    <dd className="break-words text-gray-700 dark:text-zinc-200">{row.value || 'Unknown'}</dd>
+                    <dt className={row.modified ? 'text-ember-600 dark:text-ember-300' : 'text-gray-500 dark:text-zinc-500'}>{t(row.label)}</dt>
+                    <dd className="break-words text-gray-700 dark:text-zinc-200">{row.value || t('Unknown')}</dd>
                     <dd className="justify-self-end">
                         <MetadataSourceBadge source={row.modified ? 'user_override' : row.source} />
                     </dd>

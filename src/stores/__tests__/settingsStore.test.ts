@@ -171,7 +171,7 @@ describe('SettingsStore', () => {
         expect(settings.monitoredFolders).toEqual([savedFolder]);
         expect(settings.invokeSyncBoards).toBe(false);
         expect(settings.invokeSyncFavorites).toBe(true);
-        expect(settings.autoCheckForUpdates).toBe(true);
+        expect(settings.autoCheckForUpdates).toBe(false);
         expect(settings.thumbnailOptimizationProfile).toBe('balanced');
     });
 

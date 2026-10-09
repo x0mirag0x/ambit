@@ -32,6 +32,36 @@
     postMountTimer = undefined;
   }
 
+  function isRussianUi() {
+    var cached = null;
+    try { cached = localStorage.getItem('ambit.uiLanguage'); } catch (error) { cached = null; }
+    if (cached === 'ru') return true;
+    if (cached === 'en') return false;
+    var tags = ((navigator.language || '') + ' ' + (navigator.languages || []).join(' ')).toLowerCase();
+    return tags.indexOf('ru') !== -1;
+  }
+
+  function startupCopy() {
+    if (!isRussianUi()) {
+      return {
+        title: 'DV couldn’t start',
+        body: 'Restart DV. If the problem continues, share this launch ID with support.',
+        launch: 'Launch ID: ',
+        unavailable: 'unavailable',
+        slow: 'Startup is taking longer than expected',
+        diagnostics: 'Startup diagnostics unavailable. DV will continue starting.'
+      };
+    }
+    return {
+      title: 'DV не удалось запустить',
+      body: 'Перезапустите DV. Если проблема повторится, передайте этот идентификатор запуска в поддержку.',
+      launch: 'Идентификатор запуска: ',
+      unavailable: 'недоступен',
+      slow: 'Запуск занимает больше времени, чем ожидалось',
+      diagnostics: 'Диагностика запуска недоступна. DV продолжит запуск.'
+    };
+  }
+
   function showFailure() {
     stopTimers();
     fatalShown = true;
@@ -52,13 +82,14 @@
     loader.style.background = '#09090b';
     loader.style.opacity = '1';
     loader.style.pointerEvents = 'auto';
-    loader.innerHTML = '<main data-startup-failure="true" role="alert" style="max-width:32rem;padding:2rem;text-align:center;color:#f4f4f5;font-family:Inter,ui-sans-serif,system-ui,sans-serif"><h1 style="margin:0 0 .75rem;font-size:1.25rem">Ambit couldn’t start</h1><p style="margin:0;color:#d4d4d8;font-size:.9rem">Restart Ambit. If the problem continues, share this launch ID with support.</p><p data-startup-launch-id="true" style="margin:1rem 0 0;color:#a1a1aa;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.75rem">Launch ID: ' + (launchId || 'unavailable') + '</p></main>';
+    var copy = startupCopy();
+    loader.innerHTML = '<main data-startup-failure="true" role="alert" style="max-width:32rem;padding:2rem;text-align:center;color:#f4f4f5;font-family:Inter,ui-sans-serif,system-ui,sans-serif"><h1 style="margin:0 0 .75rem;font-size:1.25rem">' + copy.title + '</h1><p style="margin:0;color:#d4d4d8;font-size:.9rem">' + copy.body + '</p><p data-startup-launch-id="true" style="margin:1rem 0 0;color:#a1a1aa;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.75rem">' + copy.launch + (launchId || copy.unavailable) + '</p></main>';
   }
 
   function setFailureLaunchId(value) {
     launchId = value;
     var launch = document.querySelector('[data-startup-launch-id="true"]');
-    if (launch) launch.textContent = 'Launch ID: ' + launchId;
+    if (launch) launch.textContent = startupCopy().launch + launchId;
   }
 
   function removeOldestNonTerminal() {
@@ -104,7 +135,7 @@
       postMountTimer = window.setTimeout(function () {
         postMountTimer = undefined;
         if (!startupActive || fatalShown || !staticLoader()) return;
-        updateStatus('Startup is taking longer than expected');
+        updateStatus(startupCopy().slow);
         record('renderer-stall', 'completed', null, 30000);
       }, 30000);
     },
@@ -114,7 +145,7 @@
     },
     showFailure: showFailure,
     markTransportUnavailable: function () {
-      updateStatus('Startup diagnostics unavailable. Ambit will continue starting.');
+      updateStatus(startupCopy().diagnostics);
     },
     setFailureLaunchId: setFailureLaunchId
   };
@@ -137,7 +168,7 @@
   });
   stallTimer = window.setTimeout(function () {
     if (!startupActive || fatalShown || !staticLoader()) return;
-    updateStatus('Startup is taking longer than expected');
+    updateStatus(startupCopy().slow);
     record('renderer-stall', 'completed', null, 15000);
   }, 15000);
 }());

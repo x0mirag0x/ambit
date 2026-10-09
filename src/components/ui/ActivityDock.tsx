@@ -14,6 +14,7 @@ import {
     THUMBNAIL_QUEUE_RUNNING_FOOTER
 } from '../../hooks/thumbnailQueueProgress';
 import { TooltipButton } from './InfoTooltip';
+import { useTranslation } from 'react-i18next';
 
 const ELAPSED_VISIBLE_AFTER_MS = 5000;
 const LIVE_WATCH_DOCK_REVEAL_MS = 2500;
@@ -172,6 +173,7 @@ const useLiveWatchPresentation = (
 };
 
 export const ActivityDock: React.FC = () => {
+    const { t } = useTranslation();
     const {
         isImporting, importProgress, importAbortController,
         syncStatus, syncProgress, invokeSyncActivityKind,
@@ -231,8 +233,8 @@ export const ActivityDock: React.FC = () => {
         label = invokeSyncActivityKind === 'startup' ? "InvokeAI Catch-up" : "InvokeAI Sync";
         supportsCancel = true;
         footerMessage = invokeSyncActivityKind === 'startup'
-            ? "You can keep using the library while Ambit catches up."
-            : "You can keep using the library while Ambit synchronizes InvokeAI.";
+            ? "You can keep using the library while Dvoyna Vault catches up."
+            : "You can keep using the library while Dvoyna Vault synchronizes InvokeAI.";
     } else if (isRegeneratingThumbnails) {
         progress = thumbnailProgress;
         label = "Optimizing";
@@ -249,12 +251,12 @@ export const ActivityDock: React.FC = () => {
         progress = duplicateScanProgress;
         label = "Duplicate Scan";
         supportsCancel = true;
-        footerMessage = "You can keep using Ambit while this scans.";
+        footerMessage = "You can keep using Dvoyna Vault while this scans.";
     } else if (isScanningMissingFiles) {
         progress = missingScanProgress;
         label = "Missing File Audit";
         supportsCancel = true;
-        footerMessage = "You can keep using Ambit while this audit runs.";
+        footerMessage = "You can keep using Dvoyna Vault while this audit runs.";
     } else if (isPopulatingThumbnails) {
         progress = { current: 0, total: 0, message: "Matching images to models..." };
         label = "Smart Fill";
@@ -331,8 +333,8 @@ export const ActivityDock: React.FC = () => {
         ? {
             iconText: 'text-sage-600 dark:text-sage-300',
             iconBg: 'bg-sage-500/10 text-sage-600 dark:text-sage-300',
-            fill: 'bg-sage-500 shadow-[0_0_12px_rgba(139,174,124,0.32)]',
-            pillHover: 'hover:shadow-[0_0_15px_rgba(139,174,124,0.2)]',
+            fill: 'bg-sage-500 shadow-[0_0_12px_rgba(198,164,90,0.32)]',
+            pillHover: 'hover:shadow-[0_0_15px_rgba(198,164,90,0.2)]',
             percentText: 'text-sage-600 dark:text-sage-300'
         }
         : isLowPriority
@@ -346,8 +348,8 @@ export const ActivityDock: React.FC = () => {
         : {
             iconText: 'text-sage-600 dark:text-sage-300',
             iconBg: 'bg-sage-500/10 text-sage-600 dark:text-sage-300',
-            fill: 'bg-sage-500 shadow-[0_0_12px_rgba(139,174,124,0.5)]',
-            pillHover: 'hover:shadow-[0_0_15px_rgba(139,174,124,0.3)]',
+            fill: 'bg-sage-500 shadow-[0_0_12px_rgba(198,164,90,0.5)]',
+            pillHover: 'hover:shadow-[0_0_15px_rgba(198,164,90,0.3)]',
             percentText: 'text-sage-600 dark:text-sage-300'
         };
 
@@ -376,8 +378,8 @@ export const ActivityDock: React.FC = () => {
                     {isActivityDockMinimized ? (
                         <motion.div layoutId="dock-content">
                             <TooltipButton
-                                label="Expand Activity Details"
-                                content="Expand Activity Details"
+                                label={t('Expand Activity Details')}
+                                content={t('Expand Activity Details')}
                                 onClick={() => setIsActivityDockMinimized(false)}
                                 className={`group bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-white/20 dark:border-white/10 p-2.5 rounded-full shadow-xl flex items-center gap-3 cursor-pointer hover:scale-105 transition-transform ${accentClasses.pillHover}`}
                             >
@@ -403,7 +405,7 @@ export const ActivityDock: React.FC = () => {
                                         {isScanningDuplicates ? <Fingerprint className="w-4 h-4" /> : isScanningMissingFiles ? <Search className="w-4 h-4" /> : shouldUseSparkles ? <Sparkles className={`w-4 h-4 ${shouldPulseSparkles ? 'animate-pulse' : ''}`} /> : <Loader2 className="w-4 h-4 animate-spin" />}
                                     </motion.div>
                                     <motion.div layout="position">
-                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-500 italic opacity-80 leading-none mb-1">{isLiveWatchVisible ? 'Live Watch' : 'Background Activity'}</h4>
+                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-500 italic opacity-80 leading-none mb-1">{isLiveWatchVisible ? t('Live Watch') : t('Background Activity')}</h4>
                                         <p className="text-sm font-bold text-gray-900 dark:text-white flex min-w-0 items-center gap-2 whitespace-nowrap">
                                             {isLiveWatchVisible ? (
                                                 liveWatchPresentation.sourceLabel && (
@@ -419,8 +421,7 @@ export const ActivityDock: React.FC = () => {
                                             )}
                                             {isLiveWatchVisible && !liveWatchPresentation.sourceLabel && (
                                                 <span className={LIVE_WATCH_SOURCE_CHIP_CLASS}>
-                                                    Watch
-                                                </span>
+                                                    {t('Watch')}</span>
                                             )}
                                         </p>
                                     </motion.div>
@@ -429,7 +430,7 @@ export const ActivityDock: React.FC = () => {
                                     <button
                                         type="button"
                                         onClick={() => setIsActivityDockMinimized(true)}
-                                        aria-label="Minimize Activity Details"
+                                        aria-label={t('Minimize Activity Details')}
                                         className="p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all hover:scale-105 active:scale-95"
                                     >
                                         <Minus className="w-3.5 h-3.5" />
@@ -437,7 +438,7 @@ export const ActivityDock: React.FC = () => {
                                     <button
                                         type="button"
                                         onClick={dismissDock}
-                                        aria-label="Dismiss Activity Details"
+                                        aria-label={t('Dismiss Activity Details')}
                                         className="p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all hover:scale-105 active:scale-95"
                                     >
                                         <X className="w-3.5 h-3.5" />
@@ -466,7 +467,7 @@ export const ActivityDock: React.FC = () => {
                                 )}
                                 <div className="flex justify-between items-center px-0.5">
                                     <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 truncate flex-1 pr-4 h-4 leading-4">
-                                        {message || "Starting work..."}
+                                        {message || t('Starting work...')}
                                     </p>
                                     {!showIndeterminateProgress && !isLiveWatchActive && !isBackgroundActive && !isRefreshActive && !isCompleteProgress && (
                                         <span className={`text-[11px] font-black font-mono italic ${accentClasses.percentText}`}>
@@ -518,8 +519,7 @@ export const ActivityDock: React.FC = () => {
                                         }}
                                         className="text-[10px] font-bold text-red-500 hover:text-red-700 dark:hover:text-red-400 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/30 px-2 py-1 rounded-md transition-colors uppercase tracking-wider"
                                     >
-                                        Cancel
-                                    </button>
+                                        {t('Cancel')}</button>
                                 )}
                             </motion.div>
                         </motion.div>

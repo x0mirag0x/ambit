@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Key, Check, XCircle, Loader2, Sparkles, ExternalLink } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { GEMINI_API_KEY_URL, openExternalUrl } from '../../utils/externalLinks';
+import { useTranslation } from 'react-i18next';
 
 interface ApiKeyInputProps {
     value: string;
@@ -32,6 +33,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
     showLabel = true,
     className
 }) => {
+    const { t } = useTranslation();
     const inputId = React.useId();
     const labelId = `${inputId}-label`;
     const hasPositiveStatus = status === 'success' || (!isEnvKey && status === 'configured');
@@ -62,8 +64,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
                         onClick={() => { void openExternalUrl(GEMINI_API_KEY_URL); }}
                         className="inline-flex items-center gap-1 rounded text-xs font-semibold text-amethyst-600 hover:text-amethyst-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amethyst-500 dark:text-amethyst-300"
                     >
-                        Get a Gemini API key
-                        <ExternalLink className="w-3 h-3" aria-hidden="true" />
+                        {t('Get a Gemini API key')}<ExternalLink className="w-3 h-3" aria-hidden="true" />
                     </button>
                 </div>
             )}
@@ -77,7 +78,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
                         className="flex items-center gap-3 rounded-xl border border-amethyst-200 bg-amethyst-50 p-4 text-sm text-amethyst-600 dark:border-amethyst-500/20 dark:bg-amethyst-500/10 dark:text-amethyst-300"
                     >
                         <Key className="w-5 h-5 text-amethyst-600 dark:text-amethyst-300" />
-                        <span className="font-medium">Environment API key detected</span>
+                        <span className="font-medium">{t('Environment API key detected')}</span>
                         <div className="flex-1" />
                         {hasPositiveStatus ? (
                             <Check className="w-4 h-4 text-sage-600 dark:text-sage-300 animate-in fade-in duration-150 motion-reduce:animate-none" />
@@ -92,7 +93,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
                             className="flex items-center gap-2 rounded-lg bg-amethyst-600 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white transition-all hover:bg-amethyst-500"
                         >
                             {isVerifying ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
-                            {isVerifying ? 'Checking' : 'Test environment key'}
+                            {isVerifying ? t('Checking') : t('Test environment key')}
                         </button>
                     </div>
                 </div>
@@ -135,7 +136,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
                                 ) : (
                                     <Sparkles className="h-3 w-3 text-amethyst-600 dark:text-amethyst-300" />
                                 )}
-                                {isVerifying ? 'Checking...' : verifyLabel}
+                                {isVerifying ? t('Checking...') : verifyLabel}
                             </button>
                         </div>
                     </div>

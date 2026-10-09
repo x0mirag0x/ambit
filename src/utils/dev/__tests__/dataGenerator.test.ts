@@ -33,7 +33,7 @@ describe('generateStressTestData', () => {
             url: expect.stringMatching(/^stress:\/\/stress_test_0_/),
             width: 1024,
             height: 1024,
-            thumbnailUrl: '/branding/ambit-window-icon.png',
+            thumbnailUrl: '/branding/dv-window-icon.png',
             metadata: {
                 tool: GeneratorTool.AUTOMATIC1111,
                 loras: [],

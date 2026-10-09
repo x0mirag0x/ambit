@@ -144,7 +144,7 @@ describe('useMetadataRefresh', () => {
 
         expect(startAttempts).toBe(1);
         expect(mockAddToast).not.toHaveBeenCalledWith(
-            'Ambit is updating metadata for 12 items after a parser update. Your library remains available.',
+            'Dvoyna Vault is updating metadata for 12 items after a parser update. Your library remains available.',
             'info'
         );
         expect(mockAddToast).not.toHaveBeenCalledWith(
@@ -226,7 +226,7 @@ describe('useMetadataRefresh', () => {
         });
 
         expect(mockAddToast).not.toHaveBeenCalledWith(
-            'Ambit is updating metadata for 12 items after a parser update. Your library remains available.',
+            'Dvoyna Vault is updating metadata for 12 items after a parser update. Your library remains available.',
             'info'
         );
 
@@ -247,7 +247,7 @@ describe('useMetadataRefresh', () => {
         expect(useLibraryStore.getState().isRefreshingMetadata).toBe(false);
         expect(useLibraryStore.getState().refreshProgress).toBeNull();
         expect(mockAddToast).not.toHaveBeenCalledWith(
-            'Ambit is updating metadata for 12 items after a parser update. Your library remains available.',
+            'Dvoyna Vault is updating metadata for 12 items after a parser update. Your library remains available.',
             'info'
         );
 
@@ -268,7 +268,7 @@ describe('useMetadataRefresh', () => {
         expect(useLibraryStore.getState().isRefreshingMetadata).toBe(false);
         expect(useLibraryStore.getState().refreshProgress).toBeNull();
         expect(mockAddToast).not.toHaveBeenCalledWith(
-            'Ambit is updating metadata for 12 items after a parser update. Your library remains available.',
+            'Dvoyna Vault is updating metadata for 12 items after a parser update. Your library remains available.',
             'info'
         );
 
@@ -292,7 +292,7 @@ describe('useMetadataRefresh', () => {
             phase: 'processing'
         }));
         expect(mockAddToast).toHaveBeenCalledWith(
-            'Ambit is updating metadata for 12 items after a parser update. Your library remains available.',
+            'Dvoyna Vault is updating metadata for 12 items after a parser update. Your library remains available.',
             'info'
         );
 

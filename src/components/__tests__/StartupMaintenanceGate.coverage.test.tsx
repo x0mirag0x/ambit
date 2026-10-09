@@ -54,7 +54,7 @@ describe('StartupMaintenanceGate', () => {
 
         await waitFor(() => {
             expect(screen.getByText('Database startup failed')).toBeTruthy();
-            expect(screen.getByText('Ambit could not prepare the local library database. Restart the app and contact support if this repeats.')).toBeTruthy();
+            expect(screen.getByText('Dvoyna Vault could not prepare the local library database. Restart the app and contact support if this repeats.')).toBeTruthy();
             expect(screen.getByText('migration failed')).toBeTruthy();
         });
         expect(screen.queryByText('Library ready')).toBeNull();

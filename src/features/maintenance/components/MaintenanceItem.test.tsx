@@ -119,7 +119,7 @@ describe('MaintenanceItem', () => {
         expect(screen.getByText('clip.mp4')).toBeTruthy();
     });
 
-    it('renders an Ambit-owned video poster without falling back to the video source', () => {
+    it('renders an Dvoyna Vault-owned video poster without falling back to the video source', () => {
         settingsState.privacyEnabled = false;
         const { container } = render(
             <MaintenanceItem

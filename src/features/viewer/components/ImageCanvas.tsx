@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { AIImage } from '../../../types';
 import { SmartImage } from '../../library/components/SmartImage';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
+import { useTranslation } from 'react-i18next';
 
 interface ImageCanvasProps {
     image: AIImage;
@@ -49,6 +50,7 @@ export const ImageCanvas: React.FC<ImageCanvasProps> = ({
     onToggleTheater,
     handlers
 }) => {
+    const { t } = useTranslation();
     return (
         <div
             className="flex-1 relative flex flex-col h-full overflow-hidden select-none"
@@ -58,15 +60,15 @@ export const ImageCanvas: React.FC<ImageCanvasProps> = ({
             <div
                 className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 bg-black/80 backdrop-blur-xl rounded-full px-4 py-2 border border-white/10 pointer-events-auto transition-opacity duration-500 shadow-2xl focus-within:opacity-100 ${showControls ? 'opacity-100' : 'opacity-0'}`}
             >
-                <TooltipButton label="Zoom Out" content="Zoom Out" onClick={onZoomOut} className="p-1.5 hover:bg-white/10 rounded-full text-gray-400 hover:text-white">
+                <TooltipButton label={t('Zoom Out')} content={t('Zoom Out')} onClick={onZoomOut} className="p-1.5 hover:bg-white/10 rounded-full text-gray-400 hover:text-white">
                     <ZoomOut className="w-4 h-4" />
                 </TooltipButton>
                 <span className="text-xs font-mono text-sage-400 min-w-[3ch] text-center">{Math.round(scale * 100)}%</span>
-                <TooltipButton label="Zoom In" content="Zoom In" onClick={onZoomIn} className="p-1.5 hover:bg-white/10 rounded-full text-gray-400 hover:text-white">
+                <TooltipButton label={t('Zoom In')} content={t('Zoom In')} onClick={onZoomIn} className="p-1.5 hover:bg-white/10 rounded-full text-gray-400 hover:text-white">
                     <ZoomIn className="w-4 h-4" />
                 </TooltipButton>
                 <div className="w-px h-4 bg-white/10 mx-1" />
-                <TooltipButton label="Reset View" content="Reset View" onClick={onResetZoom} className="p-1.5 hover:bg-white/10 rounded-full text-gray-400 hover:text-white">
+                <TooltipButton label={t('Reset View')} content={t('Reset View')} onClick={onResetZoom} className="p-1.5 hover:bg-white/10 rounded-full text-gray-400 hover:text-white">
                     <RotateCcw className="w-4 h-4" />
                 </TooltipButton>
             </div>
@@ -88,7 +90,7 @@ export const ImageCanvas: React.FC<ImageCanvasProps> = ({
                 {/* Prev Button */}
                 <button
                     type="button"
-                    aria-label="Previous Image (Left Arrow)"
+                    aria-label={t('Previous Image (Left Arrow)')}
                     disabled={!canNavigatePrevious}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
@@ -129,7 +131,7 @@ export const ImageCanvas: React.FC<ImageCanvasProps> = ({
                 {/* Next Button */}
                 <button
                     type="button"
-                    aria-label="Next Image (Right Arrow)"
+                    aria-label={t('Next Image (Right Arrow)')}
                     disabled={!canNavigateNext}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();

@@ -172,7 +172,7 @@ describe('ImageCard', () => {
         expect(screen.getByText('1024x768 · 0:12')).toBeTruthy();
     });
 
-    it('uses only an Ambit poster for video cards and has no source-video fallback', () => {
+    it('uses only an Dvoyna Vault poster for video cards and has no source-video fallback', () => {
         setup({
             image: video({
                 thumbnailUrl: 'poster.webp',

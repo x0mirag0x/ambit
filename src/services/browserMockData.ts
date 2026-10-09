@@ -54,7 +54,7 @@ const colorForIndex = (index: number): string => {
 const makeImageDataUrl = (index: number, width: number, height: number): string => {
     const bg = colorForIndex(index);
     const accent = colorForIndex(index + 2);
-    const label = `Ambit Mock ${index + 1}`;
+    const label = `Dvoyna Vault Mock ${index + 1}`;
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
 <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${bg}"/><stop offset="1" stop-color="#18181b"/></linearGradient></defs>
 <rect width="100%" height="100%" fill="url(#g)"/>

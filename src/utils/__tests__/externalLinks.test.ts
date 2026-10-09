@@ -9,16 +9,16 @@ describe('externalLinks', () => {
     });
 
     it('opens allowlisted HTTPS URLs through Tauri shell first', async () => {
-        await openExternalUrl('https://github.com/AsuraAce/ambit/issues');
+        await openExternalUrl('https://github.com/x0mirag0x/ambit/issues');
 
-        expect(open).toHaveBeenCalledWith('https://github.com/AsuraAce/ambit/issues');
+        expect(open).toHaveBeenCalledWith('https://github.com/x0mirag0x/ambit/issues');
         expect(window.open).not.toHaveBeenCalled();
     });
 
     it('falls back to window.open only for allowlisted URLs after Tauri shell fails', async () => {
         vi.mocked(open).mockRejectedValueOnce(new Error('shell unavailable'));
 
-        const releasesUrl = 'https://github.com/AsuraAce/ambit/releases';
+        const releasesUrl = 'https://github.com/x0mirag0x/ambit/releases';
 
         await openExternalUrl(releasesUrl);
 
@@ -28,6 +28,12 @@ describe('externalLinks', () => {
             '_blank',
             'noopener,noreferrer'
         );
+    });
+
+    it('opens the upstream Ambit repository used for GPL attribution', async () => {
+        await openExternalUrl('https://github.com/AsuraAce/ambit');
+
+        expect(open).toHaveBeenCalledWith('https://github.com/AsuraAce/ambit');
     });
 
     it('opens the exact Google AI Studio API key page', async () => {

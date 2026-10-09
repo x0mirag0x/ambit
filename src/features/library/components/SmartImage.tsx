@@ -4,6 +4,7 @@ import { ImageOff, AlertCircle } from 'lucide-react';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { ensureAssetPathAccessible } from '../../../services/assetScope';
 import { repairAssetUrl } from '../../../utils/pathUtils';
+import { useTranslation } from 'react-i18next';
 
 interface SmartImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
@@ -34,6 +35,7 @@ export const SmartImage: React.FC<SmartImageProps> = ({
   ...props
 }) => {
   // Use a ref to track the last source to avoid useEffect delays for loading state
+  const { t } = useTranslation();
   const lastSrcRef = useRef(src);
   const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
   const [retryCount, setRetryCount] = useState(0);
@@ -190,7 +192,7 @@ export const SmartImage: React.FC<SmartImageProps> = ({
       {status === 'error' ? (
         <div className="absolute inset-0 bg-gray-100 dark:bg-zinc-900 flex flex-col items-center justify-center text-gray-400 dark:text-gray-600 p-4 border border-gray-200 dark:border-white/5">
           <AlertCircle className="w-8 h-8 mb-2 opacity-50 text-red-500/50" />
-          <span className="text-xs text-center font-medium">Failed to load</span>
+          <span className="text-xs text-center font-medium">{t('Failed to load')}</span>
           <span className="text-[10px] text-center opacity-70 mt-1 truncate max-w-full font-mono">{displayFilename}</span>
         </div>
       ) : (

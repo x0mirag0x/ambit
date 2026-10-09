@@ -6,6 +6,7 @@ import { useSearch } from '../../../contexts/SearchContext';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import { useDelayedBusyPresentation } from '../../../hooks/useDelayedBusyPresentation';
 import { formatCountCompact } from '../../../utils/formatUtils';
+import { useTranslation } from 'react-i18next';
 
 const COUNT_LOADING_REVEAL_DELAY_MS = 180;
 const COUNT_LOADING_MIN_VISIBLE_MS = 300;
@@ -56,19 +57,19 @@ export const SortOptionList = ({
     sortOption: SortOption;
     onSelect: (option: SortOption) => void;
     compact?: boolean;
-}) => (
+}) => { const { t } = useTranslation(); return ((
     <>
         {SORT_OPTIONS.map(option => (
             <button key={option.val} type="button" onClick={() => onSelect(option.val)} className={compact
                 ? `flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left text-xs ${sortOption === option.val ? 'bg-sage-500/15 text-sage-700 dark:text-sage-200' : 'text-gray-600 hover:bg-gray-100 dark:text-zinc-300 dark:hover:bg-white/5'}`
                 : `w-full text-left px-3 py-2 text-xs transition-colors flex justify-between items-center ${sortOption === option.val ? 'bg-sage-50 text-sage-600 dark:bg-sage-900/40 dark:text-sage-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5'}`
             }>
-                <span className="flex items-center gap-2"><option.icon aria-hidden className="h-3.5 w-3.5 shrink-0 opacity-70" />{option.label}</span>
+                <span className="flex items-center gap-2"><option.icon aria-hidden className="h-3.5 w-3.5 shrink-0 opacity-70" />{t(option.label)}</span>
                 {sortOption === option.val && <Check aria-hidden className="w-3 h-3 shrink-0" />}
             </button>
         ))}
     </>
-);
+)); };
 
 export const ViewControls: React.FC<ViewControlsProps> = ({
     showLayoutSwitcher,
@@ -89,6 +90,7 @@ export const ViewControls: React.FC<ViewControlsProps> = ({
     showThumbnailSize = true,
     compact = false,
 }) => {
+    const { t } = useTranslation();
     const { availableHiddenContent, filters, setFilters } = useSearch();
     const [showSortMenu, setShowSortMenu] = useState(false);
     const [showViewMenu, setShowViewMenu] = useState(false);
@@ -116,6 +118,7 @@ export const ViewControls: React.FC<ViewControlsProps> = ({
     const countPresentation = isFiltering && !showCountLoading && hasSettledCurrentOwnerScope
         ? settledCountPresentation!
         : { displayedCount, totalCount, scopeName, ownerPresentationKey };
+    const localizeScope = (name: string) => name === 'Library' ? t('Library') : name;
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -156,7 +159,7 @@ export const ViewControls: React.FC<ViewControlsProps> = ({
                 <div className="relative" ref={sortMenuRef}>
                     <button ref={sortTriggerRef} type="button" aria-expanded={showSortMenu} onClick={() => setShowSortMenu(open => !open)} className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-zinc-800/50 rounded-xl border border-gray-200 dark:border-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
                         <ArrowUpDown className="w-3 h-3 text-gray-500" />
-                        <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{sortLabel(sortOption)}</span>
+                        <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{t(sortLabel(sortOption))}</span>
                     </button>
                     {showSortMenu && (
                         <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-white/10 rounded-xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
@@ -167,57 +170,63 @@ export const ViewControls: React.FC<ViewControlsProps> = ({
             )}
 
             <div className="relative" ref={viewMenuRef}>
-                <button ref={viewTriggerRef} type="button" aria-expanded={showViewMenu} onClick={() => setShowViewMenu(open => !open)} className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border transition-colors ${showViewMenu ? 'bg-sage-600 border-sage-500 text-white' : 'bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300'}`} title="View Options">
+                <button ref={viewTriggerRef} type="button" aria-expanded={showViewMenu} onClick={() => setShowViewMenu(open => !open)} className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border transition-colors ${showViewMenu ? 'bg-sage-600 border-sage-500 text-white' : 'bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300'}`} title={t('View Options')}>
                     <Eye className="w-3 h-3" />
-                    <span className="text-xs font-medium">View</span>
+                    <span className="text-xs font-medium">{t('View')}</span>
                 </button>
                 {showViewMenu && (
                     <div className="absolute top-full right-0 mt-2 w-64 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-white/10 rounded-xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                        {showLayoutSwitcher && <div role="group" aria-label="Layout" className="border-b border-gray-100 p-3 dark:border-white/5">
-                                <span className="px-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">Layout</span>
+                        {showLayoutSwitcher && <div role="group" aria-label={t('Layout')} className="border-b border-gray-100 p-3 dark:border-white/5">
+                                <span className="px-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">{t('Layout')}</span>
                                 <div className="mt-1 flex items-center gap-1 px-1">
                                     {showLayoutSwitcher && (
                                         <>
-                                            <TooltipButton label="Use Grid Layout" content="Use Grid Layout" aria-pressed={layoutMode === 'grid'} onClick={() => setLayoutMode('grid')} className={`p-1.5 rounded-lg transition-all ${layoutMode === 'grid' ? 'bg-white dark:bg-white/10 text-sage-600 dark:text-sage-300 shadow-sm' : 'text-gray-400'}`}><LayoutGrid className="w-4 h-4" /></TooltipButton>
-                                            <TooltipButton label="Use Masonry Layout" content="Use Masonry Layout" aria-pressed={layoutMode === 'masonry'} onClick={() => setLayoutMode('masonry')} className={`p-1.5 rounded-lg transition-all ${layoutMode === 'masonry' ? 'bg-white dark:bg-white/10 text-sage-600 dark:text-sage-300 shadow-sm' : 'text-gray-400'}`}><Columns className="w-4 h-4" /></TooltipButton>
-                                            <TooltipButton label="Use Justified Layout" content="Use Justified Layout" aria-pressed={layoutMode === 'justified'} onClick={() => setLayoutMode('justified')} className={`p-1.5 rounded-lg transition-all ${layoutMode === 'justified' ? 'bg-white dark:bg-white/10 text-sage-600 dark:text-sage-300 shadow-sm' : 'text-gray-400'}`}><AlignJustify className="w-4 h-4" /></TooltipButton>
+                                            <TooltipButton label={t('Use Grid Layout')} content={t('Use Grid Layout')} aria-pressed={layoutMode === 'grid'} onClick={() => setLayoutMode('grid')} className={`p-1.5 rounded-lg transition-all ${layoutMode === 'grid' ? 'bg-white dark:bg-white/10 text-sage-600 dark:text-sage-300 shadow-sm' : 'text-gray-400'}`}><LayoutGrid className="w-4 h-4" /></TooltipButton>
+                                            <TooltipButton label={t('Use Masonry Layout')} content={t('Use Masonry Layout')} aria-pressed={layoutMode === 'masonry'} onClick={() => setLayoutMode('masonry')} className={`p-1.5 rounded-lg transition-all ${layoutMode === 'masonry' ? 'bg-white dark:bg-white/10 text-sage-600 dark:text-sage-300 shadow-sm' : 'text-gray-400'}`}><Columns className="w-4 h-4" /></TooltipButton>
+                                            <TooltipButton label={t('Use Justified Layout')} content={t('Use Justified Layout')} aria-pressed={layoutMode === 'justified'} onClick={() => setLayoutMode('justified')} className={`p-1.5 rounded-lg transition-all ${layoutMode === 'justified' ? 'bg-white dark:bg-white/10 text-sage-600 dark:text-sage-300 shadow-sm' : 'text-gray-400'}`}><AlignJustify className="w-4 h-4" /></TooltipButton>
                                         </>
                                     )}
                                 </div>
                         </div>}
                         {showThumbnailSize && <div className="border-b border-gray-100 p-3 dark:border-white/5">
                                 <label className="flex flex-col gap-3 px-2 text-xs text-gray-500">
-                                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Thumbnail Size</span>
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t('Thumbnail Size')}</span>
                                     <span className="flex items-center gap-2">
                                     <Sliders className="w-3 h-3" />
-                                    <input aria-label="Thumbnail Size" type="range" min="100" max="400" value={thumbnailSize} onChange={event => setThumbnailSize(Number(event.target.value))} className="h-1 w-32 cursor-pointer appearance-none rounded-lg bg-gray-300 accent-sage-500 dark:bg-slate-700" />
+                                    <input aria-label={t('Thumbnail Size')} type="range" min="100" max="400" value={thumbnailSize} onChange={event => setThumbnailSize(Number(event.target.value))} className="h-1 w-32 cursor-pointer appearance-none rounded-lg bg-gray-300 accent-sage-500 dark:bg-slate-700" />
                                     </span>
                                 </label>
                         </div>}
                         {hasHiddenContentControls && (
                             <div>
-                                <div className="border-b border-gray-100 bg-gray-50/50 p-3 dark:border-white/5 dark:bg-black/20"><span className="pl-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">Visibility</span></div>
-                                {availableHiddenContent.hasInvokeImageAssets && <HiddenContentToggle label="Show InvokeAI Image Assets" description="Reference, control, mask, and source images" enabled={Boolean(filters.showInvokeImageAssets)} onClick={() => setFilters(previous => ({ ...previous, showInvokeImageAssets: !previous.showInvokeImageAssets }))} />}
-                                {availableHiddenContent.hasIntermediates && <HiddenContentToggle label="Show Intermediates" description="Ephemeral generation steps" enabled={Boolean(filters.showIntermediates)} onClick={() => setFilters(previous => ({ ...previous, showIntermediates: !previous.showIntermediates }))} />}
-                                {availableHiddenContent.hasGrids && <HiddenContentToggle label="Show Image Grids" description="Combined previews (SD WebUI)" enabled={Boolean(filters.showGrids)} onClick={() => setFilters(previous => ({ ...previous, showGrids: !previous.showGrids }))} />}
+                                <div className="border-b border-gray-100 bg-gray-50/50 p-3 dark:border-white/5 dark:bg-black/20"><span className="pl-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">{t('Visibility')}</span></div>
+                                {availableHiddenContent.hasInvokeImageAssets && <HiddenContentToggle label={t('Show InvokeAI Image Assets')} description={t('Reference, control, mask, and source images')} enabled={Boolean(filters.showInvokeImageAssets)} onClick={() => setFilters(previous => ({ ...previous, showInvokeImageAssets: !previous.showInvokeImageAssets }))} />}
+                                {availableHiddenContent.hasIntermediates && <HiddenContentToggle label={t('Show Intermediates')} description={t('Ephemeral generation steps')} enabled={Boolean(filters.showIntermediates)} onClick={() => setFilters(previous => ({ ...previous, showIntermediates: !previous.showIntermediates }))} />}
+                                {availableHiddenContent.hasGrids && <HiddenContentToggle label={t('Show Image Grids')} description={t('Combined previews (SD WebUI)')} enabled={Boolean(filters.showGrids)} onClick={() => setFilters(previous => ({ ...previous, showGrids: !previous.showGrids }))} />}
                             </div>
                         )}
                     </div>
                 )}
             </div>
 
-            {showSlideshowButton && <TooltipButton label="Start Slideshow" content="Start Slideshow" onClick={onSlideshow} className="rounded-xl border border-gray-200 bg-gray-100 p-2 text-gray-500 transition-colors hover:text-sage-600 dark:border-white/10 dark:bg-zinc-800/50 dark:hover:text-sage-300"><Play aria-hidden className="h-4 w-4 fill-current" /></TooltipButton>}
+            {showSlideshowButton && <TooltipButton label={t('Start Slideshow')} content={t('Start Slideshow')} onClick={onSlideshow} className="rounded-xl border border-gray-200 bg-gray-100 p-2 text-gray-500 transition-colors hover:text-sage-600 dark:border-white/10 dark:bg-zinc-800/50 dark:hover:text-sage-300"><Play aria-hidden className="h-4 w-4 fill-current" /></TooltipButton>}
 
             <div className={`flex flex-col items-end justify-center border-l border-gray-200 pl-3 text-right text-[10px] font-bold tracking-widest tabular-nums text-gray-400 transition-opacity duration-200 dark:border-white/10 dark:text-gray-500 ${compact ? 'w-24' : 'w-36'} ${showCountLoading ? 'opacity-50' : 'opacity-100'}`}>
-                {isAwaitingFirstSettledCount ? <span aria-hidden>&nbsp;</span> : showCountLoading ? <span aria-label={`Loading ${scopeName}`} className="text-gray-600 dark:text-gray-300">...<span className="sr-only" title={`LOADING ${scopeName}`}>{`LOADING ${scopeName}`}</span></span> : countPresentation.displayedCount !== countPresentation.totalCount ? (
-                    <span aria-label={`${countPresentation.displayedCount.toLocaleString()} matches in ${countPresentation.scopeName}; ${countPresentation.totalCount === null ? 'collection total not available' : `${countPresentation.totalCount.toLocaleString()} total`}`}>
-                        <span title={countPresentation.displayedCount.toLocaleString()} className="text-sage-600 dark:text-sage-400">{formatCountCompact(countPresentation.displayedCount)}</span><span className="px-1 opacity-40">/</span><span className="text-gray-600 dark:text-gray-300" aria-label={countPresentation.totalCount === null ? 'Collection total not available' : undefined} title={countPresentation.totalCount === null ? 'Collection total not available' : countPresentation.totalCount.toLocaleString()}>{countPresentation.totalCount === null ? '—' : formatCountCompact(countPresentation.totalCount)}</span>
-                        <span className="sr-only text-[10px] text-gray-500 dark:text-gray-400 normal-case tracking-normal max-w-[40ch] truncate" title={`MATCHES IN ${countPresentation.scopeName}`}>{`MATCHES IN ${countPresentation.scopeName}`}</span>
+                {isAwaitingFirstSettledCount ? <span aria-hidden>{'\u00a0'}</span> : showCountLoading ? <span aria-label={t('Loading {{scopeName}}', { scopeName: localizeScope(scopeName) })} className="text-gray-600 dark:text-gray-300">...<span className="sr-only" title={t('LOADING {{scopeName}}', { scopeName: localizeScope(scopeName) })}>{t('LOADING {{scopeName}}', { scopeName: localizeScope(scopeName) })}</span></span> : countPresentation.displayedCount !== countPresentation.totalCount ? (
+                    <span aria-label={t('{{displayed}} matches in {{scopeName}}; {{totalPhrase}}', {
+                        displayed: countPresentation.displayedCount.toLocaleString(),
+                        scopeName: localizeScope(countPresentation.scopeName),
+                        totalPhrase: countPresentation.totalCount === null
+                            ? t('collection total not available')
+                            : t('{{total}} total', { total: countPresentation.totalCount.toLocaleString() }),
+                    })}>
+                        <span title={countPresentation.displayedCount.toLocaleString()} className="text-sage-600 dark:text-sage-400">{formatCountCompact(countPresentation.displayedCount)}</span><span className="px-1 opacity-40">/</span><span className="text-gray-600 dark:text-gray-300" aria-label={countPresentation.totalCount === null ? t('Collection total not available') : undefined} title={countPresentation.totalCount === null ? t('Collection total not available') : countPresentation.totalCount.toLocaleString()}>{countPresentation.totalCount === null ? '—' : formatCountCompact(countPresentation.totalCount)}</span>
+                        <span className="sr-only text-[10px] text-gray-500 dark:text-gray-400 normal-case tracking-normal max-w-[40ch] truncate" title={t('MATCHES IN {{scopeName}}', { scopeName: localizeScope(countPresentation.scopeName) })}>{t('MATCHES IN {{scopeName}}', { scopeName: localizeScope(countPresentation.scopeName) })}</span>
                     </span>
                 ) : (
-                    <span title={countPresentation.totalCount?.toLocaleString()} aria-label={`${countPresentation.totalCount?.toLocaleString() ?? 'collection total not available'} in ${countPresentation.scopeName}`} className="text-gray-600 dark:text-gray-300">{countPresentation.totalCount === null ? '—' : formatCountCompact(countPresentation.totalCount)}</span>
+                    <span title={countPresentation.totalCount?.toLocaleString()} aria-label={t('{{v0}} in {{scopeName}}', { v0: countPresentation.totalCount?.toLocaleString() ?? t('collection total not available'), scopeName: localizeScope(countPresentation.scopeName) })} className="text-gray-600 dark:text-gray-300">{countPresentation.totalCount === null ? '—' : formatCountCompact(countPresentation.totalCount)}</span>
                 )}
-                {!isAwaitingFirstSettledCount && <span title={showCountLoading ? scopeName : countPresentation.scopeName} className="mt-0.5 block w-full truncate text-[10px] normal-case tracking-normal text-gray-500 dark:text-gray-400">{showCountLoading ? scopeName : countPresentation.scopeName}</span>}
+                {!isAwaitingFirstSettledCount && <span title={showCountLoading ? localizeScope(scopeName) : localizeScope(countPresentation.scopeName)} className="mt-0.5 block w-full truncate text-[10px] normal-case tracking-normal text-gray-500 dark:text-gray-400">{showCountLoading ? localizeScope(scopeName) : localizeScope(countPresentation.scopeName)}</span>}
             </div>
         </div>
     );

@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Coffee, Heart, X } from 'lucide-react';
-import { APP_NAME } from '../../constants/app';
+import { APP_FULL_NAME } from '../../constants/app';
 import { ENABLED_DONATION_PROVIDERS } from '../../constants/support';
 import { openExternalUrl } from '../../utils/externalLinks';
+import { useTranslation } from 'react-i18next';
 
 interface DonationModalProps {
     isOpen: boolean;
@@ -11,6 +12,7 @@ interface DonationModalProps {
 }
 
 export const DonationModal: React.FC<DonationModalProps> = ({ isOpen, onClose }) => {
+    const { t } = useTranslation();
     const closeButtonRef = React.useRef<HTMLButtonElement>(null);
 
     React.useEffect(() => {
@@ -55,7 +57,7 @@ export const DonationModal: React.FC<DonationModalProps> = ({ isOpen, onClose })
                         <button
                             ref={closeButtonRef}
                             type="button"
-                            aria-label="Close Support Dialog"
+                            aria-label={t('Close Support Dialog')}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onClose();
@@ -70,10 +72,9 @@ export const DonationModal: React.FC<DonationModalProps> = ({ isOpen, onClose })
                                 <Heart className="w-8 h-8 text-red-500 fill-current animate-pulse" />
                             </div>
 
-                            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Support {APP_NAME}</h2>
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('Support')} {APP_FULL_NAME}</h2>
                             <p className="text-gray-600 dark:text-gray-400 text-sm mb-8 leading-relaxed max-w-xs">
-                                If Ambit helps you manage your image library, optional support helps fund development, testing, packaging, and maintenance.
-                            </p>
+                                {t('If Dvoyna Vault helps you manage your image library, optional support helps fund development, testing, packaging, and maintenance.')}</p>
 
                             {ENABLED_DONATION_PROVIDERS.length > 0 ? (
                                 <div className="flex flex-col gap-3 w-full">
@@ -98,16 +99,14 @@ export const DonationModal: React.FC<DonationModalProps> = ({ isOpen, onClose })
                                 </div>
                             ) : (
                                 <div className="w-full rounded-xl border border-dashed border-gray-300 dark:border-gray-700 bg-gray-50/90 dark:bg-black/20 px-4 py-4 text-left">
-                                    <div className="font-semibold text-gray-900 dark:text-white">Donations are not configured yet</div>
+                                    <div className="font-semibold text-gray-900 dark:text-white">{t('Donations are not configured yet')}</div>
                                     <div className="text-sm text-gray-500 dark:text-gray-400">
-                                        Add your Ko-fi, GitHub Sponsors, or Patreon URL in <code>src/constants/support.ts</code> when the pages are live.
-                                    </div>
+                                        {t('Add your Ko-fi, GitHub Sponsors, or Patreon URL in')} <code>src/constants/support.ts</code> {t('when the pages are live.')}</div>
                                 </div>
                             )}
 
                             <div className="mt-8 text-xs text-gray-400">
-                                Thank you for being part of the journey.
-                            </div>
+                                {t('Thank you for being part of the journey.')}</div>
                         </div>
                     </motion.div>
                 </motion.div>

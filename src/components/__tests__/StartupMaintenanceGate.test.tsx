@@ -53,7 +53,7 @@ describe('StartupMaintenanceGate', () => {
         await flushAsyncWork();
 
         expect(screen.getByText('Library ready')).toBeTruthy();
-        expect(screen.queryByText('Preparing Ambit')).toBeNull();
+        expect(screen.queryByText('Preparing DV')).toBeNull();
         expect(staticLoader.style.opacity).toBe('');
         expect(staticLoader.style.pointerEvents).toBe('');
     });
@@ -102,7 +102,7 @@ describe('StartupMaintenanceGate', () => {
         expect(staticLoader.style.opacity).toBe('');
         expect(staticLoader.style.pointerEvents).toBe('');
         expect(screen.getByText('Local database')).toBeTruthy();
-        expect(screen.getByRole('heading', { name: 'Preparing Ambit' })).toBeTruthy();
+        expect(screen.getByRole('heading', { name: 'Preparing DV' })).toBeTruthy();
         expect(screen.getByText('Preparing database')).toBeTruthy();
         expect(screen.getByText('Preparing the local database. Startup may take longer than usual this time.')).toBeTruthy();
 
@@ -112,18 +112,18 @@ describe('StartupMaintenanceGate', () => {
         });
 
         expect(screen.getByText('Library ready')).toBeTruthy();
-        expect(screen.getByRole('heading', { name: 'Preparing Ambit' })).toBeTruthy();
+        expect(screen.getByRole('heading', { name: 'Preparing DV' })).toBeTruthy();
         expect(document.getElementById('static-loading')).toBe(staticLoader);
 
         await act(async () => {
             await vi.advanceTimersByTimeAsync(499);
         });
-        expect(screen.getByRole('heading', { name: 'Preparing Ambit' })).toBeTruthy();
+        expect(screen.getByRole('heading', { name: 'Preparing DV' })).toBeTruthy();
 
         await act(async () => {
             await vi.advanceTimersByTimeAsync(1);
         });
-        expect(screen.queryByRole('heading', { name: 'Preparing Ambit' })).toBeNull();
+        expect(screen.queryByRole('heading', { name: 'Preparing DV' })).toBeNull();
         expect(screen.getByText('Library ready')).toBeTruthy();
         expect(document.getElementById('static-loading')).toBe(staticLoader);
     });
@@ -146,7 +146,7 @@ describe('StartupMaintenanceGate', () => {
         expect(staticLoader.style.pointerEvents).toBe('');
         expect(screen.getByText('Local database')).toBeTruthy();
         expect(screen.getByText('Database startup failed')).toBeTruthy();
-        expect(screen.getByText('Ambit could not prepare the local library database. Restart the app and contact support if this repeats.')).toBeTruthy();
+        expect(screen.getByText('Dvoyna Vault could not prepare the local library database. Restart the app and contact support if this repeats.')).toBeTruthy();
         expect(screen.getByText('migration failed')).toBeTruthy();
         expect(screen.queryByText('Library ready')).toBeNull();
         expect(errorSpy).toHaveBeenCalledWith('[Startup] Failed to prepare database', startupError);
@@ -163,7 +163,7 @@ describe('StartupMaintenanceGate', () => {
         );
 
         expect(screen.getByText('Browser mock app')).toBeTruthy();
-        expect(screen.queryByText('Preparing Ambit')).toBeNull();
+        expect(screen.queryByText('Preparing DV')).toBeNull();
         expect(vi.mocked(getDb)).not.toHaveBeenCalled();
     });
 });

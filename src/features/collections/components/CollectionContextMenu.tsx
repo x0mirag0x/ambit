@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Pencil, Trash2, Archive, ArchiveRestore, Play, Download, ImageOff, ChevronRight, Pin, Settings } from 'lucide-react';
 import { SortOption } from '../../../types';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
+import { useTranslation } from 'react-i18next';
 
 interface CollectionContextMenuProps {
   x: number;
@@ -55,6 +56,7 @@ export const CollectionContextMenu: React.FC<CollectionContextMenuProps> = ({
   onColorChange,
   onEditCollection,
 }) => {
+  const { t } = useTranslation();
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Keep menu within viewport logic
@@ -99,25 +101,25 @@ export const CollectionContextMenu: React.FC<CollectionContextMenuProps> = ({
           <ActionButton
             icon={<Play className="w-4 h-4 text-gray-400" />}
             onClick={onPlaySlideshow}
-            label="Play Slideshow"
+            label={t('Play Slideshow')}
           />
           <ActionButton
             icon={<Pin className={`w-4 h-4 ${isPinned ? 'fill-sage-400 text-white' : 'text-gray-400'}`} />}
             onClick={onTogglePin}
-            label={isPinned ? "Unpin collection" : "Pin collection"}
+            label={isPinned ? t('Unpin collection') : t('Pin collection')}
             pressed={Boolean(isPinned)}
           />
           <ActionButton
             icon={isArchived ? <ArchiveRestore className="h-4 w-4 text-gray-500 dark:text-gray-300" /> : <Archive className="w-4 h-4 text-gray-400" />}
             onClick={onToggleArchive}
-            label={isArchived ? "Unarchive" : "Archive"}
+            label={isArchived ? t('Unarchive') : t('Archive')}
             pressed={Boolean(isArchived)}
           />
         </div>
         <ActionButton
           icon={<Trash2 className="w-4 h-4 text-gray-400" />}
           onClick={onDelete}
-          label="Delete Collection"
+          label={t('Delete Collection')}
           className="hover:!bg-red-500/20 hover:!text-red-400"
         />
       </div>
@@ -125,9 +127,9 @@ export const CollectionContextMenu: React.FC<CollectionContextMenuProps> = ({
       {/* Main Menu Groups */}
 
       {/* Management */}
-      <MenuItem icon={<Pencil className="w-4 h-4 text-gray-400" />} label="Rename" onClick={onRename} />
+      <MenuItem icon={<Pencil className="w-4 h-4 text-gray-400" />} label={t('Rename')} onClick={onRename} />
       {onEditCollection && (
-        <MenuItem icon={<Settings className="w-4 h-4 text-gray-400" />} label="Edit Collection" onClick={onEditCollection} />
+        <MenuItem icon={<Settings className="w-4 h-4 text-gray-400" />} label={t('Edit Collection')} onClick={onEditCollection} />
       )}
 
       {/* Color Tags */}
@@ -136,7 +138,7 @@ export const CollectionContextMenu: React.FC<CollectionContextMenuProps> = ({
           <button
             key={String(c.id)}
             type="button"
-            aria-label={c.id ? `Set collection color to ${c.id}` : "Clear collection color"}
+            aria-label={c.id ? t('Set collection color to {{id}}', { id: c.id }) : t('Clear collection color')}
             aria-pressed={currentColor === c.id}
             onClick={() => { onColorChange(c.id); onClose(); }}
             className={`w-4 h-4 rounded-full transition-transform hover:scale-125 ${c.class} ${currentColor === c.id ? 'ring-2 ring-white' : ''}`}
@@ -147,12 +149,12 @@ export const CollectionContextMenu: React.FC<CollectionContextMenuProps> = ({
       <div className="h-px bg-white/5 my-1" />
 
       {/* Data & Assets */}
-      <MenuItem icon={<Download className="w-4 h-4 text-gray-400" />} label="Export to ZIP..." onClick={onExport} />
+      <MenuItem icon={<Download className="w-4 h-4 text-gray-400" />} label={t('Export to ZIP...')} onClick={onExport} />
 
       {hasCustomThumbnail && (
         <>
           <div className="h-px bg-white/5 my-1" />
-          <MenuItem icon={<ImageOff className="w-4 h-4 text-gray-400" />} label="Reset Thumbnail" onClick={onResetThumbnail} />
+          <MenuItem icon={<ImageOff className="w-4 h-4 text-gray-400" />} label={t('Reset Thumbnail')} onClick={onResetThumbnail} />
         </>
       )}
 

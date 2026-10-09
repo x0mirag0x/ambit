@@ -19,6 +19,7 @@ import { useAppVersion } from '../../../hooks/useAppVersion';
 import { openExternalUrl } from '../../../utils/externalLinks';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import { hasNonCollectionResultFilters, normalizeCollectionScope } from '../../../utils/filterState';
+import { useTranslation } from 'react-i18next';
 
 interface FilterPanelProps {
     isInvokeCollectionCatchupPending?: boolean;
@@ -67,6 +68,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
     isVisible = true,
     className
 }) => {
+    const { t } = useTranslation();
     const appVersion = useAppVersion();
 
     const {
@@ -276,31 +278,29 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
             <div className="p-4 border-b border-gray-200 dark:border-white/10 flex items-center justify-between min-w-[18rem]">
                 <div className="flex items-center gap-2 h-7">
                     <Filter className="w-4 h-4 text-sage-600 dark:text-sage-300" />
-                    <h2 className="font-bold text-sm text-gray-800 dark:text-gray-200 uppercase tracking-wider">Library</h2>
+                    <h2 className="font-bold text-sm text-gray-800 dark:text-gray-200 uppercase tracking-wider">{t('Library')}</h2>
                 </div>
 
                 <div className="flex items-center gap-2">
                     {showUpdateButton && (
                         <TooltipButton
-                            label="Update"
+                            label={t('Update')}
                             content={scopeConflicts
-                                ? 'This scope conflicts with the collection rules. Use Edit Filters to change them.'
-                                : `Update ${activeSmartCol.name} with new filters`}
+                                ? t('This scope conflicts with the collection rules. Use Edit Filters to change them.')
+                                : t('Update {{name}} with new filters', { name: activeSmartCol.name })}
                             aria-disabled={scopeConflicts}
                             onClick={handleQuickUpdate}
                             className="flex items-center gap-1.5 text-[10px] font-bold text-white bg-sage-500 hover:bg-sage-600 aria-disabled:cursor-not-allowed aria-disabled:opacity-50 transition-all shadow-lg shadow-sage-500/20 px-3 py-1.5 rounded-full animate-in zoom-in duration-300"
                         >
                             <Save className="w-3 h-3" />
-                            Update
-                        </TooltipButton>
+                            {t('Update')}</TooltipButton>
                     )}
                     {isDirty && !showUpdateButton && (
                         <button
                             onClick={clearAllFilters}
                             className="text-[10px] font-bold text-sage-600 dark:text-sage-300 hover:text-sage-600 dark:hover:text-sage-300 transition-colors uppercase tracking-wider bg-sage-100 dark:bg-sage-900/30 px-2 py-1 rounded-md"
                         >
-                            Clear filters
-                        </button>
+                            {t('Clear filters')}</button>
                     )}
                 </div>
             </div>
@@ -316,8 +316,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                             }`}
                     >
                         <FolderOpen className="w-3.5 h-3.5" />
-                        Organize
-                        {isOrganizeDirty && <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-sage-500 rounded-full" />}
+                        {t('Organize')}{isOrganizeDirty && <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-sage-500 rounded-full" />}
                     </button>
                     <button
                         onClick={() => setActiveTab('resources')}
@@ -327,8 +326,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                             }`}
                     >
                         <Puzzle className="w-3.5 h-3.5" />
-                        Assets
-                        {isResourcesDirty && <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-sage-500 rounded-full" />}
+                        {t('Assets')}{isResourcesDirty && <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-sage-500 rounded-full" />}
                     </button>
                     <button
                         onClick={() => setActiveTab('generate')}
@@ -338,8 +336,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                             }`}
                     >
                         <Sliders className="w-3.5 h-3.5" />
-                        Filters
-                        {isGenerateDirty && <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-sage-500 rounded-full" />}
+                        {t('Filters')}{isGenerateDirty && <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-sage-500 rounded-full" />}
                     </button>
                 </div>
             </div>
@@ -384,8 +381,8 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                                         return (
                                             <TooltipButton
                                                 key={option.id}
-                                                label={option.label}
-                                                content={option.label}
+                                                label={t(option.label)}
+                                                content={t(option.label)}
                                                 onClick={() => setAssetScope(option.id)}
                                                 aria-pressed={isSelected}
                                                 className={`flex h-9 items-center justify-center rounded-lg transition-all ${isSelected
@@ -402,10 +399,9 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                                 {showLocalEmptyState && (
                                     <div className="rounded-xl border border-dashed border-harbor-200 bg-harbor-50/70 p-4 text-center dark:border-harbor-500/30 dark:bg-harbor-500/10">
                                         <FolderSearch className="mx-auto mb-2 h-5 w-5 text-harbor-600 dark:text-harbor-300" />
-                                        <p className="text-xs font-semibold text-harbor-600 dark:text-harbor-300">No local resource folders scanned yet.</p>
+                                        <p className="text-xs font-semibold text-harbor-600 dark:text-harbor-300">{t('No local resource folders scanned yet.')}</p>
                                         <p className="mt-1 text-[11px] leading-relaxed text-harbor-600 dark:text-harbor-300">
-                                            Add model, LoRA, embedding, ControlNet, or IP-Adapter folders to build a local asset inventory.
-                                        </p>
+                                            {t('Add model, LoRA, embedding, ControlNet, or IP-Adapter folders to build a local asset inventory.')}</p>
                                         {onOpenResourceFolders && (
                                             <button
                                                 type="button"
@@ -413,8 +409,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                                                 className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-sage-600 px-3 py-1.5 text-[11px] font-bold text-white shadow-sm transition-colors hover:bg-sage-500"
                                             >
                                                 <FolderSearch className="h-3.5 w-3.5" />
-                                                Add Resource Folder
-                                            </button>
+                                                {t('Add Resource Folder')}</button>
                                         )}
                                     </div>
                                 )}
@@ -423,7 +418,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                             {showResourceLists && (
                                 <>
                                     <ResourceSection
-                                        title="Checkpoints"
+                                        title={t('Checkpoints')}
                                         type="checkpoints"
                                         filters={filters} setFilters={setFilters}
                                         data={facets.checkpoints}
@@ -433,7 +428,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                                         assetScope={assetScope}
                                     />
                                     <ResourceSection
-                                        title="Resources (LoRA)"
+                                        title={t('Resources (LoRA)')}
                                         type="loras"
                                         filters={filters} setFilters={setFilters}
                                         data={facets.loras}
@@ -444,7 +439,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                                     />
                                     {hasScopedResourceItems(facets.embeddings) && (
                                         <ResourceSection
-                                            title="Resources (Embedding)"
+                                            title={t('Resources (Embedding)')}
                                             type="embeddings"
                                             filters={filters} setFilters={setFilters}
                                             data={facets.embeddings}
@@ -456,7 +451,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                                     )}
                                     {hasScopedResourceItems(facets.hypernetworks) && (
                                         <ResourceSection
-                                            title="Resources (Hypernet)"
+                                            title={t('Resources (Hypernet)')}
                                             type="hypernetworks"
                                             filters={filters} setFilters={setFilters}
                                             data={facets.hypernetworks}
@@ -468,7 +463,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                                     )}
                                     {hasScopedResourceItems(facets.controlNets) && (
                                         <ResourceSection
-                                            title="Resources (ControlNet)"
+                                            title={t('Resources (ControlNet)')}
                                             type="controlNets"
                                             filters={filters} setFilters={setFilters}
                                             data={facets.controlNets}
@@ -480,7 +475,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                                     )}
                                     {hasScopedResourceItems(facets.ipAdapters) && (
                                         <ResourceSection
-                                            title="Resources (IP-Adapter)"
+                                            title={t('Resources (IP-Adapter)')}
                                             type="ipAdapters"
                                             filters={filters} setFilters={setFilters}
                                             data={facets.ipAdapters}
@@ -533,8 +528,8 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                 </div>
                 <div className="flex items-center gap-3">
                     <TooltipButton
-                        label="Open Ambit on GitHub"
-                        content="Open Ambit on GitHub"
+                        label={t('Open Dvoyna Vault on GitHub')}
+                        content={t('Open Dvoyna Vault on GitHub')}
                         onClick={() => openExternalUrl(REPOSITORY_URL)}
                         className="hover:text-gray-900 dark:hover:text-zinc-200 transition-colors opacity-80 hover:opacity-100"
                     >

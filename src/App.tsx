@@ -28,6 +28,7 @@ import { useAiSearchLogic } from './hooks/useAiSearchLogic';
 import { useFileOperations } from './hooks/useFileOperations';
 import { useCollectionOperations } from './hooks/useCollectionOperations';
 import { useTheme } from './hooks/useTheme';
+import { useUiLanguage } from './hooks/useUiLanguage';
 import { useDragDrop } from './hooks/useDragDrop';
 import { useFolderMonitor } from './hooks/useFolderMonitor';
 import { useModalManager } from './hooks/useModalManager';
@@ -51,6 +52,7 @@ import { useLibraryModelOptions } from './features/viewer/hooks/useLibraryModelO
 import { startupDiagnostics } from './utils/startupDiagnostics';
 import { commands } from './bindings';
 import { isTauriRuntime } from './services/runtime';
+import { useTranslation } from 'react-i18next';
 
 const ImageViewer = React.lazy(() => import('./features/viewer/components/ImageViewer').then(module => ({ default: module.ImageViewer })));
 const VideoViewer = React.lazy(() => import('./features/viewer/components/VideoViewer').then(module => ({ default: module.VideoViewer })));
@@ -91,6 +93,7 @@ const dismissStaticLoader = (immediate = false) => {
 };
 
 export default function App() {
+    const { t } = useTranslation();
     const { addToast } = useToast();
     const queryClient = useQueryClient();
     const modals = useModalManager();
@@ -268,6 +271,7 @@ export default function App() {
 
     // --- UI Logic Hooks ---
     const { toggleTheme } = useTheme(settings.theme, setSettings);
+    useUiLanguage(settings.uiLanguage, isSettingsLoaded);
     const {
         selectedIds, setSelectedIds, lastSelectedId, setLastSelectedId,
         handleImageClick, handleSelectionToggle, handleRangeSelection, clearSelection
@@ -477,7 +481,7 @@ export default function App() {
             if (paths.length === 0) return;
             await fileOps.handleImportPaths(paths);
         } catch (error) {
-            addToast(`Video import failed: ${String(error)}`, 'error');
+            addToast(t('Video import failed: {{v0}}', { v0: String(error) }), 'error');
         }
     }, [addToast, fileOps]);
 
@@ -680,7 +684,7 @@ export default function App() {
         const visibleIndex = images.findIndex(image => image.id === imageId);
         if (visibleIndex !== -1) {
             if (isCurrentlyPrivacyHidden(images[visibleIndex])) {
-                addToast('The referenced image is hidden by Privacy Mode.', 'warning');
+                addToast(t('The referenced image is hidden by Privacy Mode.'), 'warning');
                 return false;
             }
             setDirectViewerImage(null);
@@ -695,12 +699,12 @@ export default function App() {
             const image = await getImageWithFullMetadata(imageId);
             if (referenceNavigationRequestRef.current !== requestId) return false;
             if (!image) {
-                addToast('The referenced image is no longer available in Ambit.', 'error');
+                addToast(t('The referenced image is no longer available in Dvoyna Vault.'), 'error');
                 await queryClient.invalidateQueries({ queryKey: INVOKE_REFERENCE_QUERY_KEY });
                 return false;
             }
             if (isCurrentlyPrivacyHidden(image)) {
-                addToast('The referenced image is hidden by Privacy Mode.', 'warning');
+                addToast(t('The referenced image is hidden by Privacy Mode.'), 'warning');
                 return false;
             }
 
@@ -710,7 +714,7 @@ export default function App() {
             return true;
         } catch (error) {
             console.error('[Viewer] Failed to open referenced image', error);
-            addToast('Failed to open the referenced image.', 'error');
+            addToast(t('Failed to open the referenced image.'), 'error');
             await queryClient.invalidateQueries({ queryKey: INVOKE_REFERENCE_QUERY_KEY });
             return false;
         }
@@ -839,10 +843,10 @@ export default function App() {
                 setIsCompletingOnboarding(false);
                 if (isOnboardingReplay) {
                     modals.closeModal('onboarding');
-                    addToast('Setup guide settings updated', 'success');
+                    addToast(t('Setup guide settings updated'), 'success');
                 } else {
                     workspaceRef.current?.focus();
-                    addToast('Setup complete!', 'success');
+                    addToast(t('Setup complete!'), 'success');
                 }
             } catch (error) {
                 const restoredSettings = useSettingsStore.getState().rollbackSettings(permit, current => ({
@@ -868,7 +872,7 @@ export default function App() {
                     }
                 }
                 setIsCompletingOnboarding(false);
-                addToast('Setup could not be saved. Please try again.', 'error');
+                addToast(t('Setup could not be saved. Please try again.'), 'error');
                 throw error;
             }
         })
@@ -889,7 +893,7 @@ export default function App() {
             settings: false,
             onboarding: false,
         }));
-        addToast('First-run onboarding reset', 'info');
+        addToast(t('First-run onboarding reset'), 'info');
     };
 
 

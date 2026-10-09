@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { Database, Zap, Loader2, BrainCircuit, Undo2, Save, Wrench, RefreshCw, History } from 'lucide-react';
-import { APP_NAME } from '../../../constants/app';
 import { generateStressTestData } from '../../../utils/dev/dataGenerator';
 import { useLibraryContext } from '../../../hooks/useLibraryContext';
 import { useSettingsStore } from '../../../stores/settingsStore';
@@ -16,6 +15,7 @@ import { listenWithCleanup } from '../../../utils/tauriListener';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import { rebuildFacetCache } from '../../../services/db/imageRepo';
 import { ConfirmDialog } from '../../../components/ui/ConfirmDialog';
+import { useTranslation } from 'react-i18next';
 
 type DevTabId = 'prompts' | 'tools';
 
@@ -24,6 +24,7 @@ interface DevTabProps {
 }
 
 export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => {
+    const { t } = useTranslation();
     const { fetchData } = useLibraryContext();
     const { settings, setSettings } = useSettingsStore();
     const { addToast } = useToast();
@@ -92,13 +93,13 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
         try {
             const result = await commands.optimizeDatabase();
             if (result.status === 'ok') {
-                addToast(result.data, 'success');
+                addToast(t(result.data), 'success');
             } else {
                 console.error(result.error);
-                addToast('Failed to optimize database', 'error');
+                addToast(t('Failed to optimize database'), 'error');
             }
         } catch (e) {
-            addToast('Error communicating with backend', 'error');
+            addToast(t('Error communicating with backend'), 'error');
         } finally {
             setIsOptimizing(false);
         }
@@ -108,10 +109,10 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
         setIsRebuilding(true);
         try {
             await rebuildFacetCache();
-            addToast('Facet cache rebuilt successfully', 'success');
+            addToast(t('Facet cache rebuilt successfully'), 'success');
         } catch (e) {
             console.error(e);
-            addToast('Failed to rebuild facet cache', 'error');
+            addToast(t('Failed to rebuild facet cache'), 'error');
         } finally {
             setIsRebuilding(false);
         }
@@ -122,7 +123,7 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
         const resetProgressListener = listenWithCleanup<string>(
             'reset-progress',
             (event) => {
-                addToast(event.payload, 'info');
+                addToast(t(event.payload), 'info');
             },
             'Database reset progress'
         );
@@ -152,14 +153,14 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
                             className="flex items-center justify-between cursor-pointer group"
                         >
                             <div>
-                                <div className="text-sm font-bold text-gray-900 dark:text-gray-200 group-hover:text-sage-500 transition-colors">Developer Mode</div>
-                                <div className="text-xs text-gray-500">Enable prompt overrides, diagnostics, and low-level tooling for this development build.</div>
+                                <div className="text-sm font-bold text-gray-900 dark:text-gray-200 group-hover:text-sage-500 transition-colors">{t('Developer Mode')}</div>
+                                <div className="text-xs text-gray-500">{t('Enable prompt overrides, diagnostics, and low-level tooling for this development build.')}</div>
                             </div>
                             <button
                                 type="button"
                                 role="switch"
                                 aria-checked={developerModeEnabled}
-                                aria-label="Developer Mode"
+                                aria-label={t('Developer Mode')}
                                 className={`w-10 h-6 rounded-full relative transition-colors ${developerModeEnabled ? 'bg-sage-600' : 'bg-gray-200 dark:bg-white/10'}`}
                             >
                                 <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all ${developerModeEnabled ? 'left-5' : 'left-1'}`} />
@@ -184,7 +185,7 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
                                         )}
                                     >
                                         <Icon className="w-4 h-4" />
-                                        {tab.label}
+                                        {t(tab.label)}
                                     </button>
                                 );
                             })}
@@ -201,11 +202,9 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
                             <div className="flex items-start gap-3 p-4 bg-amethyst-50 dark:bg-amethyst-500/10 border border-amethyst-200 dark:border-amethyst-500/20 rounded-xl">
                                 <BrainCircuit className="w-5 h-5 text-amethyst-600 dark:text-amethyst-300 mt-0.5 shrink-0" />
                                 <div>
-                                    <h4 className="text-sm font-bold text-amethyst-600 dark:text-amethyst-300">System Prompt Overrides</h4>
+                                    <h4 className="text-sm font-bold text-amethyst-600 dark:text-amethyst-300">{t('System Prompt Overrides')}</h4>
                                     <p className="text-xs text-amethyst-600/70 dark:text-amethyst-300/70 mt-1 leading-relaxed">
-                                        Customize the internal instructions sent to the AI models.
-                                        Changes here apply immediately. "Reset to Default" removes your override.
-                                    </p>
+                                        {t('Customize the internal instructions sent to the AI models. Changes here apply immediately. "Reset to Default" removes your override.')}</p>
                                 </div>
                             </div>
 
@@ -226,15 +225,14 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
                                                     </div>
                                                     {isOverridden && (
                                                         <span className="text-[10px] font-bold text-ember-600 dark:text-ember-300 bg-ember-100 dark:bg-ember-900/30 px-2 py-0.5 rounded-full flex items-center gap-1">
-                                                            <Wrench className="w-3 h-3" /> Modified
-                                                        </span>
+                                                            <Wrench className="w-3 h-3" /> {t('Modified')}</span>
                                                     )}
                                                 </div>
                                                 <div className="flex gap-2">
                                                     {isOverridden && (
                                                         <TooltipButton
-                                                            label="Reset Prompt to Default"
-                                                            content="Reset Prompt to Default"
+                                                            label={t('Reset Prompt to Default')}
+                                                            content={t('Reset Prompt to Default')}
                                                             onClick={() => handleResetPrompt(key)}
                                                             className="p-1.5 text-gray-400 hover:text-red-600 transition-colors rounded hover:bg-red-50 dark:hover:bg-red-500/20 dark:hover:text-red-300"
                                                         >
@@ -246,8 +244,7 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
                                                             onClick={() => handleEditPrompt(key)}
                                                             className="text-xs font-bold text-gray-600 dark:text-gray-300 hover:text-amethyst-600 dark:hover:text-amethyst-300 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
                                                         >
-                                                            Edit
-                                                        </button>
+                                                            {t('Edit')}</button>
                                                     )}
                                                 </div>
                                             </div>
@@ -265,14 +262,12 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
                                                             onClick={() => setOpenPrompt(null)}
                                                             className="px-3 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-900 dark:hover:text-gray-200"
                                                         >
-                                                            Cancel
-                                                        </button>
+                                                            {t('Cancel')}</button>
                                                         <button
                                                             onClick={() => handleSavePrompt(key)}
                                                             className="px-4 py-1.5 bg-amethyst-600 hover:bg-amethyst-500 text-white rounded-lg text-xs font-bold flex items-center gap-2 shadow-lg shadow-amethyst-500/20"
                                                         >
-                                                            <Save className="w-3 h-3" /> Save Override
-                                                        </button>
+                                                            <Save className="w-3 h-3" /> {t('Save Override')}</button>
                                                     </div>
                                                 </div>
                                             ) : (
@@ -297,12 +292,10 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
                                 <div className="flex gap-4">
                                     <Database className="w-6 h-6 text-ember-600 dark:text-ember-300 shrink-0" />
                                     <div>
-                                        <h5 className="mb-1 text-sm font-bold text-ember-600 dark:text-ember-300">Database Stress Testing</h5>
+                                        <h5 className="mb-1 text-sm font-bold text-ember-600 dark:text-ember-300">{t('Database Stress Testing')}</h5>
                                         <p className="text-xs leading-relaxed text-ember-600 dark:text-ember-300">
-                                            Generate dummy data to benchmark application performance.
-                                            <br />
-                                            <strong>Note:</strong> This increases database size significantly.
-                                        </p>
+                                            {t('Generate dummy data to benchmark application performance.')}<br />
+                                            <strong>{t('Note:')}</strong> {t('This increases database size significantly.')}</p>
                                     </div>
                                 </div>
                             </div>
@@ -310,8 +303,8 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
                             <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-xl p-4">
                                 <div className="flex items-center justify-between gap-4">
                                     <div>
-                                        <div className="text-sm font-bold text-gray-900 dark:text-gray-200">Optimize Database</div>
-                                        <div className="text-xs text-gray-500 mt-1">Run VACUUM and ANALYZE for local database maintenance.</div>
+                                        <div className="text-sm font-bold text-gray-900 dark:text-gray-200">{t('Optimize Database')}</div>
+                                        <div className="text-xs text-gray-500 mt-1">{t('Run VACUUM and ANALYZE for local database maintenance.')}</div>
                                     </div>
                                     <button
                                         type="button"
@@ -320,7 +313,7 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
                                         className="px-4 py-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-700 dark:text-gray-200 rounded-lg text-xs font-bold transition-all flex items-center gap-2 disabled:opacity-50 whitespace-nowrap"
                                     >
                                         {isOptimizing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Database className="w-3.5 h-3.5" />}
-                                        {isOptimizing ? 'Optimizing...' : 'Optimize Now'}
+                                        {isOptimizing ? t('Optimizing...') : t('Optimize Now')}
                                     </button>
                                 </div>
                             </div>
@@ -328,24 +321,23 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
                             <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-xl p-4">
                                 <div className="flex items-center justify-between gap-4">
                                     <div>
-                                        <div className="text-sm font-bold text-gray-900 dark:text-gray-200">Reset first-run onboarding</div>
-                                        <div className="text-xs text-gray-500 mt-1">Test the non-dismissible first-run flow without deleting application settings or library data.</div>
+                                        <div className="text-sm font-bold text-gray-900 dark:text-gray-200">{t('Reset first-run onboarding')}</div>
+                                        <div className="text-xs text-gray-500 mt-1">{t('Test the non-dismissible first-run flow without deleting application settings or library data.')}</div>
                                     </div>
                                     <button
                                         type="button"
                                         onClick={() => setIsResetOnboardingConfirmOpen(true)}
                                         className="px-4 py-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-700 dark:text-gray-200 rounded-lg text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap"
                                     >
-                                        <History className="w-3.5 h-3.5" /> Reset onboarding
-                                    </button>
+                                        <History className="w-3.5 h-3.5" /> {t('Reset onboarding')}</button>
                                 </div>
                             </div>
 
                             <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-xl p-4">
                                 <div className="flex items-center justify-between gap-4">
                                     <div>
-                                        <div className="text-sm font-bold text-gray-900 dark:text-gray-200">Rebuild Facet Cache</div>
-                                        <div className="text-xs text-gray-500 mt-1">Recalculate metadata facets if filters look stale after low-level changes.</div>
+                                        <div className="text-sm font-bold text-gray-900 dark:text-gray-200">{t('Rebuild Facet Cache')}</div>
+                                        <div className="text-xs text-gray-500 mt-1">{t('Recalculate metadata facets if filters look stale after low-level changes.')}</div>
                                     </div>
                                     <button
                                         type="button"
@@ -354,7 +346,7 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
                                         className="px-4 py-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-700 dark:text-gray-200 rounded-lg text-xs font-bold transition-all flex items-center gap-2 disabled:opacity-50 whitespace-nowrap"
                                     >
                                         {isRebuilding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-                                        {isRebuilding ? 'Rebuilding...' : 'Rebuild Cache'}
+                                        {isRebuilding ? t('Rebuilding...') : t('Rebuild Cache')}
                                     </button>
                                 </div>
                             </div>
@@ -363,43 +355,42 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
                             <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-xl p-4">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <div className="text-sm font-bold text-gray-900 dark:text-gray-200">Metadata Diagnostics</div>
-                                        <div className="text-xs text-gray-500">Check raw metadata storage status</div>
+                                        <div className="text-sm font-bold text-gray-900 dark:text-gray-200">{t('Metadata Diagnostics')}</div>
+                                        <div className="text-xs text-gray-500">{t('Check raw metadata storage status')}</div>
                                     </div>
                                     <button
                                         onClick={async () => {
                                             try {
                                                 const res = await invoke<{ total: number, with_raw: number, with_pv: number, v0: number, v1: number }>('get_metadata_stats');
                                                 const msg = `Total: ${res.total}, With Raw: ${res.with_raw}, V0: ${res.v0}, V1: ${res.v1}`;
-                                                addToast(msg, 'info');
+                                                addToast(t(msg), 'info');
                                                 await navigator.clipboard.writeText(msg);
-                                                addToast('Stats copied to clipboard', 'success');
+                                                addToast(t('Stats copied to clipboard'), 'success');
                                             } catch (e: unknown) {
                                                 const message = e instanceof Error ? e.message : String(e);
-                                                addToast(`Error: ${message}`, 'error');
+                                                addToast(t('Error: {{message}}', { message: message }), 'error');
                                             }
                                         }}
                                         className="flex items-center gap-2 whitespace-nowrap rounded-lg bg-gray-100 px-4 py-2 text-xs font-bold text-gray-700 transition-all hover:bg-gray-200 dark:bg-white/10 dark:text-gray-200 dark:hover:bg-white/20"
                                     >
-                                        Run Check
-                                    </button>
+                                        {t('Run Check')}</button>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end bg-white dark:bg-white/5 border border-gray-200 dark:border-white/5 p-4 rounded-xl">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Target Image Count</label>
+                                    <label className="text-xs font-medium text-gray-500 dark:text-gray-400">{t('Target Image Count')}</label>
                                     <select
                                         value={targetCount}
                                         onChange={(e) => setTargetCount(Number(e.target.value))}
                                         className="w-full bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-sage-500/50 transition-all font-mono text-gray-900 dark:text-gray-100"
                                         disabled={isGenerating}
                                     >
-                                        <option value={1000}>1,000 images</option>
-                                        <option value={5000}>5,000 images</option>
-                                        <option value={10000}>10,000 images</option>
-                                        <option value={50000}>50,000 images</option>
-                                        <option value={100000}>100,000 images</option>
+                                        <option value={1000}>{t('1,000 images')}</option>
+                                        <option value={5000}>{t('5,000 images')}</option>
+                                        <option value={10000}>{t('10,000 images')}</option>
+                                        <option value={50000}>{t('50,000 images')}</option>
+                                        <option value={100000}>{t('100,000 images')}</option>
                                     </select>
                                 </div>
 
@@ -411,13 +402,12 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
                                     {isGenerating ? (
                                         <>
                                             <Loader2 className="w-4 h-4 animate-spin" />
-                                            Generating {progress.current.toLocaleString()}...
+                                            {t('Generating')} {progress.current.toLocaleString()}...
                                         </>
                                     ) : (
                                         <>
                                             <Zap className="w-4 h-4 fill-white" />
-                                            Start Stress Test
-                                        </>
+                                            {t('Start Stress Test')}</>
                                     )}
                                 </button>
                             </div>
@@ -431,10 +421,9 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
                             <div className="flex gap-4">
                                 <Wrench className="w-5 h-5 text-gray-400 shrink-0 mt-0.5" />
                                 <div>
-                                    <h4 className="text-sm font-bold text-gray-900 dark:text-gray-200">Developer tools are off</h4>
+                                    <h4 className="text-sm font-bold text-gray-900 dark:text-gray-200">{t('Developer tools are off')}</h4>
                                     <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                                        Enable Developer Mode to access prompt overrides, diagnostics, database tools, and stress testing.
-                                    </p>
+                                        {t('Enable Developer Mode to access prompt overrides, diagnostics, database tools, and stress testing.')}</p>
                                 </div>
                             </div>
                         </section>
@@ -443,9 +432,9 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
             </div>
             <ConfirmDialog
                 isOpen={isResetOnboardingConfirmOpen}
-                title="Reset First-Run Onboarding?"
-                message="This opens the non-dismissible first-run wizard. It does not delete library data, prompt keywords, masking behavior, API keys, or other settings."
-                confirmLabel="Reset & Open"
+                title={t('Reset First-Run Onboarding?')}
+                message={t('This opens the non-dismissible first-run wizard. It does not delete library data, prompt keywords, masking behavior, API keys, or other settings.')}
+                confirmLabel={t('Reset & Open')}
                 onConfirm={() => {
                     setIsResetOnboardingConfirmOpen(false);
                     onResetFirstRunOnboarding?.();

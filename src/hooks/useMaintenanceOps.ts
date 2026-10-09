@@ -20,6 +20,7 @@ import {
 } from '../utils/settingsUtils';
 import type { ActiveImageStateAdapter } from './activeImageState';
 import { invalidateInvokeReferenceQueries } from '../services/db/invokeReferenceRepo';
+import { useTranslation } from 'react-i18next';
 
 interface UseMaintenanceOpsProps {
     images: AIImage[];
@@ -36,6 +37,7 @@ export const useMaintenanceOps = ({
     settings,
     activeImageState
 }: UseMaintenanceOpsProps) => {
+    const { t } = useTranslation();
     const { addToast } = useToast();
     const queryClient = useQueryClient();
     const [isRecoveringMetadata, setIsRecoveringMetadata] = useState(false);
@@ -54,14 +56,14 @@ export const useMaintenanceOps = ({
             const affectedIds = new Set(result.affectedIds);
             setImages(prev => prev.filter(img => !affectedIds.has(img.id)));
             removeImagesFromQueryCaches(queryClient, affectedIds);
-            addToast(`Removed ${affectedIds.size} item${affectedIds.size === 1 ? '' : 's'} from the library`, 'success');
+            addToast(t('toast.removedItems', { count: affectedIds.size }), 'success');
 
             try {
                 console.info(`${logPrefix}: refreshing collections`);
                 await refreshCollections();
             } catch (collectionRefreshError) {
                 console.error(`${logPrefix}: collection refresh failed`, collectionRefreshError);
-                addToast('Removed from library, but collections may need a refresh.', 'warning');
+                addToast(t('Removed from library, but collections may need a refresh.'), 'warning');
             }
 
             try {
@@ -71,7 +73,7 @@ export const useMaintenanceOps = ({
                 ]);
             } catch (queryRefreshError) {
                 console.error(`${logPrefix}: dependent view refresh failed`, queryRefreshError);
-                addToast('Removed from library, but some views may need a refresh.', 'warning');
+                addToast(t('Removed from library, but some views may need a refresh.'), 'warning');
             }
 
             try {
@@ -85,12 +87,12 @@ export const useMaintenanceOps = ({
             if (rebuildSucceeded) {
                 incrementFacetCacheVersion();
             } else {
-                addToast('Library update succeeded, but filters may take a moment to refresh.', 'info');
+                addToast(t('Library update succeeded, but filters may take a moment to refresh.'), 'info');
             }
             return true;
         } catch (e) {
             console.error(`${logPrefix}: mutation failed`, e);
-            addToast("Failed to update library state", "error");
+            addToast(t('Failed to update library state'), "error");
             return false;
         }
     }, [setImages, addToast, refreshCollections, incrementFacetCacheVersion, queryClient]);
@@ -102,7 +104,7 @@ export const useMaintenanceOps = ({
                 ?? images.find(i => i.id === targetId)
                 ?? (await getImagesByIds([targetId]))[0];
             if (!img) {
-                addToast("Prompt Recovery could not find this image in the library.", "error");
+                addToast(t('Prompt Recovery could not find this image in the library.'), "error");
                 return null;
             }
 
@@ -140,11 +142,11 @@ export const useMaintenanceOps = ({
                 cachedImage.id === img.id ? updatedImg : cachedImage
             ));
 
-            addToast("Metadata recovered successfully!", "success");
+            addToast(t('Metadata recovered successfully!'), "success");
             return updatedImg;
         } catch (e) {
             console.error(e);
-            addToast("AI Prompt Recovery failed. Please try again.", "error");
+            addToast(t('AI Prompt Recovery failed. Please try again.'), "error");
             return null;
         } finally {
             setIsRecoveringMetadata(false);

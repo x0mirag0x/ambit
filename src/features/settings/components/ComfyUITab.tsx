@@ -4,6 +4,8 @@ import { Workflow, Folder, Info, CheckCircle2, XCircle, Plus, FolderOpen } from 
 import { AppSettings, GeneratorTool } from '../../../types';
 import { useToast } from '../../../hooks/useToast';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
+import { useTranslation } from 'react-i18next';
+import { translateRuntimeMessage } from '../../../i18n/statusMessages';
 
 interface TabProps {
     settings: AppSettings;
@@ -11,6 +13,7 @@ interface TabProps {
 }
 
 export const ComfyUITab: React.FC<TabProps> = React.memo(({ settings, setSettings }) => {
+    const { t } = useTranslation();
     const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
     const { addToast } = useToast();
 
@@ -22,7 +25,7 @@ export const ComfyUITab: React.FC<TabProps> = React.memo(({ settings, setSetting
 
         if (exists) {
             setTestResult({ success: true, message: "Folder is already being monitored!" });
-            addToast("Folder is already being monitored", "info");
+            addToast(t('Folder is already being monitored'), "info");
             return;
         }
 
@@ -46,11 +49,11 @@ export const ComfyUITab: React.FC<TabProps> = React.memo(({ settings, setSetting
             }));
 
             setTestResult({ success: true, message: "Successfully linked ComfyUI output folder!" });
-            addToast("Successfully linked ComfyUI output folder", "success");
+            addToast(t('Successfully linked ComfyUI output folder'), "success");
         } catch (e) {
             console.error(e);
             setTestResult({ success: false, message: "Failed to link folder." });
-            addToast("Failed to link folder", "error");
+            addToast(t('Failed to link folder'), "error");
         }
     };
 
@@ -59,29 +62,27 @@ export const ComfyUITab: React.FC<TabProps> = React.memo(({ settings, setSetting
 
             <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-6 shadow-sm relative overflow-hidden group">
                 <h4 className="mb-6 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-sage-600 dark:text-sage-300">
-                    <Workflow className="w-4 h-4" /> Output Configuration
-                </h4>
+                    <Workflow className="w-4 h-4" /> {t('Output Configuration')}</h4>
 
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 gap-6">
                         <div className="relative">
                             <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3 px-1">
-                                Output Folder Path
-                            </label>
+                                {t('Output Folder Path')}</label>
                             <div className="flex gap-2">
                                 <div className="flex-1 relative group">
                                     <input
                                         type="text"
                                         value={settings.comfyUiPath || ''}
                                         onChange={(e) => setSettings(prev => ({ ...prev, comfyUiPath: e.target.value }))}
-                                        placeholder="e.g. C:\\ComfyUI\\output"
+                                        placeholder={t('e.g. C:\\\\ComfyUI\\\\output')}
                                         className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:border-sage-500 focus:ring-1 focus:ring-sage-500/50 outline-none text-gray-900 dark:text-white font-mono transition-all"
                                     />
                                     <Folder className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-sage-500 transition-colors" />
                                 </div>
                                 <TooltipButton
-                                    label="Browse for ComfyUI Output Folder"
-                                    content="Browse for ComfyUI Output Folder"
+                                    label={t('Browse for ComfyUI Output Folder')}
+                                    content={t('Browse for ComfyUI Output Folder')}
                                     onClick={async () => {
                                         try {
                                             const { open } = await import('@tauri-apps/plugin-dialog');
@@ -98,8 +99,7 @@ export const ComfyUITab: React.FC<TabProps> = React.memo(({ settings, setSetting
                                 </TooltipButton>
                             </div>
                             <p className="text-[10px] text-gray-500 mt-3 flex items-center gap-1.5 opacity-80 px-1">
-                                <Info className="w-3 h-3" /> Select the 'output' folder where ComfyUI saves generated images.
-                            </p>
+                                <Info className="w-3 h-3" /> {t('Select the \'output\' folder where ComfyUI saves generated images.')}</p>
                         </div>
                     </div>
 
@@ -114,8 +114,7 @@ export const ComfyUITab: React.FC<TabProps> = React.memo(({ settings, setSetting
                                     }`}
                             >
                                 <Plus className="w-4 h-4" />
-                                Link Output Folder
-                            </button>
+                                {t('Link Output Folder')}</button>
 
                             {testResult && (
                                 <div className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2.5 animate-in fade-in duration-150 motion-reduce:animate-none ${testResult.success
@@ -123,7 +122,7 @@ export const ComfyUITab: React.FC<TabProps> = React.memo(({ settings, setSetting
                                     : 'bg-red-500/10 text-red-600 dark:text-red-300'
                                     }`}>
                                     {testResult.success ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
-                                    {testResult.message}
+                                    {translateRuntimeMessage(testResult.message)}
                                 </div>
                             )}
                         </div>

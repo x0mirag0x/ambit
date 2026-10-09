@@ -28,6 +28,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCollectionStore } from '../../../stores/collectionStore';
 import { refreshThumbnailConsumers } from '../../../services/thumbnailConsumerRefresh';
 import { useToast } from '../../../hooks/useToast';
+import { useTranslation } from 'react-i18next';
 
 interface MaintenanceViewProps {
     images: AIImage[];
@@ -93,6 +94,7 @@ export const MaintenanceView: React.FC<MaintenanceViewProps> = ({
     modelOptions = []
 }) => {
     // --- State ---
+    const { t } = useTranslation();
     const [activeTab, setActiveTabOriginal] = useState<MaintenanceTab>('missing');
     const intermediatesCount = useLibraryStore(s => s.maintenanceCounts.intermediates);
     const isScanningDuplicates = useLibraryStore(s => s.isScanningDuplicates);
@@ -196,7 +198,7 @@ export const MaintenanceView: React.FC<MaintenanceViewProps> = ({
 
     useEffect(() => {
         if (removedViewerError) {
-            addToast('Could not load removed item details. Close and reopen the viewer to retry.', 'error');
+            addToast(t('Could not load removed item details. Close and reopen the viewer to retry.'), 'error');
         }
     }, [removedViewerError, addToast]);
 
@@ -549,7 +551,7 @@ export const MaintenanceView: React.FC<MaintenanceViewProps> = ({
                 );
             } catch (error) {
                 console.error('[Maintenance] Thumbnail regeneration failed', error);
-                addToast('Thumbnail optimization failed partway through', 'error');
+                addToast(t('Thumbnail optimization failed partway through'), 'error');
             } finally {
                 try {
                     await refreshThumbnailConsumers({
@@ -559,7 +561,7 @@ export const MaintenanceView: React.FC<MaintenanceViewProps> = ({
                     });
                 } catch (error) {
                     console.error('[Maintenance] Thumbnail changes were saved, but consumers failed to refresh', error);
-                    addToast('Thumbnail changes were saved, but the library view failed to refresh', 'error');
+                    addToast(t('Thumbnail changes were saved, but the library view failed to refresh'), 'error');
                 }
                 setIsRegeneratingThumbnails(false);
                 setThumbnailProgress(null);
@@ -641,8 +643,8 @@ export const MaintenanceView: React.FC<MaintenanceViewProps> = ({
                             <div role="alert" className="flex min-h-64 flex-col items-center justify-center gap-4 text-center">
                                 <AlertTriangle className="h-10 w-10 text-ember-600 dark:text-ember-300" aria-hidden="true" />
                                 <div>
-                                    <h3 className="font-bold text-gray-900 dark:text-white">Couldn&apos;t load {activeTabLabel} data</h3>
-                                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Your library was not changed. Try loading this section again.</p>
+                                    <h3 className="font-bold text-gray-900 dark:text-white">{t("Couldn't load {{tab}} data", { tab: activeTabLabel })}</h3>
+                                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t('Your library was not changed. Try loading this section again.')}</p>
                                 </div>
                                 <button
                                     type="button"
@@ -650,8 +652,7 @@ export const MaintenanceView: React.FC<MaintenanceViewProps> = ({
                                     className="inline-flex items-center gap-2 rounded-lg bg-sage-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition-colors hover:bg-sage-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-950"
                                 >
                                     <RefreshCw className="h-4 w-4" aria-hidden="true" />
-                                    Retry
-                                </button>
+                                    {t('Retry')}</button>
                             </div>
                         ) : (
                             <div inert={isLoading ? true : undefined}>
@@ -659,12 +660,11 @@ export const MaintenanceView: React.FC<MaintenanceViewProps> = ({
                                     <div role="alert" className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-ember-200 bg-ember-50 px-4 py-3 text-sm text-ember-600 dark:border-ember-500/30 dark:bg-ember-500/10 dark:text-ember-300">
                                         <span className="flex items-center gap-2">
                                             <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden="true" />
-                                            Refresh failed. Showing the last loaded {activeTabLabel.toLowerCase()} data.
+                                            {t('Refresh failed. Showing the last loaded')} {activeTabLabel.toLowerCase()} data.
                                         </span>
                                         <button type="button" onClick={() => void retryActiveTab()} className="inline-flex items-center gap-2 font-bold underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-500">
                                             <RefreshCw className="h-4 w-4" aria-hidden="true" />
-                                            Retry
-                                        </button>
+                                            {t('Retry')}</button>
                                     </div>
                                 )}
 
@@ -815,7 +815,7 @@ export const MaintenanceView: React.FC<MaintenanceViewProps> = ({
                             <div className="flex flex-col items-center gap-4">
                                 <Loader2 className="h-10 w-10 animate-spin text-sage-600 dark:text-sage-400" aria-hidden="true" />
                                 <p className="animate-pulse text-sm font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">
-                                    Loading {activeTabLabel} data...
+                                    {t('Loading')} {activeTabLabel} data...
                                 </p>
                             </div>
                         </motion.div>
@@ -920,14 +920,14 @@ export const MaintenanceView: React.FC<MaintenanceViewProps> = ({
             <ConfirmDialog
                 isOpen={deleteConfirmationIds !== null}
                 title={deleteConfirmationSource === 'removed'
-                    ? 'Move files to OS Trash?'
-                    : 'Delete intermediate files?'}
+                    ? t('Move files to OS Trash?')
+                    : t('Delete intermediate files?')}
                 message={deleteConfirmationError
-                    ? 'The deletion could not be completed. Any recoverable Removed entries were kept; you can safely try again.'
+                    ? t('The deletion could not be completed. Any recoverable Removed entries were kept; you can safely try again.')
                     : deleteConfirmationSource === 'removed'
-                        ? `${deleteConfirmationIds?.length ?? 0} selected ${deleteConfirmationIds?.length === 1 ? 'file' : 'files'} will be moved to OS Trash and their generation data will be removed from Ambit. Already-missing files will have their remaining Ambit entries cleared.`
-                        : `${deleteConfirmationIds?.length ?? 0} intermediate ${deleteConfirmationIds?.length === 1 ? 'file' : 'files'} will be removed from Ambit and moved to OS Trash. Failed moves remain recoverable in Maintenance > Removed.`}
-                confirmLabel="Move to OS Trash"
+                        ? t('dialog.moveRemovedToTrash', { count: deleteConfirmationIds?.length ?? 0 })
+                        : t('dialog.deleteIntermediate', { count: deleteConfirmationIds?.length ?? 0 })}
+                confirmLabel={t('Move to OS Trash')}
                 isDangerous
                 isLoading={removedAction === 'deleting'}
                 onConfirm={handleConfirmDeleteRemoved}

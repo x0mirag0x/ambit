@@ -7,6 +7,7 @@ import { PrivacyAwareThumbnail } from '../../../components/ui/PrivacyAwareThumbn
 import { CollectionThumbnailSkeleton } from '../../../components/ui/CollectionThumbnailSkeleton';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import { MetadataSectionHeader } from './metadata/MetadataSectionHeader';
+import { useTranslation } from 'react-i18next';
 
 interface CollectionMembershipPickerProps {
     assetId: string;
@@ -50,6 +51,7 @@ export const CollectionMembershipPicker: React.FC<CollectionMembershipPickerProp
     collections,
     onSetCollectionMembership,
 }) => {
+    const { t } = useTranslation();
     const [query, setQuery] = React.useState('');
     const [isSearchOpen, setIsSearchOpen] = React.useState(false);
     const searchInputRef = React.useRef<HTMLInputElement>(null);
@@ -247,12 +249,12 @@ export const CollectionMembershipPicker: React.FC<CollectionMembershipPickerProp
     return (
         <section className="mb-6">
             <MetadataSectionHeader
-                title="Collections"
+                title={t('Collections')}
                 icon={Layout}
                 trailing={(
                     <TooltipButton
-                        label="Search Collections"
-                        content="Search Collections"
+                        label={t('Search Collections')}
+                        content={t('Search Collections')}
                         aria-expanded={isSearchOpen}
                         aria-controls={searchRegionId}
                         onClick={toggleSearch}
@@ -266,13 +268,13 @@ export const CollectionMembershipPicker: React.FC<CollectionMembershipPickerProp
             {isSearchOpen ? (
                 <div id={searchRegionId} className="animate-in fade-in slide-in-from-top-1 mb-2 duration-150">
                     <label className="relative block">
-                        <span className="sr-only">Find collection</span>
+                        <span className="sr-only">{t('Find collection')}</span>
                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" aria-hidden="true" />
                         <input
                             ref={searchInputRef}
                             type="search"
-                            aria-label="Find collection"
-                            placeholder="Find collection..."
+                            aria-label={t('Find collection')}
+                            placeholder={t('Find collection...')}
                             value={query}
                             onChange={event => setQuery(event.target.value)}
                             onKeyDown={event => {
@@ -288,32 +290,32 @@ export const CollectionMembershipPicker: React.FC<CollectionMembershipPickerProp
             ) : null}
             <div ref={listRef} data-testid="collection-membership-list" className="custom-scrollbar relative max-h-60 min-h-12 space-y-3 overflow-y-auto pr-1">
                 {isLoading && (
-                    <div role="status" aria-label="Loading collection membership" className="absolute inset-0 z-10 flex items-center justify-center bg-white/50 backdrop-blur-[1px] dark:bg-zinc-900/50">
+                    <div role="status" aria-label={t('Loading collection membership')} className="absolute inset-0 z-10 flex items-center justify-center bg-white/50 backdrop-blur-[1px] dark:bg-zinc-900/50">
                         <div className="h-4 w-4 animate-spin rounded-full border-2 border-sage-500 border-t-transparent" />
                     </div>
                 )}
                 {hasError && (
                     <div role="alert" className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-white/90 px-4 text-center dark:bg-zinc-900/90">
-                        <span className="text-xs text-gray-600 dark:text-gray-300">Could not load collection membership.</span>
-                        <button type="button" onClick={() => setRetryToken(token => token + 1)} className="text-xs font-medium text-sage-700 hover:underline dark:text-sage-300">Retry</button>
+                        <span className="text-xs text-gray-600 dark:text-gray-300">{t('Could not load collection membership.')}</span>
+                        <button type="button" onClick={() => setRetryToken(token => token + 1)} className="text-xs font-medium text-sage-700 hover:underline dark:text-sage-300">{t('Retry')}</button>
                     </div>
                 )}
                 {!isLoading && !hasError && !hasVisibleCollections && (
                     <p className="px-3 py-4 text-center text-xs text-gray-500">
-                        {manualCollections.length === 0 ? 'No collections available.' : 'No collections found.'}
+                        {manualCollections.length === 0 ? t('No collections available.') : t('No collections found.')}
                     </p>
                 )}
                 {visibleMemberCollections.length > 0 && (
                     <div className="space-y-2">
                         <p className="px-1 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                            Member of ({memberCollections.length})
+                            {t('Member of (')}{memberCollections.length})
                         </p>
                         {visibleMemberCollections.map(renderCollection)}
                     </div>
                 )}
                 {visibleOtherCollections.length > 0 && (
                     <div className="space-y-2">
-                        <p className="px-1 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">{memberCollections.length > 0 ? 'Add to another collection' : 'Add to a collection'}</p>
+                        <p className="px-1 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">{memberCollections.length > 0 ? t('Add to another collection') : t('Add to a collection')}</p>
                         {visibleOtherCollections.map(renderCollection)}
                     </div>
                 )}

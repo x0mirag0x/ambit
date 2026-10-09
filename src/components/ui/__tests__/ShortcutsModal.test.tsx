@@ -7,7 +7,7 @@ describe('ShortcutsModal', () => {
 
     it('renders only while open and defaults to an expanded General category', async () => {
         const { rerender } = render(<ShortcutsModal isOpen={false} onClose={vi.fn()} />);
-        expect(screen.queryByText('Ambit Help & Guide')).toBeNull();
+        expect(screen.queryByText('Dvoyna Vault Help & Guide')).toBeNull();
 
         rerender(<ShortcutsModal isOpen onClose={vi.fn()} />);
         expect(await screen.findByText('Show this help dialog')).toBeTruthy();

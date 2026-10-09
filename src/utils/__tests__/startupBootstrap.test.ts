@@ -61,7 +61,7 @@ describe('startup bootstrap', () => {
             phase: 'startup-failure', failureKind: 'script-load',
         })]);
         expect(document.querySelector('[data-startup-failure="true"]')?.textContent)
-            .toContain('Ambit couldn’t start');
+            .toContain('DV couldn’t start');
         bootstrap.setFailureLaunchId('launch-123');
         expect(document.querySelector('[data-startup-launch-id="true"]')?.textContent)
             .toBe('Launch ID: launch-123');
@@ -79,7 +79,7 @@ describe('startup bootstrap', () => {
         bootstrap.showFailure();
 
         expect(document.querySelector('[data-startup-failure="true"]')?.textContent)
-            .toContain('Ambit couldn’t start');
+            .toContain('DV couldn’t start');
         expect(document.querySelector('[data-startup-launch-id="true"]')?.textContent)
             .toBe('Launch ID: launch-after-ready');
         const loader = document.getElementById('static-loading')!;
@@ -107,7 +107,7 @@ describe('startup bootstrap', () => {
         bootstrap.markTransportUnavailable();
 
         expect(document.querySelector('.static-loading__subtitle')?.textContent)
-            .toBe('Startup diagnostics unavailable. Ambit will continue starting.');
+            .toBe('Startup diagnostics unavailable. DV will continue starting.');
     });
 
     it('shows a fatal fallback if the sole module entry cannot load the app', () => {
@@ -117,7 +117,7 @@ describe('startup bootstrap', () => {
         document.body.append(script);
         script.dispatchEvent(new Event('error'));
 
-        expect(document.querySelector('[data-startup-failure="true"]')?.textContent).toContain('Ambit couldn’t start');
+        expect(document.querySelector('[data-startup-failure="true"]')?.textContent).toContain('DV couldn’t start');
         expect(document.getElementById('static-loading')?.dataset.ambitFatal).toBe('true');
         expect(bootstrap.takeEvents()).toEqual([expect.objectContaining({
             phase: 'startup-failure', failureKind: 'script-load',
@@ -196,6 +196,6 @@ describe('startup bootstrap', () => {
 
         expect(bootstrap.takeEvents()).toEqual([]);
         expect(document.querySelector('[data-startup-failure="true"]')?.textContent)
-            .toContain('Ambit couldn’t start');
+            .toContain('DV couldn’t start');
     });
 });

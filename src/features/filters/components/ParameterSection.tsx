@@ -4,6 +4,7 @@ import { FilterState } from '../../../types';
 import { SectionHeader, FilterSlider, MultiSelectDropdown, ChipSelect } from './FilterPrimitives';
 import { useParameterRangesQuery } from '../../../hooks/useParameterRangesQuery';
 import { Check } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ParameterSectionProps {
     filters: FilterState;
@@ -74,6 +75,7 @@ export const ParameterSection: React.FC<ParameterSectionProps> = ({
     isOpen,
     onToggle
 }) => {
+    const { t } = useTranslation();
     const { data: ranges, isLoading } = useParameterRangesQuery(filters);
 
     // Check if any parameters have data to show
@@ -88,25 +90,24 @@ export const ParameterSection: React.FC<ParameterSectionProps> = ({
     if (!isOpen) {
         return (
             <div className="space-y-2">
-                <SectionHeader title="Parameters" isOpen={isOpen} onToggle={onToggle} isLoading={isLoading} />
+                <SectionHeader title={t('Parameters')} isOpen={isOpen} onToggle={onToggle} isLoading={isLoading} />
             </div>
         );
     }
 
     return (
         <div className="space-y-2">
-            <SectionHeader title="Parameters" isOpen={isOpen} onToggle={onToggle} isLoading={isLoading} />
+            <SectionHeader title={t('Parameters')} isOpen={isOpen} onToggle={onToggle} isLoading={isLoading} />
             <div className="space-y-6 animate-in slide-in-from-top-2 duration-300 ease-spring px-4 pt-2">
                 {!hasAnyData && !isLoading && (
                     <div className="text-xs text-gray-400 text-center py-4 italic border border-dashed border-gray-200 dark:border-white/10 rounded-xl">
-                        No parameter data available
-                    </div>
+                        {t('No parameter data available')}</div>
                 )}
 
                 {/* Steps Slider - only if data exists */}
                 {hasSteps && ranges?.steps && (
                     <FilterSlider
-                        label="Steps"
+                        label={t('Steps')}
                         min={Math.floor(ranges.steps.min)}
                         max={Math.ceil(ranges.steps.max)}
                         minValue={filters.minSteps}
@@ -118,7 +119,7 @@ export const ParameterSection: React.FC<ParameterSectionProps> = ({
                 {/* CFG Scale Slider - only if data exists */}
                 {hasCfg && ranges?.cfg && (
                     <FilterSlider
-                        label="CFG Scale"
+                        label={t('CFG Scale')}
                         min={Math.floor(ranges.cfg.min)}
                         max={Math.ceil(ranges.cfg.max)}
                         step={0.5}
@@ -131,22 +132,22 @@ export const ParameterSection: React.FC<ParameterSectionProps> = ({
                 {/* Sampler Filter - only if samplers exist */}
                 {hasSamplers && ranges?.samplers && (
                     <MultiSelectDropdown
-                        label="Sampler"
+                        label={t('Sampler')}
                         groups={groupSamplers(ranges.samplers)}
                         selected={filters.samplers || []}
                         onChange={(samplers) => setFilters(prev => ({ ...prev, samplers }))}
-                        placeholder="Search samplers..."
+                        placeholder={t('Search samplers...')}
                     />
                 )}
 
                 {/* Generation Type Filter - uses disjunctive query (won't self-filter) */}
                 {ranges?.generationTypes && ranges.generationTypes.length > 0 && (
                     <ChipSelect
-                        label="Generation Type"
+                        label={t('Generation Type')}
                         options={ranges.generationTypes}
                         selected={filters.generationTypes || []}
                         onChange={(generationTypes) => setFilters(prev => ({ ...prev, generationTypes }))}
-                        formatLabel={formatGenType}
+                        formatLabel={(type) => t(formatGenType(type))}
                     />
                 )}
             </div>

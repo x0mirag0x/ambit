@@ -13,6 +13,7 @@ import { invoke } from '@tauri-apps/api/core';
 import type { useAppActions } from '../../hooks/useAppActions';
 import type { useCollectionOperations } from '../../hooks/useCollectionOperations';
 import type { useModalManager } from '../../hooks/useModalManager';
+import { useTranslation } from 'react-i18next';
 
 interface AppContextMenuProps {
     contextMenu: ContextMenuState | null;
@@ -37,6 +38,7 @@ export const AppContextMenu: React.FC<AppContextMenuProps> = ({
     modals,
     filters
 }) => {
+    const { t } = useTranslation();
     const { addToast } = useToast();
     const browserMockMode = isBrowserMockMode();
     const settings = useSettingsStore(s => s.settings);
@@ -79,13 +81,13 @@ export const AppContextMenu: React.FC<AppContextMenuProps> = ({
             onCopyPrompt={isGenerated ? () => {
                 if (activeImage?.metadata.positivePrompt) {
                     navigator.clipboard.writeText(activeImage.metadata.positivePrompt);
-                    addToast('Prompt copied', 'success');
+                    addToast(t('Prompt copied'), 'success');
                 }
                 onClose();
             } : undefined}
             onCopySeed={isGenerated && activeImage?.metadata.seed !== undefined ? () => {
                 navigator.clipboard.writeText(String(activeImage.metadata.seed));
-                addToast('Seed copied', 'success');
+                addToast(t('Seed copied'), 'success');
                 onClose();
             } : undefined}
             onCopyGenerationInfo={isGenerated ? () => {
@@ -102,7 +104,7 @@ export const AppContextMenu: React.FC<AppContextMenuProps> = ({
 
                 const text = infoLines.join('\n');
                 navigator.clipboard.writeText(text);
-                addToast('Generation info copied', 'success');
+                addToast(t('Generation info copied'), 'success');
                 onClose();
             } : undefined}
             onCopyImage={async () => {
@@ -113,11 +115,11 @@ export const AppContextMenu: React.FC<AppContextMenuProps> = ({
                         await navigator.clipboard.write([
                             new ClipboardItem({ [blob.type]: blob })
                         ]);
-                        addToast('Image copied to clipboard', 'success');
+                        addToast(t('Image copied to clipboard'), 'success');
                     } catch (e) {
                         // Fallback to path if blob copy fails (e.g. browser security)
                         navigator.clipboard.writeText(activeImage.url);
-                        addToast('Image path copied (fallback)', 'info');
+                        addToast(t('Image path copied (fallback)'), 'info');
                     }
                 }
                 onClose();
@@ -125,7 +127,7 @@ export const AppContextMenu: React.FC<AppContextMenuProps> = ({
             onCopyFilePath={() => {
                 if (activeImage?.id) {
                     navigator.clipboard.writeText(activeImage.id);
-                    addToast('File path copied', 'success');
+                    addToast(t('File path copied'), 'success');
                 }
                 onClose();
             }}
@@ -164,7 +166,7 @@ export const AppContextMenu: React.FC<AppContextMenuProps> = ({
                 if (contextMenu.imageId) {
                     await toggleImageIntermediate(contextMenu.imageId, !activeImage?.metadata?.isIntermediate);
                     // We might need to refresh state here, but let's assume watchers handle it
-                    addToast(activeImage?.metadata?.isIntermediate ? "Unmarked as intermediate" : "Marked as intermediate", "info");
+                    addToast(activeImage?.metadata?.isIntermediate ? t("Unmarked as intermediate") : t("Marked as intermediate"), "info");
                 }
                 onClose();
             } : undefined}
@@ -179,9 +181,9 @@ export const AppContextMenu: React.FC<AppContextMenuProps> = ({
                 if (id) {
                     const result = await showPathInFolder(id);
                     if (result.status === 'ok') {
-                        addToast('Opening folder...', 'info');
+                        addToast(t('Opening folder...'), 'info');
                     } else {
-                        addToast(result.error, isOsOpenUnavailable(result.error) ? 'info' : 'error');
+                        addToast(t(result.error), isOsOpenUnavailable(result.error) ? 'info' : 'error');
                     }
                 }
                 onClose();
@@ -191,7 +193,7 @@ export const AppContextMenu: React.FC<AppContextMenuProps> = ({
                 if (id) {
                     const result = await openFileInDefaultApp(id);
                     if (result.status === 'error') {
-                        addToast(result.error, isOsOpenUnavailable(result.error) ? 'info' : 'error');
+                        addToast(t(result.error), isOsOpenUnavailable(result.error) ? 'info' : 'error');
                     }
                 }
                 onClose();
@@ -201,7 +203,7 @@ export const AppContextMenu: React.FC<AppContextMenuProps> = ({
                     await colOps.setCollectionThumbnail(collectionId, activeImage);
                 } catch (error) {
                     console.error('[ContextMenu] Failed to set collection thumbnail', error);
-                    addToast('Failed to update thumbnail', 'error');
+                    addToast(t('Failed to update thumbnail'), 'error');
                 } finally {
                     onClose();
                 }
@@ -211,7 +213,7 @@ export const AppContextMenu: React.FC<AppContextMenuProps> = ({
                     await colOps.resetCollectionThumbnail(collectionId);
                 } catch (error) {
                     console.error('[ContextMenu] Failed to reset collection thumbnail', error);
-                    addToast('Failed to reset thumbnail', 'error');
+                    addToast(t('Failed to reset thumbnail'), 'error');
                 } finally {
                     onClose();
                 }
@@ -257,7 +259,7 @@ export const AppContextMenu: React.FC<AppContextMenuProps> = ({
             })()}
             onSetModelThumbnail={async (model) => {
                 if (browserMockMode) {
-                    addToast('Unavailable in browser mock mode.', 'info');
+                    addToast(t('Unavailable in browser mock mode.'), 'info');
                     onClose();
                     return;
                 }
@@ -272,7 +274,7 @@ export const AppContextMenu: React.FC<AppContextMenuProps> = ({
                     // Invalidate stats query to refresh thumbnails in FilterPanel
                     await queryClient.invalidateQueries({ queryKey: ['libraryStats'] });
 
-                    addToast(`Thumbnail set for ${model.name}`, 'success');
+                    addToast(t('Thumbnail set for {{name}}', { name: model.name }), 'success');
                 }
                 onClose();
             }}

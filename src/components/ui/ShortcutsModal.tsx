@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Keyboard, Search, ChevronDown, ChevronRight, Monitor, Puzzle, Sliders, Calendar, ListChecks } from 'lucide-react';
 import { APP_NAME } from '../../constants/app';
 import { SEARCH_OPERATOR_DEFINITIONS, type SearchOperatorCategory } from '../../constants/searchOperators';
+import { useTranslation } from 'react-i18next';
 
 interface ShortcutsModalProps {
     isOpen: boolean;
@@ -24,6 +25,7 @@ const getSearchOperatorIcon = (category: SearchOperatorCategory) => {
 };
 
 export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose, initialTab = 'shortcuts', onOpenSetupGuide }) => {
+    const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState<'shortcuts' | 'search' | 'setup'>(initialTab);
     const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
     const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -157,8 +159,8 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose,
 
                 {/* Header */}
                 <div className="p-4 border-b border-gray-100 dark:border-white/5 flex items-center justify-between bg-gray-50/50 dark:bg-black/20">
-                    <h2 className="text-lg font-bold text-gray-900 dark:text-white pl-2">{APP_NAME} Help & Guide</h2>
-                    <button ref={closeButtonRef} type="button" aria-label="Close Help & Guide" onClick={onClose} className="p-1.5 text-gray-500 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-white pl-2">{APP_NAME} {t('Help & Guide')}</h2>
+                    <button ref={closeButtonRef} type="button" aria-label={t('Close Help & Guide')} onClick={onClose} className="p-1.5 text-gray-500 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-white/10 transition-colors">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
@@ -169,22 +171,19 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose,
                         onClick={() => setActiveTab('shortcuts')}
                         className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors relative ${activeTab === 'shortcuts' ? 'text-sage-600 dark:text-sage-400 bg-white dark:bg-[#09090b]' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5'}`}
                     >
-                        <Keyboard className="w-4 h-4" /> Shortcuts
-                        {activeTab === 'shortcuts' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-sage-500" />}
+                        <Keyboard className="w-4 h-4" /> {t('Shortcuts')}{activeTab === 'shortcuts' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-sage-500" />}
                     </button>
                     <button
                         onClick={() => setActiveTab('search')}
                         className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors relative ${activeTab === 'search' ? 'text-sage-600 dark:text-sage-400 bg-white dark:bg-[#09090b]' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5'}`}
                     >
-                        <Search className="w-4 h-4" /> Search Syntax
-                        {activeTab === 'search' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-sage-500" />}
+                        <Search className="w-4 h-4" /> {t('Search Syntax')}{activeTab === 'search' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-sage-500" />}
                     </button>
                     <button
                         onClick={() => setActiveTab('setup')}
                         className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors relative ${activeTab === 'setup' ? 'text-sage-600 dark:text-sage-400 bg-white dark:bg-[#09090b]' : 'text-gray-500 hover:bg-gray-50 dark:hover:bg-white/5'}`}
                     >
-                        <ListChecks className="w-4 h-4" /> Setup Guide
-                        {activeTab === 'setup' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-sage-500" />}
+                        <ListChecks className="w-4 h-4" /> {t('Setup Guide')}{activeTab === 'setup' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-sage-500" />}
                     </button>
                 </div>
 
@@ -205,9 +204,9 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose,
                                         >
                                             <span className="flex items-center gap-2">
                                                 {isExpanded ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
-                                                {cat.title}
+                                                {t(cat.title)}
                                             </span>
-                                            <span className="text-[8px] opacity-0 group-hover:opacity-100 transition-opacity">Click to toggle</span>
+                                            <span className="text-[8px] opacity-0 group-hover:opacity-100 transition-opacity">{t('Click to toggle')}</span>
                                         </button>
 
                                         {isExpanded && (
@@ -226,8 +225,7 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose,
                                 );
                             })}
                             <div className="text-center text-[10px] text-gray-400 pt-4 border-t border-gray-100 dark:border-white/5 uppercase tracking-tight">
-                                Tip: Right-click images for context-specific actions.
-                            </div>
+                                {t('Tip: Right-click images for context-specific actions.')}</div>
                         </div>
                     )}
 
@@ -235,13 +233,13 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose,
                         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                             <div>
                                 <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
-                                    By default, search matches the <strong>positive prompt only</strong>. Spaces narrow results, while explicit OR matches alternatives. Use operators below to search other fields.
+                                    {t('By default, search matches the')} <strong>{t('positive prompt only')}</strong>. Spaces narrow results, while explicit OR matches alternatives. Use operators below to search other fields.
                                 </p>
 
                                 <div className="bg-gray-50 dark:bg-black/20 rounded-lg border border-gray-200 dark:border-white/10 overflow-hidden">
                                     <div className="grid grid-cols-12 bg-gray-100 dark:bg-white/5 p-2 text-[10px] font-bold text-gray-500 uppercase tracking-wider border-b border-gray-200 dark:border-white/10">
-                                        <div className="col-span-5 pl-2">Operator</div>
-                                        <div className="col-span-7">Description</div>
+                                        <div className="col-span-5 pl-2">{t('Operator')}</div>
+                                        <div className="col-span-7">{t('Description')}</div>
                                     </div>
                                     <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
                                         {SEARCH_OPERATOR_DEFINITIONS.map(operator => (
@@ -249,7 +247,7 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose,
                                                 <div className="col-span-5 font-mono text-sage-600 dark:text-sage-400 pl-2 flex items-center gap-2 whitespace-nowrap overflow-hidden text-ellipsis">
                                                     {getSearchOperatorIcon(operator.category)} {operator.example}
                                                 </div>
-                                                <div className="col-span-7 text-xs text-gray-600 dark:text-gray-400">{operator.description}</div>
+                                                <div className="col-span-7 text-xs text-gray-600 dark:text-gray-400">{t(operator.description)}</div>
                                             </div>
                                         ))}
                                     </div>
@@ -257,66 +255,63 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose,
                             </div>
 
                             <div className="space-y-2">
-                                <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Date Syntax</h4>
+                                <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">{t('Date Syntax')}</h4>
                                 <div className="p-3 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 space-y-2">
                                     <div className="grid grid-cols-1 gap-1 text-xs sm:grid-cols-12 sm:gap-2">
                                         <span className="sm:col-span-6 font-bold text-sage-600 dark:text-sage-400 font-mono break-all">date:2025</span>
-                                        <span className="sm:col-span-6 text-gray-600 dark:text-gray-300">Images from a year</span>
+                                        <span className="sm:col-span-6 text-gray-600 dark:text-gray-300">{t('Images from a year')}</span>
                                     </div>
                                     <div className="grid grid-cols-1 gap-1 text-xs sm:grid-cols-12 sm:gap-2">
                                         <span className="sm:col-span-6 font-bold text-sage-600 dark:text-sage-400 font-mono break-all">date:2026-04</span>
-                                        <span className="sm:col-span-6 text-gray-600 dark:text-gray-300">Images from a month</span>
+                                        <span className="sm:col-span-6 text-gray-600 dark:text-gray-300">{t('Images from a month')}</span>
                                     </div>
                                     <div className="grid grid-cols-1 gap-1 text-xs sm:grid-cols-12 sm:gap-2">
                                         <span className="sm:col-span-6 font-bold text-sage-600 dark:text-sage-400 font-mono break-all">date:2026-04-15</span>
-                                        <span className="sm:col-span-6 text-gray-600 dark:text-gray-300">Images from one day</span>
+                                        <span className="sm:col-span-6 text-gray-600 dark:text-gray-300">{t('Images from one day')}</span>
                                     </div>
                                     <div className="grid grid-cols-1 gap-1 text-xs sm:grid-cols-12 sm:gap-2">
                                         <span className="sm:col-span-6 font-bold text-sage-600 dark:text-sage-400 font-mono break-all">date:2026-04..2026-06</span>
-                                        <span className="sm:col-span-6 text-gray-600 dark:text-gray-300">Inclusive date range</span>
+                                        <span className="sm:col-span-6 text-gray-600 dark:text-gray-300">{t('Inclusive date range')}</span>
                                     </div>
                                     <div className="grid grid-cols-1 gap-1 text-xs sm:grid-cols-12 sm:gap-2">
                                         <span className="sm:col-span-6 font-bold text-sage-600 dark:text-sage-400 font-mono break-all">after:2026-04</span>
-                                        <span className="sm:col-span-6 text-gray-600 dark:text-gray-300">From Apr 2026 onward</span>
+                                        <span className="sm:col-span-6 text-gray-600 dark:text-gray-300">{t('From Apr 2026 onward')}</span>
                                     </div>
                                     <div className="grid grid-cols-1 gap-1 text-xs sm:grid-cols-12 sm:gap-2">
                                         <span className="sm:col-span-6 font-bold text-sage-600 dark:text-sage-400 font-mono break-all">before:2025</span>
-                                        <span className="sm:col-span-6 text-gray-600 dark:text-gray-300">Through 2025</span>
+                                        <span className="sm:col-span-6 text-gray-600 dark:text-gray-300">{t('Through 2025')}</span>
                                     </div>
                                     <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-tight pt-1 border-t border-gray-200 dark:border-white/10">
-                                        Use ISO dates to avoid country-specific ambiguity. Dates use local calendar days and combine with other terms using AND.
-                                    </p>
+                                        {t('Use ISO dates to avoid country-specific ambiguity. Dates use local calendar days and combine with other terms using AND.')}</p>
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Advanced Syntax</h4>
+                                <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">{t('Advanced Syntax')}</h4>
                                 <div className="grid grid-cols-1 gap-2">
                                     <div className="p-3 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10">
                                         <div className="flex items-center gap-2 mb-1">
                                             <span className="text-xs font-bold text-sage-600 dark:text-sage-400 font-mono">-tag</span>
-                                            <span className="text-xs text-gray-600 dark:text-gray-300">Exclude terms with "-" or "!"</span>
+                                            <span className="text-xs text-gray-600 dark:text-gray-300">{t('Exclude terms with "-" or "!"')}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <span className="text-xs font-bold text-sage-600 dark:text-sage-400 font-mono">"phrase"</span>
-                                            <span className="text-xs text-gray-600 dark:text-gray-300">Exact match with quotes</span>
+                                            <span className="text-xs font-bold text-sage-600 dark:text-sage-400 font-mono">{t('"phrase"')}</span>
+                                            <span className="text-xs text-gray-600 dark:text-gray-300">{t('Exact match with quotes')}</span>
                                         </div>
                                         <div className="flex items-center gap-2 mt-1">
-                                            <span className="text-xs font-bold text-sage-600 dark:text-sage-400 font-mono">OR</span>
-                                            <span className="text-xs text-gray-600 dark:text-gray-300">Match either adjacent prompt term</span>
+                                            <span className="text-xs font-bold text-sage-600 dark:text-sage-400 font-mono">{t('OR')}</span>
+                                            <span className="text-xs text-gray-600 dark:text-gray-300">{t('Match either adjacent prompt term')}</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="p-4 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10">
-                                <h4 className="text-xs font-bold text-gray-800 dark:text-gray-300 mb-1">Example Query</h4>
+                                <h4 className="text-xs font-bold text-gray-800 dark:text-gray-300 mb-1">{t('Example Query')}</h4>
                                 <div className="font-mono text-xs bg-white dark:bg-black/40 p-2 rounded border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 mb-2">
-                                    forest OR "city skyline" model:flux
-                                </div>
+                                    {t('forest OR "city skyline" model:flux')}</div>
                                 <p className="text-[10px] text-gray-600 dark:text-gray-400 uppercase tracking-tight">
-                                    Finds Flux images whose positive prompt mentions forest or city skyline.
-                                </p>
+                                    {t('Finds Flux images whose positive prompt mentions forest or city skyline.')}</p>
                             </div>
                         </div>
                     )}
@@ -327,18 +322,16 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose,
                                 <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-white text-sage-600 shadow-sm dark:bg-white/10 dark:text-sage-300">
                                     <ListChecks className="h-5 w-5" />
                                 </div>
-                                <h3 className="text-base font-bold text-gray-900 dark:text-white">Review your setup</h3>
+                                <h3 className="text-base font-bold text-gray-900 dark:text-white">{t('Review your setup')}</h3>
                                 <p className="mt-2 text-sm leading-relaxed text-gray-600 dark:text-gray-300">
-                                    Walk through integrations, Intelligence, and privacy again without resetting your library or existing preferences. Only guide controls you change are saved when you finish.
-                                </p>
+                                    {t('Walk through integrations, Intelligence, and privacy again without resetting your library or existing preferences. Only guide controls you change are saved when you finish.')}</p>
                             </div>
                             <button
                                 type="button"
                                 onClick={onOpenSetupGuide}
                                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sage-600 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-sage-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#09090b]"
                             >
-                                <ListChecks className="h-4 w-4" /> Open setup guide
-                            </button>
+                                <ListChecks className="h-4 w-4" /> {t('Open setup guide')}</button>
                         </div>
                     )}
 

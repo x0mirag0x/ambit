@@ -4,7 +4,7 @@ import { commands, type FileMetadataProbe, type InvokeImageReferenceSet } from '
 import { unwrap } from '../../utils/spectaUtils';
 import { mapInvokeMetadata } from './metadataMapper';
 import { fetchBoardMappings, getInvokeSourceDatabase, resolveInvokePaths, type InvokeBoardInfo } from './connection';
-import { APP_NAME } from '../../constants/app';
+import { APP_FULL_NAME } from '../../constants/app';
 import { AIImage, FacetType } from '../../types';
 import {
     debugLiveWatchPerf,
@@ -242,7 +242,7 @@ export const syncImages = async (
     const touchedFacetTypes = new Set<FacetType>();
     let touchedFacetResources = createEmptyTouchedFacetResources();
 
-    onProgress(0, 0, `Scanning ${APP_NAME} library...`);
+    onProgress(0, 0, `Scanning ${APP_FULL_NAME} library...`);
     const pathResolver = createInvokeImagePathResolver(imagesRoot, async () =>
         unwrap(commands.listInvokeaiImages(imagesRoot))
     );
@@ -748,10 +748,10 @@ export const syncImages = async (
 
                     if (existing) {
                         // SMART SYNC: Check if user has modified from original state
-                        // CRITICAL: For legacy images without originalState, preserve Ambit's current values
+                        // CRITICAL: For legacy images without originalState, preserve Dvoyna Vault's current values
                         // (we can't know if user modified them, so assume they did)
                         if (!existing.originalState) {
-                            // Legacy image - preserve current Ambit values
+                            // Legacy image - preserve current Dvoyna Vault values
                             isFavorite = existing.isFavorite;
                             isPinned = existing.isPinned || false;
                         } else {
@@ -794,9 +794,9 @@ export const syncImages = async (
 
                 if (existing) {
                     // SMART SYNC: Check if user has modified board from original state
-                    // CRITICAL: For legacy images without originalState, preserve Ambit's current board
+                    // CRITICAL: For legacy images without originalState, preserve Dvoyna Vault's current board
                     if (!existing.originalState) {
-                        // Legacy image - preserve current Ambit board
+                        // Legacy image - preserve current Dvoyna Vault board
                         boardId = existing.boardId;
                     } else {
                         const userModifiedBoard = existing.boardId !== existing.originalState.boardId;

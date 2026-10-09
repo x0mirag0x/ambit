@@ -9,6 +9,7 @@ import {
   getEffectiveAiThinkingMode,
   getEffectiveSystemPrompts
 } from '../utils/settingsUtils';
+import { useTranslation } from 'react-i18next';
 
 interface UseSearchProps {
   filters: FilterState;
@@ -27,6 +28,7 @@ export const useAiSearchLogic = ({
   availableTags,
   onOpenSettings
 }: UseSearchProps) => {
+  const { t } = useTranslation();
   const { addToast } = useToast();
   const [isAiSearchEnabled, setIsAiSearchEnabled] = useState(false);
   const [isSearchingAi, setIsSearchingAi] = useState(false);
@@ -47,7 +49,7 @@ export const useAiSearchLogic = ({
       setIsAiSearchEnabled(true);
       setPendingAiActivation(false);
       setTimeout(() => inputRef.current?.focus(), 100);
-      addToast("AI Features Enabled & Ready", "success");
+      addToast(t('AI Features Enabled & Ready'), "success");
     }
   }, [settings.enableAI, pendingAiActivation, addToast]);
 
@@ -55,7 +57,7 @@ export const useAiSearchLogic = ({
     if (!settings.enableAI) {
       setPendingAiActivation(true);
       onOpenSettings();
-      addToast("Enable AI features to use Natural Language Search.", "info");
+      addToast(t('Enable AI features to use Natural Language Search.'), "info");
       return;
     }
 
@@ -79,7 +81,7 @@ export const useAiSearchLogic = ({
       setRecentSearches(prev => [trimmed, ...prev.filter(s => s !== trimmed)].slice(0, 8));
       const apiKey = useSettingsStore.getState().geminiApiKey;
       setIsSearchingAi(true);
-      addToast("Gemini is analyzing your request...", "info");
+      addToast(t('Gemini is analyzing your request...'), "info");
       try {
         const { generateFiltersFromQuery } = await import('../services/geminiService');
         const aiFilters = await generateFiltersFromQuery(
@@ -102,10 +104,10 @@ export const useAiSearchLogic = ({
           dateTo: aiFilters.dateTo,
           favoritesOnly: aiFilters.favoritesOnly || false,
         }));
-        addToast("Filters updated by AI", "success");
+        addToast(t('Filters updated by AI'), "success");
         inputRef.current?.blur();
       } catch (error) {
-        addToast("AI Search failed. Check API Key.", "error");
+        addToast(t('AI Search failed. Check API Key.'), "error");
         inputRef.current?.focus();
       } finally {
         isAiRequestActiveRef.current = false;

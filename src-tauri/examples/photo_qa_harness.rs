@@ -85,10 +85,10 @@ fn ensure_qa_database(db: &Path) -> Result<(), String> {
         .parent()
         .and_then(Path::file_name)
         .and_then(|name| name.to_str())
-        == Some("com.ambit.qa");
+        == Some("com.dvoyna.vault.qa");
     if !db.is_absolute() || !is_images_db || !is_qa_profile {
         return Err(format!(
-            "refusing database operation outside the exact com.ambit.qa/images.db profile: {}",
+            "refusing database operation outside the exact com.dvoyna.vault.qa/images.db profile: {}",
             db.display()
         ));
     }
@@ -497,12 +497,12 @@ mod tests {
         ))
         .is_err());
         assert!(ensure_qa_database(Path::new(
-            "C:/Users/test/AppData/Roaming/com.ambit.qa/other.db"
+            "C:/Users/test/AppData/Roaming/com.dvoyna.vault.qa/other.db"
         ))
         .is_err());
         assert!(ensure_corpus_root(Path::new("C:/temp/ambit-photo-qa")).is_ok());
         assert!(ensure_qa_database(Path::new(
-            "C:/Users/test/AppData/Roaming/com.ambit.qa/images.db"
+            "C:/Users/test/AppData/Roaming/com.dvoyna.vault.qa/images.db"
         ))
         .is_ok());
     }

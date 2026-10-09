@@ -4,6 +4,7 @@ import {
     KO_FI_URL,
     RELEASES_URL,
     REPOSITORY_URL,
+    UPSTREAM_REPOSITORY_URL,
 } from '../constants/support';
 
 export const GEMINI_API_KEY_URL = 'https://aistudio.google.com/apikey';
@@ -27,6 +28,7 @@ const allowedExternalUrls = new Set(
         REPOSITORY_URL,
         ISSUES_URL,
         RELEASES_URL,
+        UPSTREAM_REPOSITORY_URL,
         GITHUB_SPONSORS_URL,
         KO_FI_URL,
         GEMINI_API_KEY_URL,
