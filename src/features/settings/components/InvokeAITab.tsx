@@ -163,7 +163,7 @@ export const InvokeAITab: React.FC<TabProps> = React.memo(({ settings, setSettin
             const selected = await open({
                 directory: true,
                 multiple: false,
-                title: 'Select InvokeAI Root Folder'
+                title: t('Select InvokeAI Root Folder')
             });
 
             if (selected && typeof selected === 'string') {

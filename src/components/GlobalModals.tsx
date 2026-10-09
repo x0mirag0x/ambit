@@ -206,7 +206,7 @@ export const GlobalModals: React.FC<GlobalModalsProps> = ({
                 onCancel={() => closeModal('deleteCollection')}
                 onConfirm={handleCollectionDeleteConfirm}
                 title={t('Delete Collection')}
-                message={t('Delete collection "{{v0}}"? Images will remain in your library.', { v0: collectionToDelete?.name ?? 'Unknown collection' })}
+                message={t('Delete collection "{{v0}}"? Images will remain in your library.', { v0: collectionToDelete?.name ?? t('Unknown collection') })}
                 confirmLabel={t('Delete Collection')}
                 isDangerous={true}
                 isLoading={isCollectionDeletePending}

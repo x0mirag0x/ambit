@@ -119,7 +119,7 @@ export const StatsDashboard: React.FC<ChartsProps> = ({ images, onFilter }) => {
                             label={t('Storage Used')}
                             value={`${estSizeMB} MB`}
                             isLoading={isStatsSummaryLoading}
-                            loadingText="Measuring library files"
+                            loadingText={t('Measuring library files')}
                         />
                     </div>
 

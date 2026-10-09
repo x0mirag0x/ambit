@@ -39,25 +39,25 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
     const hasPositiveStatus = status === 'success' || (!isEnvKey && status === 'configured');
     const statusMessage = status === 'success'
         ? isEnvKey
-            ? 'Environment API key verified'
-            : 'API key verified and saved'
+            ? t('Environment API key verified')
+            : t('API key verified and saved')
         : status === 'configured' && !isEnvKey
-            ? 'API key configured'
+            ? t('API key configured')
             : null;
     const verifyLabel = status === 'configured'
-        ? 'Re-verify'
+        ? t('Re-verify')
         : status === 'success'
-            ? 'Verified'
-            : 'Verify';
+            ? t('Verified')
+            : t('Verify');
 
     return (
         <div className={cn("space-y-2", className)}>
             {showLabel && (
                 <div className="flex justify-between items-end mb-2">
                     {isEnvKey ? (
-                        <span id={labelId} className="text-xs font-bold text-gray-500 uppercase tracking-widest leading-none">{label}</span>
+                        <span id={labelId} className="text-xs font-bold text-gray-500 uppercase tracking-widest leading-none">{t(label)}</span>
                     ) : (
-                        <label htmlFor={inputId} className="text-xs font-bold text-gray-500 uppercase tracking-widest leading-none">{label}</label>
+                        <label htmlFor={inputId} className="text-xs font-bold text-gray-500 uppercase tracking-widest leading-none">{t(label)}</label>
                     )}
                     <button
                         type="button"
@@ -73,7 +73,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
                 <div className="space-y-4">
                     <div
                         role="group"
-                        aria-label={showLabel ? undefined : label}
+                        aria-label={showLabel ? undefined : t(label)}
                         aria-labelledby={showLabel ? labelId : undefined}
                         className="flex items-center gap-3 rounded-xl border border-amethyst-200 bg-amethyst-50 p-4 text-sm text-amethyst-600 dark:border-amethyst-500/20 dark:bg-amethyst-500/10 dark:text-amethyst-300"
                     >
@@ -103,8 +103,8 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
                         <input
                             id={inputId}
                             type="password"
-                            aria-label={showLabel ? undefined : label}
-                            placeholder={placeholder}
+                            aria-label={showLabel ? undefined : t(label)}
+                            placeholder={t(placeholder)}
                             value={value}
                             readOnly={isVerifying}
                             onChange={(e) => {

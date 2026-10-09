@@ -336,11 +336,11 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
         const thumbUrl = item.thumbnailPath || item.previewUrl;
         const hasSidecarPreview = item.thumbnailSource === 'sidecar';
         const localOnlyTitle = hasSidecarPreview
-            ? 'Local only: no indexed library images. Preview from sidecar image.'
-            : 'Local only: no indexed library images.';
+            ? t('Local only: no indexed library images. Preview from sidecar image.')
+            : t('Local only: no indexed library images.');
         const localTitle = hasSidecarPreview
-            ? 'Local asset on disk. Preview from sidecar image.'
-            : 'Local asset on disk';
+            ? t('Local asset on disk. Preview from sidecar image.')
+            : t('Local asset on disk');
 
         return (
             <div
@@ -423,11 +423,11 @@ export const ResourceSection: React.FC<ResourceSectionProps> = ({
         const thumbUrl = item.thumbnailPath || item.previewUrl;
         const hasSidecarPreview = item.thumbnailSource === 'sidecar';
         const localOnlyTitle = hasSidecarPreview
-            ? 'Local only: no indexed library images. Preview from sidecar image.'
-            : 'Local only: no indexed library images.';
+            ? t('Local only: no indexed library images. Preview from sidecar image.')
+            : t('Local only: no indexed library images.');
         const localTitle = hasSidecarPreview
-            ? 'Local asset on disk. Preview from sidecar image.'
-            : 'Local asset on disk';
+            ? t('Local asset on disk. Preview from sidecar image.')
+            : t('Local asset on disk');
 
         return (
             <div

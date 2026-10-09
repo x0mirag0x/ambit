@@ -83,11 +83,11 @@ export const StartupMaintenanceGate: React.FC<StartupMaintenanceGateProps> = ({ 
                     data-testid="startup-maintenance-gate"
                 >
                     <StartupPreparationCard
-                        phaseLabel="Local database"
+                        phaseLabel={t('Local database')}
                         icon={<Database className="h-7 w-7" />}
                         description={t(STARTUP_PHASE_COPY[phase])}
-                        statusMessage={STARTUP_PHASE_LABELS[phase]}
-                        reassurance="Please keep Dvoyna Vault open."
+                        statusMessage={t(STARTUP_PHASE_LABELS[phase])}
+                        reassurance={t('Please keep Dvoyna Vault open.')}
                     />
                 </main>
             ) : null}

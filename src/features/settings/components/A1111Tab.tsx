@@ -264,7 +264,7 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
                                     onClick={async () => {
                                         try {
                                             const { open } = await import('@tauri-apps/plugin-dialog');
-                                            const selected = await open({ directory: true, multiple: false, title: 'Select SD Folder' });
+                                            const selected = await open({ directory: true, multiple: false, title: t('Select SD Folder') });
                                             if (selected && typeof selected === 'string') {
                                                 const { normalizePath } = await import('../../../utils/pathUtils');
                                                 setSettings(prev => ({ ...prev, a1111Path: normalizePath(selected) }));

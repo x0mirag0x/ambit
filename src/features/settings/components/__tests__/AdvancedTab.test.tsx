@@ -275,7 +275,7 @@ describe('AdvancedTab', () => {
 
     it('does not expose the destructive onboarding reset in public Advanced settings', () => {
         renderAdvanced();
-        fireEvent.click(screen.getByRole('button', { name: 'interface' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Interface' }));
 
         expect(screen.queryByRole('button', { name: /restart onboarding/i })).toBeNull();
         expect(screen.queryByRole('button', { name: /reset onboarding/i })).toBeNull();

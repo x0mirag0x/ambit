@@ -213,7 +213,7 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose,
                                             <div className="grid grid-cols-1 gap-1 mt-1 animate-in fade-in slide-in-from-top-1 duration-200">
                                                 {cat.items.map((s, i) => (
                                                     <div key={i} className="flex items-center justify-between p-2 rounded hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group/item">
-                                                        <span className="text-sm text-gray-600 dark:text-gray-300">{s.desc}</span>
+                                                        <span className="text-sm text-gray-600 dark:text-gray-300">{t(s.desc)}</span>
                                                         <kbd className="px-2 py-1 bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-white/10 rounded text-[10px] font-mono font-bold text-gray-500 dark:text-gray-400 shadow-sm min-w-[2rem] text-center group-hover/item:text-gray-900 dark:group-hover/item:text-white group-hover/item:border-gray-300 dark:group-hover/item:border-white/20 transition-colors">
                                                             {s.key}
                                                         </kbd>
@@ -233,7 +233,7 @@ export const ShortcutsModal: React.FC<ShortcutsModalProps> = ({ isOpen, onClose,
                         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
                             <div>
                                 <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
-                                    {t('By default, search matches the')} <strong>{t('positive prompt only')}</strong>. Spaces narrow results, while explicit OR matches alternatives. Use operators below to search other fields.
+                                    {t('By default, search matches the')} <strong>{t('positive prompt only')}</strong>. {t('Spaces narrow results, while explicit OR matches alternatives. Use operators below to search other fields.')}
                                 </p>
 
                                 <div className="bg-gray-50 dark:bg-black/20 rounded-lg border border-gray-200 dark:border-white/10 overflow-hidden">

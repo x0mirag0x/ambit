@@ -66,10 +66,10 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
 
   const installLabel =
     status === 'downloading'
-      ? 'Downloading update...'
+      ? t('Downloading update...')
       : status === 'installing'
-        ? 'Installing update...'
-        : 'Download and Install';
+        ? t('Installing update...')
+        : t('Download and Install');
 
   return (
     <AnimatePresence>

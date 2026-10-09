@@ -1,3 +1,4 @@
+import i18n from '../i18n';
 import { getAdvancedDateSearchReadiness } from './dateFilters';
 
 export type SearchQueryIssueKind = 'pending' | 'invalid';
@@ -100,14 +101,14 @@ export const canAppendPromptOr = (query: string): boolean => {
 
 export const getSearchQueryReadiness = (query: string): SearchQueryReadiness => {
     if (hasUnfinishedQuote(query)) {
-        return createIssue('pending', 'Finish the quoted phrase before searching.');
+        return createIssue('pending', i18n.t('Finish the quoted phrase before searching.'));
     }
 
     const dateReadiness = getAdvancedDateSearchReadiness(query);
     if (!dateReadiness.isReady) {
         return createIssue(
             dateReadiness.issue ?? 'invalid',
-            'Use ISO dates like date:2026-04 or before:2025.',
+            i18n.t('Use ISO dates like date:2026-04 or before:2025.'),
             dateReadiness.token
         );
     }
@@ -124,7 +125,7 @@ export const getSearchQueryReadiness = (query: string): SearchQueryReadiness => 
         const value = token.term.slice(separatorIndex + 1);
 
         if (!value) {
-            return createIssue('pending', `Add a value after ${key}:`, token.term);
+            return createIssue('pending', i18n.t('Add a value after {{operator}}', { operator: `${key}:` }), token.term);
         }
         if (DATE_KEYS.has(key)) continue;
 
@@ -134,7 +135,7 @@ export const getSearchQueryReadiness = (query: string): SearchQueryReadiness => 
         ) {
             return createIssue(
                 value === '<' || value === '>' ? 'pending' : 'invalid',
-                `Use ${key}:30, ${key}:>30, or ${key}:<30.`,
+                i18n.t('Use {{key}}:30, {{key}}:>30, or {{key}}:<30.', { key }),
                 token.term
             );
         }
@@ -146,19 +147,19 @@ export const getSearchQueryReadiness = (query: string): SearchQueryReadiness => 
                 && PENDING_DECIMAL_COMPARISON_PATTERN.test(value);
             return createIssue(
                 isPendingDecimal ? 'pending' : 'invalid',
-                `Use ${key}:7, ${key}:>7, or ${key}:<7.`,
+                i18n.t('Use {{key}}:7, {{key}}:>7, or {{key}}:<7.', { key }),
                 token.term
             );
         }
         if (key === 'seed' && !DIGITS_PATTERN.test(value)) {
-            return createIssue('invalid', 'Use seed: followed by digits.', token.term);
+            return createIssue('invalid', i18n.t('Use seed: followed by digits.'), token.term);
         }
         if (key === 'upscaled' && value.toLowerCase() !== 'true' && value.toLowerCase() !== 'false') {
             const normalizedValue = value.toLowerCase();
             const isPendingBoolean = 'true'.startsWith(normalizedValue) || 'false'.startsWith(normalizedValue);
             return createIssue(
                 isPendingBoolean ? 'pending' : 'invalid',
-                'Use upscaled:true or upscaled:false.',
+                i18n.t('Use upscaled:true or upscaled:false.'),
                 token.term
             );
         }
@@ -168,10 +169,10 @@ export const getSearchQueryReadiness = (query: string): SearchQueryReadiness => 
         if (!tokens[index].isOrOperator) continue;
 
         if (index === tokens.length - 1 && isPositivePromptOperand(tokens[index - 1])) {
-            return createIssue('pending', 'Add a positive prompt term after OR.', tokens[index].term);
+            return createIssue('pending', i18n.t('Add a positive prompt term after OR.'), tokens[index].term);
         }
         if (!isPositivePromptOperand(tokens[index - 1]) || !isPositivePromptOperand(tokens[index + 1])) {
-            return createIssue('invalid', 'Use OR between two positive prompt terms.', tokens[index].term);
+            return createIssue('invalid', i18n.t('Use OR between two positive prompt terms.'), tokens[index].term);
         }
     }
 

@@ -35,7 +35,7 @@ const BusyGate: React.FC<{ state: InvokeOwnerScopeState }> = ({ state }) => {
             : 'Preparing your InvokeAI library...');
     const ownerId = state.scope?.mode === 'owner' ? state.scope.ownerId : undefined;
     const ownerLabel = state.scope?.mode === 'all'
-        ? 'All users'
+        ? t('All users')
         : state.scope?.mode === 'legacy'
             ? 'InvokeAI'
             : ownerId
@@ -43,19 +43,19 @@ const BusyGate: React.FC<{ state: InvokeOwnerScopeState }> = ({ state }) => {
                     || ownerId
                 : undefined;
     const statusMessage = elapsedSeconds >= 5
-        ? `${message} · ${elapsedSeconds}s elapsed`
-        : message;
+        ? t('{{message}} · {{seconds}}s elapsed', { message: t(message), seconds: elapsedSeconds })
+        : t(message);
 
     return (
         <StartupPreparationCard
-            phaseLabel="InvokeAI library"
+            phaseLabel={t('InvokeAI library')}
             title={state.status === 'applying' && ownerLabel
                 ? t('Switching to {{ownerLabel}}', { ownerLabel: ownerLabel })
                 : t('Preparing your InvokeAI view')}
             icon={<ShieldCheck className="h-7 w-7" />}
             description={t('Dvoyna Vault is loading the images, boards, and filters available in this view.')}
             statusMessage={statusMessage}
-            reassurance="Your library remains unchanged while this view loads."
+            reassurance={t('Your library remains unchanged while this view loads.')}
             progress={progress}
         />
     );
@@ -114,11 +114,11 @@ export const InvokeOwnerScopeGate: React.FC<InvokeOwnerScopeGateProps> = ({
 
     const isSourceUnavailable = state.failure?.kind === 'source_unavailable';
     const title = isSourceUnavailable
-        ? 'InvokeAI needs attention'
-        : 'InvokeAI library preparation failed';
+        ? t('InvokeAI needs attention')
+        : t('InvokeAI library preparation failed');
     const description = isSourceUnavailable
-        ? "Dvoyna Vault couldn't open the configured InvokeAI database, so InvokeAI content is staying hidden."
-        : "Dvoyna Vault couldn't finish verifying owner visibility. InvokeAI content is staying hidden to avoid showing the wrong library.";
+        ? t("Dvoyna Vault couldn't open the configured InvokeAI database, so InvokeAI content is staying hidden.")
+        : t("Dvoyna Vault couldn't finish verifying owner visibility. InvokeAI content is staying hidden to avoid showing the wrong library.");
 
     return (
         <main

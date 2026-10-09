@@ -86,7 +86,7 @@ export const ComfyUITab: React.FC<TabProps> = React.memo(({ settings, setSetting
                                     onClick={async () => {
                                         try {
                                             const { open } = await import('@tauri-apps/plugin-dialog');
-                                            const selected = await open({ directory: true, multiple: false, title: 'Select ComfyUI Output Folder' });
+                                            const selected = await open({ directory: true, multiple: false, title: t('Select ComfyUI Output Folder') });
                                             if (selected && typeof selected === 'string') {
                                                 const { normalizePath } = await import('../../../utils/pathUtils');
                                                 setSettings(prev => ({ ...prev, comfyUiPath: normalizePath(selected) }));

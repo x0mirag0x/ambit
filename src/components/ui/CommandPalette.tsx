@@ -50,7 +50,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     { id: 'act-col', label: 'Create Collection', icon: <FolderPlus className="w-4 h-4" />, group: 'Actions', action: onCreateCollection },
     { id: 'act-ai', label: settings.enableAI ? 'Disable AI Features' : 'Enable AI Features', icon: <Sparkles className="w-4 h-4" />, group: 'Actions', action: onToggleAI },
 
-    { id: 'sys-theme', label: `Switch to ${settings.theme === 'dark' ? 'Light' : 'Dark'} Mode`, icon: settings.theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />, group: 'System', action: onToggleTheme },
+    { id: 'sys-theme', label: settings.theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode', icon: settings.theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />, group: 'System', action: onToggleTheme },
     { id: 'sys-settings', label: 'Open Settings', icon: <Settings className="w-4 h-4" />, group: 'System', action: onOpenSettings },
   ], [settings.theme, settings.enableAI, onNavigate, onImport, onCreateCollection, onToggleAI, onToggleTheme, onOpenSettings]);
 
@@ -136,7 +136,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                             </div>
                             {opt.group && (
                                 <span className={`text-[10px] uppercase font-bold tracking-wider ${i === selectedIndex ? 'text-sage-200' : 'text-gray-400'}`}>
-                                    {opt.group}
+                                    {t(opt.group)}
                                 </span>
                             )}
                         </button>
