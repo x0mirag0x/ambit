@@ -54,7 +54,7 @@ describe('TitleBar', () => {
 
         render(<TitleBar />);
 
-        await screen.findByText('AMBIT');
+        await screen.findByText('DV');
         expect(screen.getByText('QA')).toBeTruthy();
         expect(screen.queryByText('DEV')).toBeNull();
     });
@@ -70,7 +70,7 @@ describe('TitleBar', () => {
         const { win, unlisten } = createWindow();
         mockedGetCurrentWindow.mockReturnValue(win as unknown as ReturnType<typeof getCurrentWindow>);
         const { unmount } = render(<TitleBar />);
-        await screen.findByText('AMBIT');
+        await screen.findByText('DV');
         expect(screen.getByText('DEV')).toBeTruthy();
         expect(win.setIcon).toHaveBeenCalledWith('/branding/dv-window-icon.png');
 
@@ -93,7 +93,7 @@ describe('TitleBar', () => {
 
         render(<TitleBar />);
 
-        await screen.findByText('AMBIT');
+        await screen.findByText('DV');
         expect(settingsState.developer).toBe(true);
         expect(screen.queryByText('DEV')).toBeNull();
     });
@@ -104,7 +104,7 @@ describe('TitleBar', () => {
         win.isFullscreen.mockResolvedValueOnce(false).mockResolvedValueOnce(true).mockResolvedValueOnce(false);
         mockedGetCurrentWindow.mockReturnValue(win as unknown as ReturnType<typeof getCurrentWindow>);
         const { container } = render(<TitleBar />);
-        await screen.findByText('AMBIT');
+        await screen.findByText('DV');
 
         fireEvent.click(screen.getAllByRole('button')[1]);
         await waitFor(() => expect(win.unmaximize).toHaveBeenCalledOnce());
@@ -127,7 +127,7 @@ describe('TitleBar', () => {
         first.win.setIcon.mockRejectedValueOnce(new Error('unsupported'));
         mockedGetCurrentWindow.mockReturnValueOnce(first.win as unknown as ReturnType<typeof getCurrentWindow>);
         const view = render(<TitleBar />);
-        await screen.findByText('AMBIT');
+        await screen.findByText('DV');
         expect(console.warn).toHaveBeenCalledWith('TitleBar: Failed to set window icon', expect.any(Error));
         view.unmount();
 
@@ -143,7 +143,7 @@ describe('TitleBar', () => {
         win.listen.mockReturnValueOnce(new Promise(resolve => { resolveListen = resolve; }));
         mockedGetCurrentWindow.mockReturnValue(win as unknown as ReturnType<typeof getCurrentWindow>);
         const view = render(<TitleBar />);
-        await screen.findByText('AMBIT');
+        await screen.findByText('DV');
         view.unmount();
         await act(async () => resolveListen(unlisten));
         expect(unlisten).toHaveBeenCalledOnce();

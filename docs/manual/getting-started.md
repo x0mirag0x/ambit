@@ -55,7 +55,7 @@ The main Dvoyna Vault workspace has a left sidebar, a library area, and an optio
 
 Dvoyna Vault keeps source image files where they already are. It stores a local catalog, metadata, thumbnails, settings, and optional integration configuration so the app can search and maintain the library quickly.
 
-On Windows, the installer folder is only where the Ambit application is installed. The library catalog database is application data and lives under Local AppData, normally `%LOCALAPPDATA%\io.github.asuraace.ambit\images.db`. Installing Ambit to another folder or drive does not move the library database.
+On Windows, the installer folder is only where Dvoyna Vault is installed. The library catalog database is application data and lives under Local AppData, normally `%LOCALAPPDATA%\com.dvoyna.vault\images.db`. Installing Dvoyna Vault to another folder or drive does not move the library database. Dvoyna Vault does not read or move an existing Ambit profile.
 
 Gemini API keys entered through Dvoyna Vault are stored locally through the OS keyring. Credentials supplied through the environment are read but not saved by Dvoyna Vault, and no key needs to be committed to the repository or source code.
 

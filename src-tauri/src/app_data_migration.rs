@@ -197,7 +197,7 @@ fn migrate_database_files_to_local(
                 }
                 Err(copy_error) => {
                     eprintln!(
-                        "[DatabaseLocalMigration] Failed to move database to Local AppData; Ambit will keep using Roaming database at {}: {copy_error}",
+                        "[DatabaseLocalMigration] Failed to move database to Local AppData; Dvoyna Vault will keep using Roaming database at {}: {copy_error}",
                         roaming_db.display()
                     );
                     DatabaseLocalMigrationOutcome::Failed

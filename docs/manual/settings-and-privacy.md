@@ -38,7 +38,7 @@ flowchart LR
 
 The public beta has a small set of disclosed network paths:
 
-- Automatic update checks contact GitHub Releases when enabled. Updates install only after you confirm the prompt.
+- Automatic update checks are off by default. When enabled, they contact this fork's GitHub Releases. Updates install only after you confirm the prompt. An unsigned Windows installer cannot be installed as a signed update.
 - Gemini features are optional and use your own key. Requests are sent only when you verify a key or run an AI action.
 - CivitAI model-hash resolution is optional. It runs only after you confirm Resolve Online and sends unresolved model hash strings, not image files.
 - GitHub Sponsors, Ko-fi, repository, and project links open only when clicked.
