@@ -249,9 +249,9 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({
                         <motion.div
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
-                            className="mb-8 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/5 shadow-xl backdrop-blur-xl"
+                            className="mb-8 flex h-14 w-14 items-center justify-center"
                         >
-                            <img src={brandGlyphSrc} alt="" className="h-10 w-10 drop-shadow-[0_6px_18px_rgba(0,0,0,0.35)]" />
+                            <img src={brandGlyphSrc} alt="" className="h-14 w-14" />
                         </motion.div>
                         <h1 className="mb-2 text-3xl font-semibold uppercase leading-tight tracking-[0.18em] text-white/92">{APP_NAME}</h1>
                         <p className="text-sm leading-relaxed text-sage-100/50">{t('Your local-first workspace for generated images and photography.')}</p>

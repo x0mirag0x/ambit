@@ -313,13 +313,14 @@ export const ActivityDock: React.FC = () => {
     }, [active, progress?.startedAt, showIndeterminateProgress]);
 
     const percent = isLiveWatchVisible ? 0 : isCompleteProgress ? 100 : total > 0 ? Math.round((current / total) * 100) : 0;
+    const rawProgressMessage = progress?.message || progress?.phase || '';
     const message = isLiveWatchVisible
         ? translateRuntimeMessage(liveWatchPresentation.message)
         : isRefreshActive
             ? formatMetadataRefreshMessage(progress, percent)
-            : translateRuntimeMessage(progress?.message || progress?.phase || '');
+            : translateRuntimeMessage(rawProgressMessage);
     const showCounts = total > 0 && !isLiveWatchVisible && !isBackgroundActive && !isRefreshActive && !showIndeterminateProgress && !isCompleteProgress;
-    const smartThumbnailHasFailures = isBackgroundActive && message.includes('need attention');
+    const smartThumbnailHasFailures = isBackgroundActive && rawProgressMessage.includes('need attention');
     const smartThumbnailIsComplete = isBackgroundActive && total > 0 && current >= total;
     const visibleFooterMessage = smartThumbnailHasFailures
         ? THUMBNAIL_QUEUE_FAILURE_FOOTER

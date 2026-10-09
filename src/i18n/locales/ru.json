@@ -1200,7 +1200,7 @@
   "Search CivitAI for metadata for unresolved model hashes? This sends hash strings to CivitAI, not image files. It requires internet access and may take some time.": "Искать на CivitAI метаданные для нераспознанных хешей моделей? На CivitAI отправляются строки хешей, а не файлы изображений. Нужен доступ в интернет, и это может занять некоторое время.",
   "Search Collections": "Поиск коллекций",
   "Search collections...": "Поиск коллекций...",
-  "Search in {{scopeName}}...": "Поиск в {{scopeName}}...",
+  "Search in {{scopeName}}...": "Поиск в «{{scopeName}}»...",
   "Search library models…": "Поиск моделей библиотеки…",
   "Search models": "Поиск моделей",
   "Search Models": "Поиск моделей",
@@ -2207,5 +2207,6 @@
   "Importing images from {{n}} folders...": "Импорт изображений из {{n}} папок...",
   "Folder {{current}} of {{total}}": "Папка {{current}} из {{total}}",
   "Startup": "Запуск",
-  "Catch-up": "Догон"
+  "Catch-up": "Догон",
+  "{{prefix}}: {{message}}": "{{prefix}}: {{message}}"
 }
