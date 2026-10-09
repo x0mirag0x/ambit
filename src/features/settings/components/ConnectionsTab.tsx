@@ -4,6 +4,7 @@ import { Folder, DatabaseZap, Palette, FlaskConical, Boxes } from 'lucide-react'
 import { AppSettings } from '../../../types';
 import { FoldersTab, InvokeAITab, A1111Tab, ComfyUITab, ResourcesTab } from './';
 import type { ImportResult } from '../../../services/importService';
+import { useTranslation } from 'react-i18next';
 
 interface ConnectionsTabProps {
     settings: AppSettings;
@@ -24,6 +25,7 @@ export const ConnectionsTab: React.FC<ConnectionsTabProps> = ({
     onInvokeSync,
     onClose
 }) => {
+    const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState<ConnectionSubTab>(initialSubTab);
 
     // Sync active tab if initialSubTab changes (e.g. deep linking)
@@ -53,7 +55,7 @@ export const ConnectionsTab: React.FC<ConnectionsTabProps> = ({
                             }`}
                     >
                         {tab.icon}
-                        <span className="truncate">{tab.label}</span>
+                        <span className="truncate">{t(tab.label)}</span>
                     </button>
                 ))}
             </div>

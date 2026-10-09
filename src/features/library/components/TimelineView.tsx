@@ -10,6 +10,7 @@ import { useTimelineLayout } from '../hooks/useTimelineLayout';
 import { useTimelineSelection } from '../hooks/useTimelineSelection';
 import { useTimelineScroll } from '../hooks/useTimelineScroll';
 import { useSettingsStore } from '../../../stores/settingsStore';
+import { useTranslation } from 'react-i18next';
 
 interface TimelineViewProps {
     images: AIImage[];
@@ -46,6 +47,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
     onLoadMore,
     maskedKeywords
 }) => {
+    const { t } = useTranslation();
     const privacyEnabled = useSettingsStore(s => s.privacyEnabled);
     const { groups } = useTimeline(images, sortOption);
     const timelineSourceIndexes = React.useMemo(() => {
@@ -126,9 +128,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                 </div>
                 <div>
                     <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider">
-                        {activeHeaderData?.date}
+                        {activeHeaderData?.date ? t(activeHeaderData.date) : null}
                     </h3>
-                    <div className="text-[10px] text-gray-500 font-medium">{activeHeaderData?.count} images</div>
+                    <div className="text-[10px] text-gray-500 font-medium">{t('timeline.images', { count: activeHeaderData?.count ?? 0 })}</div>
                 </div>
             </div>
 
@@ -153,9 +155,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                                     </div>
                                     <div>
                                         <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">
-                                            {item.date}
+                                            {item.date ? t(item.date) : null}
                                         </h3>
-                                        <div className="text-[10px] text-gray-400 font-medium">{item.count} images</div>
+                                        <div className="text-[10px] text-gray-400 font-medium">{t('timeline.images', { count: item.count ?? 0 })}</div>
                                     </div>
                                     <div className="flex-1 h-px bg-gray-200 dark:bg-white/5 ml-4" />
                                 </div>
@@ -206,8 +208,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
 
                     {images.length === 0 && (
                         <div className="absolute inset-0 flex items-center justify-center text-gray-500">
-                            No images found in this timeframe.
-                        </div>
+                            {t('No images found in this timeframe.')}</div>
                     )}
 
                     {loadingMoreHeight > 0 && (
@@ -216,8 +217,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
                             style={{ top: totalHeight, height: loadingMoreHeight }}
                         >
                             <div className="h-5 w-5 rounded-full border-2 border-sage-500/20 border-t-sage-500 animate-spin" />
-                            Loading older images
-                        </div>
+                            {t('Loading older images')}</div>
                     )}
                 </div>
 

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Wand2, Palette, Bot, Hash } from 'lucide-react';
 import { RecoveryStyle } from '../../../types';
 import { cn } from '../../../utils/cn';
+import { useTranslation } from 'react-i18next';
 
 interface MetadataRecoveryModalProps {
     isOpen: boolean;
@@ -45,6 +46,7 @@ export const MetadataRecoveryModal: React.FC<MetadataRecoveryModalProps> = ({
     onConfirm,
     isProcessing
 }) => {
+    const { t } = useTranslation();
     const [selectedStyle, setSelectedStyle] = useState<RecoveryStyle>('generic');
     const closeButtonRef = React.useRef<HTMLButtonElement>(null);
 
@@ -94,18 +96,16 @@ export const MetadataRecoveryModal: React.FC<MetadataRecoveryModalProps> = ({
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-gray-900 dark:text-white text-sm">
-                                        AI Prompt Recovery
-                                    </h3>
+                                        {t('AI Prompt Recovery')}</h3>
                                     <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">
-                                        Gemini AI
-                                    </p>
+                                        {t('Gemini AI')}</p>
                                 </div>
                             </div>
                             {!isProcessing && (
                                 <button
                                     ref={closeButtonRef}
                                     type="button"
-                                    aria-label="Close Metadata Recovery"
+                                    aria-label={t('Close Metadata Recovery')}
                                     onClick={onClose}
                                     className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
                                 >
@@ -122,16 +122,14 @@ export const MetadataRecoveryModal: React.FC<MetadataRecoveryModalProps> = ({
                                         <div className="absolute inset-0 rounded-full bg-amethyst-500/20 animate-ping" />
                                         <div className="relative w-14 h-14 border-4 border-amethyst-500/30 border-t-amethyst-500 rounded-full animate-spin" />
                                     </div>
-                                    <h4 className="text-gray-900 dark:text-white font-bold mb-2">Analyzing Image...</h4>
+                                    <h4 className="text-gray-900 dark:text-white font-bold mb-2">{t('Analyzing Image...')}</h4>
                                     <p className="text-xs text-gray-500 max-w-[250px]">
-                                        AI is analyzing the visuals to generate a descriptive prompt.
-                                    </p>
+                                        {t('AI is analyzing the visuals to generate a descriptive prompt.')}</p>
                                 </div>
                             ) : (
                                 <>
                                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
-                                        Select a target style for the generated prompt.
-                                    </p>
+                                        {t('Select a target style for the generated prompt.')}</p>
 
                                     <div className="space-y-2 mb-6">
                                         {options.map(opt => (
@@ -158,7 +156,7 @@ export const MetadataRecoveryModal: React.FC<MetadataRecoveryModalProps> = ({
                                                         "text-sm font-semibold transition-colors",
                                                         selectedStyle === opt.id ? 'text-amethyst-600 dark:text-amethyst-300' : 'text-gray-700 dark:text-gray-300'
                                                     )}>
-                                                        {opt.label}
+                                                        {t(opt.label)}
                                                     </div>
                                                     <div className="text-xs text-gray-500 dark:text-gray-500 mt-0.5">{opt.desc}</div>
                                                 </div>
@@ -171,15 +169,13 @@ export const MetadataRecoveryModal: React.FC<MetadataRecoveryModalProps> = ({
                                             onClick={onClose}
                                             className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-white/5"
                                         >
-                                            Cancel
-                                        </button>
+                                            {t('Cancel')}</button>
                                         <button
                                             onClick={() => onConfirm(selectedStyle)}
                                             className="px-5 py-2 bg-amethyst-600 hover:bg-amethyst-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-amethyst-500/20 flex items-center gap-2 transition-colors"
                                         >
                                             <Wand2 className="w-4 h-4" />
-                                            Generate Prompt
-                                        </button>
+                                            {t('Generate Prompt')}</button>
                                     </div>
                                 </>
                             )}

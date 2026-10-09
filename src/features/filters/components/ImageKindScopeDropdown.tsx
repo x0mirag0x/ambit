@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 import type { ImageKindFilter, LibraryScopeCounts, MediaTypeFilter } from '../../../types';
 import { formatCountCompact } from '../../../utils/formatUtils';
+import { useTranslation } from 'react-i18next';
 
 interface LibraryScopeSelection {
     mediaType: MediaTypeFilter;
@@ -47,6 +48,7 @@ export const LibraryScopeDropdown = React.memo(({
     onRetryCounts,
     onScopeChange,
 }: LibraryScopeDropdownProps) => {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = React.useState(false);
     const containerRef = React.useRef<HTMLDivElement>(null);
     const triggerRef = React.useRef<HTMLButtonElement>(null);
@@ -60,7 +62,7 @@ export const LibraryScopeDropdown = React.memo(({
     const selectedOption = SCOPE_OPTIONS.find(option => (
         option.mediaType === mediaType && (mediaType !== 'image' || option.sourceKind === sourceKind)
     )) ?? SCOPE_OPTIONS[0];
-    const selectedLabel = selectedOption.label;
+    const selectedLabel = t(selectedOption.label);
     const selectedCount = getScopeCount(scopeCounts, selectedOption) ?? displayedCount;
     const visibleOptions = SCOPE_OPTIONS.filter(option => (
         option.key === 'all'
@@ -150,7 +152,7 @@ export const LibraryScopeDropdown = React.memo(({
                 aria-haspopup="menu"
                 aria-controls={isOpen ? menuId : undefined}
                 aria-expanded={isOpen}
-                aria-label={`Library scope: ${selectedLabel}, ${formatCount(selectedCount)}. Change library scope`}
+                aria-label={t('Library scope: {{selectedLabel}}, {{v1}}. Change library scope', { selectedLabel: selectedLabel, v1: formatCount(selectedCount) })}
                 onClick={() => setIsOpen(open => !open)}
                 onKeyDown={event => {
                     if (event.key === 'Enter' || event.key === ' ') event.stopPropagation();
@@ -172,20 +174,20 @@ export const LibraryScopeDropdown = React.memo(({
             </button>
 
             {isOpen && (
-                <div ref={menuRef} id={menuId} role="menu" aria-label="Choose library scope" onKeyDown={handleMenuKeyDown} className="absolute left-0 top-full z-[100] mt-2 w-56 rounded-xl border border-gray-200 bg-white p-1.5 shadow-2xl dark:border-white/10 dark:bg-zinc-800">
-                    {countsLoading && <span role="status" className="sr-only">Loading counts</span>}
-                    <div aria-hidden="true" className="px-2.5 pb-1.5 pt-2 text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-zinc-400">Media</div>
+                <div ref={menuRef} id={menuId} role="menu" aria-label={t('Choose library scope')} onKeyDown={handleMenuKeyDown} className="absolute left-0 top-full z-[100] mt-2 w-56 rounded-xl border border-gray-200 bg-white p-1.5 shadow-2xl dark:border-white/10 dark:bg-zinc-800">
+                    {countsLoading && <span role="status" className="sr-only">{t('Loading counts')}</span>}
+                    <div aria-hidden="true" className="px-2.5 pb-1.5 pt-2 text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-zinc-400">{t('Media')}</div>
                     {visibleOptions.map(option => {
                         const isSelected = option.key === selectedMenuKey;
                         const count = getScopeCount(scopeCounts, option) ?? (isSelected ? displayedCount : undefined);
                         return (
                             <React.Fragment key={option.key}>
                                 {option.key === firstImageKindKey && (
-                                    <div aria-hidden="true" className="mt-2 px-2.5 pb-1.5 pt-2 text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-zinc-400">Image Kind</div>
+                                    <div aria-hidden="true" className="mt-2 px-2.5 pb-1.5 pt-2 text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-zinc-400">{t('Image Kind')}</div>
                                 )}
-                                <button data-scope-option={option.key} type="button" role="menuitemradio" tabIndex={-1} aria-checked={isSelected} aria-label={`${option.label}, ${formatCount(count)}`} onClick={() => selectOption(option)} className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sage-500/60 ${isSelected ? 'bg-sage-500/15 text-sage-700 dark:text-sage-200' : 'text-gray-600 hover:bg-gray-100 dark:text-zinc-300 dark:hover:bg-white/5'}`}>
+                                <button data-scope-option={option.key} type="button" role="menuitemradio" tabIndex={-1} aria-checked={isSelected} aria-label={t('{{label}}, {{v1}}', { label: t(option.label), v1: formatCount(count) })} onClick={() => selectOption(option)} className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sage-500/60 ${isSelected ? 'bg-sage-500/15 text-sage-700 dark:text-sage-200' : 'text-gray-600 hover:bg-gray-100 dark:text-zinc-300 dark:hover:bg-white/5'}`}>
                                     <span className="flex h-4 w-4 shrink-0 items-center justify-center">{isSelected && <Check aria-hidden className="h-3.5 w-3.5" />}</span>
-                                    <span className="min-w-0 flex-1 truncate font-medium">{option.label}</span>
+                                    <span className="min-w-0 flex-1 truncate font-medium">{t(option.label)}</span>
                                     <span title={formatCount(count)} className="shrink-0 text-[10px] tabular-nums opacity-70">{count === undefined ? '—' : formatCountCompact(count)}</span>
                                 </button>
                             </React.Fragment>
@@ -193,12 +195,12 @@ export const LibraryScopeDropdown = React.memo(({
                     })}
                     {countsError && (
                         <div className="mt-1.5 flex items-center justify-between gap-2 border-t border-gray-200 px-2.5 pt-2 text-[10px] dark:border-white/10">
-                            <span role="status" className="text-ember-600 dark:text-ember-300">Counts unavailable</span>
+                            <span role="status" className="text-ember-600 dark:text-ember-300">{t('Counts unavailable')}</span>
                             <button type="button" role="menuitem" tabIndex={-1} aria-disabled={countsLoading} onClick={() => {
                                 if (countsLoading) return;
                                 onRetryCounts?.();
                                 closeAndRestoreFocus();
-                            }} className="rounded px-1 py-1 font-semibold text-sage-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500/60 aria-disabled:opacity-50 dark:text-sage-300">Retry counts</button>
+                            }} className="rounded px-1 py-1 font-semibold text-sage-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500/60 aria-disabled:opacity-50 dark:text-sage-300">{t('Retry counts')}</button>
                         </div>
                     )}
                 </div>

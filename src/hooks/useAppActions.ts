@@ -18,6 +18,7 @@ import { patchImageFlagsInQueryCaches, restoreImagesInQueryCaches, updateImagesQ
 import { applyOptimisticPinOrder } from '../utils/imageOptimisticUpdates';
 import type { ImagesQueryKey } from './useImagesQuery';
 import type { ActiveImageStateAdapter } from './activeImageState';
+import { useTranslation } from 'react-i18next';
 
 interface AppActionFileOps {
     deleteImages: (ids: string[]) => Promise<boolean>;
@@ -71,6 +72,7 @@ export const useAppActions = ({
     modalManager: modals, // Destructure with alias for minimum logic change
     activeImageState
 }: UseAppActionsProps) => {
+    const { t } = useTranslation();
     const { addToast } = useToast();
     const queryClient = useQueryClient();
     const pendingMetadataRecoveryRef = React.useRef<PendingMetadataRecovery | null>(null);
@@ -142,7 +144,7 @@ export const useAppActions = ({
             if (previousActiveImage && activeImageState) {
                 activeImageState.updateImage(previousActiveImage.id, () => previousActiveImage);
             }
-            addToast(errorMessage, 'error');
+            addToast(t(errorMessage), 'error');
         }
     }, [refreshCollectionsAfterImageFlagChange, setImages, addToast, queryClient, imagesQueryKey, activeImageState]);
 
@@ -169,7 +171,7 @@ export const useAppActions = ({
             if (previousActiveImage && activeImageState) {
                 activeImageState.updateImage(previousActiveImage.id, () => previousActiveImage);
             }
-            addToast('Failed to update favorite state', 'error');
+            addToast(t('Failed to update favorite state'), 'error');
         }
     }, [addToast, queryClient, refreshCollectionsAfterImageFlagChange, setImages, activeImageState]);
 
@@ -233,7 +235,7 @@ export const useAppActions = ({
 
         void persistFavoriteChanges(ids, anyUnfavorite, previousImages);
 
-        addToast(`${anyUnfavorite ? 'Favorited' : 'Unfavorited'} ${selectedIds.size} ${selectedIds.size === 1 ? 'item' : 'items'}`, 'success');
+        addToast(t('toast.favoriteItems', { count: selectedIds.size, context: anyUnfavorite ? 'on' : 'off' }), 'success');
     };
 
     const handleFavoriteImage = (id: string, options: SingleImageActionOptions = {}) => {
@@ -249,7 +251,7 @@ export const useAppActions = ({
         void persistFavoriteChanges([id], newFavorite, previousImages, img, isInCurrentQuery);
 
         if (options.showToast) {
-            addToast(newFavorite ? "Liked" : "Unliked", newFavorite ? "success" : "info");
+            addToast(newFavorite ? t('Liked') : t('Unliked'), newFavorite ? "success" : "info");
         }
     };
 
@@ -271,7 +273,7 @@ export const useAppActions = ({
             reorderQueryKey: imagesQueryKey
         });
 
-        addToast(`${anyUnpinned ? 'Pinned' : 'Unpinned'} ${selectedIds.size} ${selectedIds.size === 1 ? 'item' : 'items'}`, 'info');
+        addToast(t('toast.pinItems', { count: selectedIds.size, context: anyUnpinned ? 'on' : 'off' }), 'info');
         void persistPinChanges(ids, anyUnpinned, previousImages, nextImages, 'Failed to update pinned images');
         // await queryClient.invalidateQueries({ queryKey: ['libraryStats'] });
     };
@@ -329,14 +331,14 @@ export const useAppActions = ({
             await queryClient.invalidateQueries({ queryKey: ['parameterRanges'] });
         }
 
-        let message = '';
         const count = idsToToggle.size;
-        const s = count === 1 ? '' : 's';
-
-        if (overrideValue === true) message = `${count} item${s} Manually Masked`;
-        else if (overrideValue === false) message = `${count} item${s} Unmasked`;
-        else if (overrideValue === null) message = `${count} item${s} Reset to Auto Mask`;
-        else message = `${count} item${s} Mask Toggled`;
+        const message = overrideValue === true
+            ? t('toast.maskManual', { count })
+            : overrideValue === false
+                ? t('toast.maskUnmasked', { count })
+                : overrideValue === null
+                    ? t('toast.maskReset', { count })
+                    : t('toast.maskToggled', { count });
 
         addToast(message, 'info');
     };
@@ -373,24 +375,24 @@ export const useAppActions = ({
             refreshCollectionsAfterImageFlagChange();
 
             const label = sourceKindOverride === null
-                ? 'Automatic'
+                ? t('Automatic')
                 : sourceKindOverride === 'photograph'
-                    ? 'Photo'
+                    ? t('Photo')
                     : sourceKindOverride === 'generated'
-                        ? 'Generated'
-                        : 'Other';
-            addToast(`${ids.length === 1 ? 'Image' : `${ids.length} images`} set to ${label}`, 'success');
+                        ? t('Generated')
+                        : t('Other');
+            addToast(t('toast.imageKind', { count: ids.length, label }), 'success');
         } catch (error) {
             console.error('[ImageKind] Failed to update source kind', error);
-            addToast('Failed to update image kind', 'error');
+            addToast(t('Failed to update image kind'), 'error');
             throw error;
         }
-    }, [addToast, queryClient, refreshCollectionsAfterImageFlagChange, setImages, setViewerSessionImages]);
+    }, [addToast, queryClient, refreshCollectionsAfterImageFlagChange, setImages, setViewerSessionImages, t]);
 
     const handleTogglePrivacy = () => {
         const next = !privacyEnabled;
         setPrivacyEnabled(next);
-        addToast(next ? "Privacy Mode Enabled" : "Privacy Mode Disabled (Hidden/Blurred items revealed)", "info");
+        addToast(next ? t("Privacy Mode Enabled") : t("Privacy Mode Disabled (Hidden/Blurred items revealed)"), "info");
     };
 
     const resolveMetadataRecoveryTargetId = (targetId?: string) => (
@@ -403,13 +405,13 @@ export const useAppActions = ({
     const openMetadataRecovery = (targetId?: string, onRecovered?: (image: AIImage) => void) => {
         const resolvedTargetId = resolveMetadataRecoveryTargetId(targetId);
         if (!resolvedTargetId) {
-            addToast('Select an image before starting Prompt Recovery.', 'error');
+            addToast(t('Select an image before starting Prompt Recovery.'), 'error');
             return;
         }
         const target = viewerImages.find(image => image.id === resolvedTargetId)
             ?? images.find(image => image.id === resolvedTargetId);
         if (target && isVideoAsset(target)) {
-            addToast('Prompt Recovery is currently image-only.', 'info');
+            addToast(t('Prompt Recovery is currently image-only.'), 'info');
             return;
         }
 
@@ -418,7 +420,7 @@ export const useAppActions = ({
             pendingMetadataRecoveryRef.current = null;
             modals.setInitialSettingsTab?.('intelligence');
             openModal('settings');
-            addToast('Enable AI features and configure a Gemini API key in Settings to use Prompt Recovery.', 'info');
+            addToast(t('Enable AI features and configure a Gemini API key in Settings to use Prompt Recovery.'), 'info');
             return;
         }
 
@@ -430,7 +432,7 @@ export const useAppActions = ({
         const pendingRecovery = pendingMetadataRecoveryRef.current;
         const targetId = pendingRecovery?.targetId ?? resolveMetadataRecoveryTargetId();
         if (!targetId) {
-            addToast('Select an image before starting Prompt Recovery.', 'error');
+            addToast(t('Select an image before starting Prompt Recovery.'), 'error');
             return;
         }
 
@@ -440,12 +442,12 @@ export const useAppActions = ({
             closeModal('recovery');
             modals.setInitialSettingsTab?.('intelligence');
             openModal('settings');
-            addToast('Enable AI features and configure a Gemini API key in Settings to use Prompt Recovery.', 'info');
+            addToast(t('Enable AI features and configure a Gemini API key in Settings to use Prompt Recovery.'), 'info');
             return;
         }
 
         if (!fileOps.recoverMetadata) {
-            addToast('Prompt Recovery is unavailable in this runtime.', 'error');
+            addToast(t('Prompt Recovery is unavailable in this runtime.'), 'error');
             return;
         }
 
@@ -478,7 +480,7 @@ export const useAppActions = ({
         }
 
         if (options.showToast !== false) {
-            addToast(newPinned ? "Pinned to top" : "Unpinned", "info");
+            addToast(newPinned ? t("Pinned to top") : t("Unpinned"), "info");
         }
         void persistPinChanges(
             [id],
@@ -509,14 +511,14 @@ export const useAppActions = ({
     };
 
     const runBackfill = async () => {
-        addToast("Starting background backfill...", "info");
+        addToast(t('Starting background backfill...'), "info");
         const count = await backfillParameterColumns();
         if (count > 0) {
-            addToast(`Backfill complete: ${count} images updated`, "success");
+            addToast(t('Backfill complete: {{count}} images updated', { count: count }), "success");
             await queryClient.invalidateQueries({ queryKey: ['libraryStats'] });
             await queryClient.invalidateQueries({ queryKey: ['parameterRanges'] });
         } else {
-            addToast("Backfill complete: No images needed updating", "success");
+            addToast(t('Backfill complete: No images needed updating'), "success");
         }
     };
 

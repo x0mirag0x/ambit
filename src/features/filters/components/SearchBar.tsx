@@ -5,8 +5,13 @@ import { APP_NAME } from '../../../constants/app';
 import { useSearch } from '../../../contexts/SearchContext';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import type { SearchBarOption } from './SearchBarPopover';
+import { useTranslation } from 'react-i18next';
 
 const SearchBarPopover = React.lazy(() => import('./SearchBarPopover').then(module => ({ default: module.SearchBarPopover })));
+
+const localizeScopeName = (name: string, translate: (key: string) => string) => (
+    name === 'Library' ? translate('Library') : name
+);
 
 type SearchReadinessApi = typeof import('../../../utils/searchQueryReadiness');
 
@@ -43,6 +48,7 @@ export const SearchBar = React.memo(({
     submitNavigatesToGrid,
     onDraftPendingChange,
 }: SearchBarProps) => {
+    const { t } = useTranslation();
     const { filters, setFilters } = useSearch();
     const [localValue, setLocalValue] = React.useState(filters.searchQuery);
     const [activeOptionIndex, setActiveOptionIndex] = React.useState(-1);
@@ -163,19 +169,20 @@ export const SearchBar = React.memo(({
     }, [onDraftPendingChange]);
 
     const triggerGuidance = searchProps.isAiSearchEnabled
-        ? 'Press Enter to analyze with AI.'
+        ? t('Press Enter to analyze with AI.')
         : submitNavigatesToGrid
-            ? 'Press Enter to show results in Grid.'
-            : 'Updates after you pause. Enter finishes.';
+            ? t('Press Enter to show results in Grid.')
+            : t('Updates after you pause. Enter finishes.');
 
     const statusMessage = React.useMemo(() => {
         if (queryIssue) return null;
-        if (searchProps.isSearchingAi) return 'Analyzing with Gemini…';
+        if (searchProps.isSearchingAi) return t('Analyzing with Gemini…');
         if (!trimmedValue) return null;
         if (searchProps.isAiSearchEnabled || submitNavigatesToGrid) return triggerGuidance;
-        if (isDraftPending || isFiltering) return `Searching ${scopeName}…`;
-        if (displayedCount === 0) return `No matches in ${scopeName}.`;
-        return `${displayedCount.toLocaleString()} ${displayedCount === 1 ? 'match' : 'matches'} in ${scopeName}.`;
+        const localizedScope = localizeScopeName(scopeName, t);
+        if (isDraftPending || isFiltering) return t('Searching {{scopeName}}…', { scopeName: localizedScope });
+        if (displayedCount === 0) return t('No matches in {{scopeName}}.', { scopeName: localizedScope });
+        return t('search.matches', { count: displayedCount, formatted: displayedCount.toLocaleString(), scopeName: localizedScope });
     }, [
         queryIssue,
         displayedCount,
@@ -187,6 +194,7 @@ export const SearchBar = React.memo(({
         searchProps.isAiSearchEnabled,
         searchProps.isSearchingAi,
         submitNavigatesToGrid,
+        t,
         triggerGuidance,
         trimmedValue,
     ]);
@@ -292,10 +300,10 @@ export const SearchBar = React.memo(({
         }
     };
 
-    const listLabel = options[0]?.kind === 'recent' ? 'Recent searches' : 'Search operator suggestions';
+    const listLabel = options[0]?.kind === 'recent' ? t('Recent searches') : t('Search operator suggestions');
     const accessibleName = searchProps.isAiSearchEnabled
-        ? `Ask ${APP_NAME} with AI`
-        : `Search in ${scopeName}`;
+        ? t('Ask {{appName}} with AI', { appName: APP_NAME })
+        : t('Search in {{scopeName}}', { scopeName: localizeScopeName(scopeName, t) });
     const describedBy = searchProps.isFocused
         ? [queryIssue || statusMessage ? statusId : null, helperId].filter(Boolean).join(' ')
         : undefined;
@@ -328,7 +336,7 @@ export const SearchBar = React.memo(({
                     aria-invalid={queryIssue?.kind === 'invalid' ? true : undefined}
                     aria-busy={showLoadingIndicator}
                     readOnly={searchProps.isSearchingAi}
-                    placeholder={searchProps.isAiSearchEnabled ? `Ask ${APP_NAME}...` : `Search in ${scopeName}...`}
+                    placeholder={searchProps.isAiSearchEnabled ? t('Ask {{APP_NAME}}...', { APP_NAME: APP_NAME }) : t('Search in {{scopeName}}...', { scopeName: scopeName })}
                     className={`w-full bg-gray-100 dark:bg-zinc-800/50 border rounded-xl py-2 pl-10 pr-10 text-sm focus:outline-none transition-all text-gray-900 dark:text-gray-100 placeholder-gray-500 ${searchProps.isAiSearchEnabled ? 'border-amethyst-300 dark:border-amethyst-800 focus:border-amethyst-500/50 focus:ring-1 focus:ring-amethyst-500/30' : 'border-gray-200 dark:border-white/10 focus:border-sage-500/50 focus:ring-1 focus:ring-sage-500/30'}`}
                     value={localValue}
                     onChange={handleSearchChange}
@@ -338,7 +346,7 @@ export const SearchBar = React.memo(({
                 {localValue && !searchProps.isSearchingAi ? (
                     <button
                         type="button"
-                        aria-label="Clear Search"
+                        aria-label={t('Clear Search')}
                         onClick={clearSearch}
                         className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-900 dark:text-zinc-500 dark:hover:text-white"
                     >
@@ -366,8 +374,8 @@ export const SearchBar = React.memo(({
                 ) : null}
             </div>
             <TooltipButton
-                label={searchProps.isAiSearchEnabled ? 'Disable AI Search' : 'Enable AI Search'}
-                content={searchProps.isAiSearchEnabled ? 'Return to standard library search.' : 'Use natural-language AI search.'}
+                label={searchProps.isAiSearchEnabled ? t('Disable AI Search') : t('Enable AI Search')}
+                content={searchProps.isAiSearchEnabled ? t('Return to standard library search.') : t('Use natural-language AI search.')}
                 aria-pressed={searchProps.isAiSearchEnabled}
                 disabled={searchProps.isSearchingAi}
                 onClick={searchProps.toggleAiSearch}

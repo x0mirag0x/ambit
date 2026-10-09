@@ -14,6 +14,7 @@ import {
     getEffectiveAiModel,
     getEffectiveAiThinkingMode
 } from '../../../utils/settingsUtils';
+import { useTranslation } from 'react-i18next';
 
 interface TabProps {
     settings: AppSettings;
@@ -31,6 +32,7 @@ const THINKING_MODE_LABELS: Record<AiThinkingMode, string> = {
 };
 
 export const IntelligenceTab: React.FC<TabProps> = React.memo(({ settings, setSettings }) => {
+    const { t } = useTranslation();
     const { addToast } = useToast();
     const { geminiApiKey, setGeminiApiKey } = useSettingsStore();
     const [localApiKey, setLocalApiKey] = React.useState(geminiApiKey || '');
@@ -57,7 +59,7 @@ export const IntelligenceTab: React.FC<TabProps> = React.memo(({ settings, setSe
     const handleAIToggle = () => {
         const newValue = !settings.enableAI;
         setSettings(prev => ({ ...prev, enableAI: newValue }));
-        addToast(newValue ? 'AI features enabled' : 'AI features disabled', 'success');
+        addToast(newValue ? t('AI features enabled') : t('AI features disabled'), 'success');
     };
 
     const handleApiKeyChange = (val: string) => {
@@ -77,7 +79,7 @@ export const IntelligenceTab: React.FC<TabProps> = React.memo(({ settings, setSe
         setVerificationStatus('idle');
         setVerificationError(null);
         if (model) {
-            addToast(`Switched to ${model.name}`, 'success');
+            addToast(t('Switched to {{name}}', { name: model.name }), 'success');
         }
     };
 
@@ -86,12 +88,12 @@ export const IntelligenceTab: React.FC<TabProps> = React.memo(({ settings, setSe
         if (!supportedThinkingModes.includes(thinkingMode)) return;
 
         setSettings(prev => ({ ...prev, aiThinkingMode: thinkingMode }));
-        addToast(`Thinking effort set to ${THINKING_MODE_LABELS[thinkingMode]}`, 'success');
+        addToast(t('Thinking effort set to {{v0}}', { v0: THINKING_MODE_LABELS[thinkingMode] }), 'success');
     };
 
     const handleVerifyKey = async () => {
         if (!localApiKey) {
-            addToast('Please enter an API key first', 'error');
+            addToast(t('Please enter an API key first'), 'error');
             return;
         }
 
@@ -106,7 +108,7 @@ export const IntelligenceTab: React.FC<TabProps> = React.memo(({ settings, setSe
                 // Save to secure keyring on successful verification
                 await setGeminiApiKey(localApiKey);
                 setVerificationStatus('success');
-                addToast('API Key verified and saved securely', 'success');
+                addToast(t('API Key verified and saved securely'), 'success');
             } else {
                 setVerificationStatus('error');
                 setVerificationError(result.error || 'Verification failed');
@@ -116,7 +118,7 @@ export const IntelligenceTab: React.FC<TabProps> = React.memo(({ settings, setSe
             setVerificationStatus('error');
             const msg = error instanceof Error ? error.message : 'Unknown error';
             setVerificationError(msg);
-            addToast(msg, 'error');
+            addToast(t(msg), 'error');
         } finally {
             setIsVerifying(false);
         }
@@ -126,8 +128,7 @@ export const IntelligenceTab: React.FC<TabProps> = React.memo(({ settings, setSe
         <div className="space-y-6 max-w-2xl">
             <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-xl p-6 shadow-sm">
                 <h4 className="mb-6 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amethyst-600 dark:text-amethyst-300">
-                    <FlaskConical className="w-4 h-4" /> Ambit Intelligence
-                </h4>
+                    <FlaskConical className="w-4 h-4" /> {t('Ambit Intelligence')}</h4>
 
                 <div className="space-y-6">
                     <div
@@ -135,14 +136,14 @@ export const IntelligenceTab: React.FC<TabProps> = React.memo(({ settings, setSe
                         className="flex items-center justify-between cursor-pointer group"
                     >
                         <div className="min-w-0 pr-4">
-                            <div className="text-base font-medium text-gray-900 transition-colors group-hover:text-amethyst-600 dark:text-gray-200 dark:group-hover:text-amethyst-300">Enable AI Features</div>
-                            <div className="text-sm text-gray-500">Unlocks natural language search, prompt analysis, and metadata recovery through on-demand Gemini requests.</div>
+                            <div className="text-base font-medium text-gray-900 transition-colors group-hover:text-amethyst-600 dark:text-gray-200 dark:group-hover:text-amethyst-300">{t('Enable AI Features')}</div>
+                            <div className="text-sm text-gray-500">{t('Unlocks natural language search, prompt analysis, and metadata recovery through on-demand Gemini requests.')}</div>
                         </div>
                         <button
                             type="button"
                             role="switch"
                             aria-checked={settings.enableAI}
-                            aria-label="Enable AI Features"
+                            aria-label={t('Enable AI Features')}
                             className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${settings.enableAI ? 'bg-amethyst-600' : 'bg-gray-200 dark:bg-white/10'}`}
                         >
                             <div className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow-sm transition-all ${settings.enableAI ? 'left-6' : 'left-1'}`} />
@@ -170,7 +171,7 @@ export const IntelligenceTab: React.FC<TabProps> = React.memo(({ settings, setSe
                                                 const result = await verifyApiKey(keyToTest, effectiveAiModel);
                                                 if (result.valid) {
                                                     setVerificationStatus('success');
-                                                    addToast('Environment API Key verified', 'success');
+                                                    addToast(t('Environment API Key verified'), 'success');
                                                 } else {
                                                     setVerificationStatus('error');
                                                     setVerificationError(result.error || 'Verification failed');
@@ -190,8 +191,7 @@ export const IntelligenceTab: React.FC<TabProps> = React.memo(({ settings, setSe
                                 <div className="pt-2 space-y-4 animate-in fade-in duration-150 motion-reduce:animate-none">
                                     <div>
                                         <label className="text-sm font-bold text-gray-900 dark:text-white block mb-2 flex items-center gap-2">
-                                            <Cpu className="w-4 h-4 text-gray-400" /> AI Model (Dev Mode)
-                                        </label>
+                                            <Cpu className="w-4 h-4 text-gray-400" /> {t('AI Model (Dev Mode)')}</label>
                                         <select
                                             value={effectiveAiModel}
                                             onChange={handleModelChange}
@@ -200,20 +200,19 @@ export const IntelligenceTab: React.FC<TabProps> = React.memo(({ settings, setSe
                                             {AI_MODELS.map(model => (
                                                 <option key={model.id} value={model.id} className="dark:bg-zinc-900">
                                                     {model.name}
-                                                    {model.isExperimental ? ' (Preview)' : ''}
-                                                    {model.isLegacy ? ' (Legacy)' : ''}
+                                                    {model.isExperimental ? t(' (Preview)') : ''}
+                                                    {model.isLegacy ? t(' (Legacy)') : ''}
                                                 </option>
                                             ))}
                                         </select>
                                         <p className="text-[10px] text-gray-500 mt-2 ml-1">
-                                            {AI_MODELS.find(m => m.id === effectiveAiModel)?.description}
+                                            {t(AI_MODELS.find(m => m.id === effectiveAiModel)?.description ?? '')}
                                         </p>
                                     </div>
 
                                     <div>
                                         <label className="text-sm font-bold text-gray-900 dark:text-white block mb-2">
-                                            Thinking Effort (Dev Mode)
-                                        </label>
+                                            {t('Thinking Effort (Dev Mode)')}</label>
                                         <select
                                             value={effectiveAiThinkingMode}
                                             onChange={handleThinkingModeChange}
@@ -221,21 +220,20 @@ export const IntelligenceTab: React.FC<TabProps> = React.memo(({ settings, setSe
                                         >
                                             {supportedThinkingModes.map(mode => (
                                                 <option key={mode} value={mode} className="dark:bg-zinc-900">
-                                                    {THINKING_MODE_LABELS[mode]}
+                                                    {t(THINKING_MODE_LABELS[mode])}
                                                 </option>
                                             ))}
                                         </select>
                                         <p className="text-[10px] text-gray-500 mt-2 ml-1">
-                                            Changes the reasoning effort used by Ambit AI requests so response quality and speed can be compared.
-                                        </p>
+                                            {t('Changes the reasoning effort used by Ambit AI requests so response quality and speed can be compared.')}</p>
                                     </div>
                                 </div>
                             )}
 
                             <p className="text-xs text-gray-500 mt-2">
                                 {isEnvKey
-                                    ? 'Ambit reads this API key from your environment and does not save it. Requests are sent only when you test the key or run an AI feature.'
-                                    : 'Use your own Gemini API key. Your key is stored locally in the OS keyring, and requests are sent only when you verify the key or run an AI feature.'}
+                                    ? t('Ambit reads this API key from your environment and does not save it. Requests are sent only when you test the key or run an AI feature.')
+                                    : t('Use your own Gemini API key. Your key is stored locally in the OS keyring, and requests are sent only when you verify the key or run an AI feature.')}
                             </p>
                         </div>
                     )}

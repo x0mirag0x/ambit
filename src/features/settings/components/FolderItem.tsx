@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Folder, Info, Monitor, RefreshCw, Trash2, FileJson } from 'lucide-react';
 import { GeneratorTool, MonitoredFolder } from '../../../types';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
+import { useTranslation } from 'react-i18next';
 
 interface FolderItemProps {
     folder: MonitoredFolder;
@@ -32,6 +33,7 @@ const getVariantIcon = (variant?: GeneratorTool) => {
 };
 
 export const FolderItem: React.FC<FolderItemProps> = ({ folder, scanningIds, onRescan, onRemove, onRefresh }) => {
+    const { t } = useTranslation();
     const isScanning = scanningIds.has(folder.id);
     const path = folder.isManaged ? (folder.pathRaw ?? folder.path) : folder.path;
 
@@ -52,11 +54,11 @@ export const FolderItem: React.FC<FolderItemProps> = ({ folder, scanningIds, onR
                     </span>
                     <span className="text-[10px] text-gray-400 dark:text-gray-500 flex items-center gap-1">
                         {folder.initialScanCancelled ? (
-                            <><Info className="w-3 h-3 text-ember-600 dark:text-ember-300" /> Import cancelled. Rescan to continue.</>
+                            <><Info className="w-3 h-3 text-ember-600 dark:text-ember-300" /> {t('Import cancelled. Rescan to continue.')}</>
                         ) : folder.isManaged ? (
-                            <><Monitor className="w-3 h-3" /> Managed Integration</>
+                            <><Monitor className="w-3 h-3" /> {t('Managed Integration')}</>
                         ) : (
-                            <><Folder className="w-3 h-3" /> Monitored Folder</>
+                            <><Folder className="w-3 h-3" /> {t('Monitored Folder')}</>
                         )}
                     </span>
                 </div>
@@ -68,8 +70,8 @@ export const FolderItem: React.FC<FolderItemProps> = ({ folder, scanningIds, onR
                 )}
 
                 <TooltipButton
-                    label={folder.isManaged && folder.variant === GeneratorTool.INVOKEAI ? "Sync with InvokeAI Database" : "Rescan Folder"}
-                    content={folder.isManaged && folder.variant === GeneratorTool.INVOKEAI ? "Sync with InvokeAI Database" : "Rescan Folder"}
+                    label={folder.isManaged && folder.variant === GeneratorTool.INVOKEAI ? t('Sync with InvokeAI Database') : t('Rescan Folder')}
+                    content={folder.isManaged && folder.variant === GeneratorTool.INVOKEAI ? t('Sync with InvokeAI Database') : t('Rescan Folder')}
                     onClick={() => onRescan(folder.id, path, folder.variant, folder.isManaged)}
                     disabled={isScanning}
                     className={`rounded-lg p-1.5 text-gray-400 transition-all hover:bg-sage-50 hover:text-sage-600 dark:hover:bg-sage-500/10 dark:hover:text-sage-300 ${isScanning ? 'opacity-50 cursor-wait' : ''}`}
@@ -79,8 +81,8 @@ export const FolderItem: React.FC<FolderItemProps> = ({ folder, scanningIds, onR
 
                 {onRefresh && (
                     <TooltipButton
-                        label="Resume Smart Refresh"
-                        content="Resume Smart Refresh (Shift+Click to Force Refresh All)"
+                        label={t('Resume Smart Refresh')}
+                        content={t('Resume Smart Refresh (Shift+Click to Force Refresh All)')}
                         onClick={(e) => {
                             // Click = Resume (force=false), Shift+Click = Force (force=true)
                             console.log('[FolderItem] Refresh clicked. Shift:', e.shiftKey, 'Force:', e.shiftKey);
@@ -95,8 +97,8 @@ export const FolderItem: React.FC<FolderItemProps> = ({ folder, scanningIds, onR
 
                 {!folder.isManaged && (
                     <TooltipButton
-                        label={`Remove Folder: ${path}`}
-                        content={`Remove Folder: ${path}`}
+                        label={t('Remove Folder: {{path}}', { path: path })}
+                        content={t('Remove Folder: {{path}}', { path: path })}
                         onClick={() => onRemove(folder.id)}
                         className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
                     >

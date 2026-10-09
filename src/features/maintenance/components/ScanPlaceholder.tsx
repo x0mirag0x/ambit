@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Zap, Copy, Tag, Search, Layers, Filter, Globe, Play } from 'lucide-react';
 import { MaintenanceTab } from '../../../hooks/useMaintenanceData';
+import { useTranslation } from 'react-i18next';
 
 interface ScanPlaceholderProps {
     tab: MaintenanceTab;
@@ -12,6 +13,7 @@ export const ScanPlaceholder: React.FC<ScanPlaceholderProps> = ({
     tab,
     onStartScan
 }) => {
+    const { t } = useTranslation();
     const [scanScope, setScanScope] = useState<'global' | 'filtered'>('global');
 
     const metadata: Record<string, { title: string, description: string, icon: React.ReactNode, hasScope: boolean }> = {
@@ -62,9 +64,9 @@ export const ScanPlaceholder: React.FC<ScanPlaceholderProps> = ({
                 </div>
             </div>
 
-            <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-4 tracking-tight">{config.title}</h2>
+            <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-4 tracking-tight">{t(config.title)}</h2>
             <p className="text-gray-500 dark:text-gray-400 mb-10 leading-relaxed text-sm">
-                {config.description}
+                {t(config.description)}
             </p>
 
             <div className="flex flex-col items-center gap-6 w-full max-w-xs">
@@ -74,14 +76,12 @@ export const ScanPlaceholder: React.FC<ScanPlaceholderProps> = ({
                             onClick={() => setScanScope('filtered')}
                             className={`flex-1 px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${scanScope === 'filtered' ? 'bg-white dark:bg-zinc-700 text-sage-600 shadow-md' : 'text-gray-400'}`}
                         >
-                            <Filter className="w-3.5 h-3.5" /> Current Filter
-                        </button>
+                            <Filter className="w-3.5 h-3.5" /> {t('Current Filter')}</button>
                         <button
                             onClick={() => setScanScope('global')}
                             className={`flex-1 px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${scanScope === 'global' ? 'bg-white dark:bg-zinc-700 text-sage-600 shadow-md' : 'text-gray-400'}`}
                         >
-                            <Globe className="w-3.5 h-3.5" /> Global
-                        </button>
+                            <Globe className="w-3.5 h-3.5" /> {t('Global')}</button>
                     </div>
                 )}
 
@@ -90,12 +90,10 @@ export const ScanPlaceholder: React.FC<ScanPlaceholderProps> = ({
                     className="w-full py-4 bg-sage-600 hover:bg-sage-500 text-white rounded-2xl text-sm font-black shadow-xl shadow-sage-500/30 transition-all active:scale-95 flex items-center justify-center gap-3 group"
                 >
                     <Play className="w-5 h-5 fill-current group-hover:scale-110 transition-transform" />
-                    Start Maintenance Scan
-                </button>
+                    {t('Start Maintenance Scan')}</button>
 
                 <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">
-                    Intentionally triggered scan
-                </p>
+                    {t('Intentionally triggered scan')}</p>
             </div>
         </motion.div>
     );

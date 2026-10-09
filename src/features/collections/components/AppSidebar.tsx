@@ -3,6 +3,7 @@ import { Grid, Clock, Eraser, BarChart3, Filter, Heart, Gift, HelpCircle, Settin
 import { ViewMode, FilterState } from '../../../types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
+import { useTranslation } from 'react-i18next';
 
 interface AppSidebarProps {
   viewMode: ViewMode;
@@ -29,6 +30,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   onOpenDonation,
   showSupportPulse
 }) => {
+  const { t } = useTranslation();
   const brandGlyphSrc = '/branding/ambit-glyph.svg';
 
   return (
@@ -42,32 +44,32 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       </div>
 
       <nav className="flex-1 flex flex-col gap-6 w-full items-center">
-        <NavButton state="view" active={viewMode === 'grid' && !filters.favoritesOnly} current={viewMode === 'grid'} onClick={() => { setViewMode('grid'); setFilters(f => ({ ...f, favoritesOnly: false })); }} icon={<Grid />} tooltip="Grid View" />
-        <NavButton state="view" active={viewMode === 'timeline'} onClick={() => setViewMode('timeline')} icon={<Clock />} tooltip="Timeline View" />
-        <NavButton state="view" active={viewMode === 'dashboard'} onClick={() => setViewMode('dashboard')} icon={<BarChart3 />} tooltip="Statistics" />
+        <NavButton state="view" active={viewMode === 'grid' && !filters.favoritesOnly} current={viewMode === 'grid'} onClick={() => { setViewMode('grid'); setFilters(f => ({ ...f, favoritesOnly: false })); }} icon={<Grid />} tooltip={t('Grid View')} />
+        <NavButton state="view" active={viewMode === 'timeline'} onClick={() => setViewMode('timeline')} icon={<Clock />} tooltip={t('Timeline View')} />
+        <NavButton state="view" active={viewMode === 'dashboard'} onClick={() => setViewMode('dashboard')} icon={<BarChart3 />} tooltip={t('Statistics')} />
         <NavButton
           state="view"
           active={viewMode === 'maintenance'}
           onClick={() => setViewMode('maintenance')}
           icon={<Eraser />}
-          tooltip="Maintenance"
+          tooltip={t('Maintenance')}
         />
 
         <div className="h-px w-8 bg-gray-300 dark:bg-white/10 my-2" />
 
-        <NavButton state="toggle" active={isFilterPanelOpen && (viewMode === 'grid' || viewMode === 'timeline' || viewMode === 'dashboard')} pressed={isFilterPanelOpen} onClick={() => setIsFilterPanelOpen(p => !p)} icon={<Filter />} tooltip={isFilterPanelOpen ? "Hide Filters" : "Show Filters"} />
-        <NavButton state="toggle" active={filters.favoritesOnly} onClick={() => setFilters(prev => ({ ...prev, favoritesOnly: !prev.favoritesOnly }))} icon={<Heart className={filters.favoritesOnly ? "fill-red-500 text-red-500" : ""} />} tooltip={filters.favoritesOnly ? "Disable Favorites Only" : "Show Favorites Only"} />
-        <NavButton state="toggle" active={!!filters.pinnedOnly} onClick={() => setFilters(prev => ({ ...prev, pinnedOnly: !prev.pinnedOnly }))} icon={<Pin className={filters.pinnedOnly ? "fill-white text-white" : ""} />} tooltip={filters.pinnedOnly ? "Disable Pinned Only" : "Show Pinned Only"} />
+        <NavButton state="toggle" active={isFilterPanelOpen && (viewMode === 'grid' || viewMode === 'timeline' || viewMode === 'dashboard')} pressed={isFilterPanelOpen} onClick={() => setIsFilterPanelOpen(p => !p)} icon={<Filter />} tooltip={isFilterPanelOpen ? t('Hide Filters') : t('Show Filters')} />
+        <NavButton state="toggle" active={filters.favoritesOnly} onClick={() => setFilters(prev => ({ ...prev, favoritesOnly: !prev.favoritesOnly }))} icon={<Heart className={filters.favoritesOnly ? "fill-red-500 text-red-500" : ""} />} tooltip={filters.favoritesOnly ? t('Disable Favorites Only') : t('Show Favorites Only')} />
+        <NavButton state="toggle" active={!!filters.pinnedOnly} onClick={() => setFilters(prev => ({ ...prev, pinnedOnly: !prev.pinnedOnly }))} icon={<Pin className={filters.pinnedOnly ? "fill-white text-white" : ""} />} tooltip={filters.pinnedOnly ? t('Disable Pinned Only') : t('Show Pinned Only')} />
       </nav>
 
       <div className="mt-auto flex flex-col items-center gap-4">
-        <TooltipButton label="Support Ambit" content="Support Ambit" onClick={onOpenDonation} className={`w-10 h-10 rounded-xl flex items-center justify-center hover:text-red-500 dark:hover:text-red-400 transition-all mb-2 ${showSupportPulse ? 'animate-pulse hover:animate-none text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10' : 'text-gray-400 dark:text-zinc-500'}`}>
+        <TooltipButton label={t('Support Ambit')} content={t('Support Ambit')} onClick={onOpenDonation} className={`w-10 h-10 rounded-xl flex items-center justify-center hover:text-red-500 dark:hover:text-red-400 transition-all mb-2 ${showSupportPulse ? 'animate-pulse hover:animate-none text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10' : 'text-gray-400 dark:text-zinc-500'}`}>
           <Gift className="w-5 h-5" />
         </TooltipButton>
-        <TooltipButton label="Open Help & Guide" content="Open Help & Guide" onClick={onOpenShortcuts} className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:hover:text-white mb-2">
+        <TooltipButton label={t('Open Help & Guide')} content={t('Open Help & Guide')} onClick={onOpenShortcuts} className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:hover:text-white mb-2">
           <HelpCircle className="w-5 h-5" />
         </TooltipButton>
-        <NavButton active={false} onClick={onOpenSettings} icon={<Settings />} tooltip="Settings" />
+        <NavButton active={false} onClick={onOpenSettings} icon={<Settings />} tooltip={t('Settings')} />
       </div>
     </aside>
   );

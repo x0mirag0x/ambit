@@ -26,6 +26,7 @@ import type { useFileOperations } from '../hooks/useFileOperations';
 import type { useModalManager } from '../hooks/useModalManager';
 import { PrivacyProtectionGate } from './ui/PrivacyProtectionGate';
 import { getEffectiveMaskedKeywords } from '../utils/maskingUtils';
+import { useTranslation } from 'react-i18next';
 
 setupGlobalLogging();
 
@@ -155,6 +156,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     handleRemoveFromCollection, handleOpenCollectionModal, onSetCollectionMembership, onEditCollection
 }) => {
     // Hooks
+    const { t } = useTranslation();
     useProgressListeners();
 
     // Stores
@@ -371,7 +373,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             <main
                 ref={workspaceRef}
                 tabIndex={-1}
-                aria-label="Library workspace"
+                aria-label={t('Library workspace')}
                 className="flex-1 flex flex-col min-w-0 bg-white dark:bg-zinc-900/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-black/20 border border-zinc-200 dark:border-white/10 overflow-hidden relative outline-none"
             >
                 <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_0%,rgba(139,174,124,0.08),transparent_70%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(139,174,124,0.15),transparent_60%)] z-10" />
@@ -562,16 +564,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                                     <div className="p-6 bg-zinc-100 dark:bg-white/5 rounded-full mb-6 border border-zinc-200 dark:border-white/5 opacity-50">
                                         <Search className="w-12 h-12 text-zinc-400 dark:text-zinc-500" />
                                     </div>
-                                    <h3 className="text-2xl font-bold mb-3 text-gray-800 dark:text-gray-100">No Matches Found</h3>
+                                    <h3 className="text-2xl font-bold mb-3 text-gray-800 dark:text-gray-100">{t('No Matches Found')}</h3>
                                     <p className="text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
-                                        We couldn't find any images matching your current filters. Try adjusting your search or clearing filters.
-                                    </p>
+                                        {t('We couldn\'t find any images matching your current filters. Try adjusting your search or clearing filters.')}</p>
                                     <button
                                         onClick={clearAllFilters}
                                         className="px-8 py-3.5 bg-zinc-800 dark:bg-white/10 hover:bg-zinc-700 dark:hover:bg-white/20 text-white rounded-2xl font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
                                     >
-                                        Clear filters
-                                    </button>
+                                        {t('Clear filters')}</button>
                                 </div>
                             )}
                         </ErrorBoundary>}

@@ -10,6 +10,8 @@ import { unwrap } from '../utils/spectaUtils';
 import { formatStableImportProgress } from '../utils/importProgress';
 import { getThumbnailDir } from '../services/thumbnailService';
 import { rebuildFacetCache } from '../services/db/imageRepo';
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
 interface ImportOptions {
     mode?: ImportMode;
@@ -34,7 +36,11 @@ export const formatDetectedImageKindCounts = (images: AIImage[]): string => {
         result[getDetectedSourceKind(image)] += 1;
         return result;
     }, { generated: 0, photograph: 0, other: 0 });
-    return `${counts.generated} Generated, ${counts.photograph} Photo${counts.photograph === 1 ? '' : 's'}, ${counts.other} Other`;
+    return [
+        i18n.t('import.generated', { count: counts.generated }),
+        i18n.t('import.photos', { count: counts.photograph }),
+        i18n.t('import.other', { count: counts.other }),
+    ].join(', ');
 };
 
 interface UseImportOpsProps {
@@ -50,6 +56,7 @@ export const useImportOps = ({
     refreshCollections,
     settings
 }: UseImportOpsProps) => {
+    const { t } = useTranslation();
     const { addToast } = useToast();
     const {
         beginImportRun,
@@ -87,17 +94,18 @@ export const useImportOps = ({
                 await refreshCollections();
             }
 
-            let msg = `Imported ${uniqueNewImages.length} item${uniqueNewImages.length === 1 ? '' : 's'} (${formatDetectedImageKindCounts(uniqueNewImages)}).`;
-            if (dupeCount > 0) msg += ` (Skipped ${dupeCount} duplicates)`;
-            if (stats.skipped > 0) msg += ` Skipped ${stats.skipped} unchanged or ignored file${stats.skipped === 1 ? '' : 's'}.`;
-            if (result.videoSummary?.rejected) msg += ` Rejected ${result.videoSummary.rejected} invalid video${result.videoSummary.rejected === 1 ? '' : 's'}.`;
-            if (result.videoSummary?.posterFailures) msg += ` ${result.videoSummary.posterFailures} video${result.videoSummary.posterFailures === 1 ? '' : 's'} use a generic poster.`;
-            if (stats.errors > 0) msg += ` ${stats.errors} failed.`;
+            const kinds = formatDetectedImageKindCounts(uniqueNewImages);
+            let msg = t('import.imported', { count: uniqueNewImages.length, kinds });
+            if (dupeCount > 0) msg += ` ${t('import.skippedDuplicates', { total: dupeCount })}`;
+            if (stats.skipped > 0) msg += ` ${t('import.skippedUnchanged', { count: stats.skipped })}`;
+            if (result.videoSummary?.rejected) msg += ` ${t('import.rejectedVideos', { count: result.videoSummary.rejected })}`;
+            if (result.videoSummary?.posterFailures) msg += ` ${t('import.genericPosters', { count: result.videoSummary.posterFailures })}`;
+            if (stats.errors > 0) msg += ` ${t('import.failedSuffix', { total: stats.errors })}`;
 
             if (toastMode === 'detailed') {
                 addToast(msg, stats.errors > 0 ? 'info' : 'success');
             } else if (toastMode === 'compact') {
-                addToast(`Imported ${uniqueNewImages.length} new item${uniqueNewImages.length === 1 ? '' : 's'} (${formatDetectedImageKindCounts(uniqueNewImages)})`, 'success');
+                addToast(t('import.importedNew', { count: uniqueNewImages.length, kinds: formatDetectedImageKindCounts(uniqueNewImages) }), 'success');
             }
 
             refreshHiddenAvailability();
@@ -105,12 +113,12 @@ export const useImportOps = ({
             if (dupeCount > 0 && stats.skipped === 0 && stats.errors === 0) {
                 console.log(`Scan complete: ${dupeCount} duplicates found.`);
             } else {
-                if (toastMode === 'detailed' && stats.skipped > 0) addToast(`Skipped ${stats.skipped} unchanged or ignored file${stats.skipped === 1 ? '' : 's'}.`, 'info');
-                if (toastMode === 'detailed' && result.videoSummary?.rejected) addToast(`Rejected ${result.videoSummary.rejected} invalid video${result.videoSummary.rejected === 1 ? '' : 's'}.`, 'warning');
-                if (toastMode === 'detailed' && stats.errors > 0) addToast(`Failed to load ${stats.errors} files.`, 'error');
+                if (toastMode === 'detailed' && stats.skipped > 0) addToast(t('import.skippedUnchanged', { count: stats.skipped }), 'info');
+                if (toastMode === 'detailed' && result.videoSummary?.rejected) addToast(t('import.rejectedVideos', { count: result.videoSummary.rejected }), 'warning');
+                if (toastMode === 'detailed' && stats.errors > 0) addToast(t('Failed to load {{errors}} files.', { errors: stats.errors }), 'error');
             }
         }
-    }, [images, setImages, addToast, refreshCollections, refreshMetadata, refreshHiddenAvailability]);
+    }, [images, setImages, addToast, refreshCollections, refreshMetadata, refreshHiddenAvailability, t]);
 
     const importImages = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files) return;
@@ -124,7 +132,7 @@ export const useImportOps = ({
             abortController: abortCtrl
         });
         if (!importRunId) {
-            addToast('Import already in progress', 'info');
+            addToast(t('Import already in progress'), 'info');
             e.target.value = "";
             return;
         }
@@ -136,7 +144,7 @@ export const useImportOps = ({
                     setImportProgressForRun(importRunId, { current, total, message });
                 }, undefined, abortCtrl.signal);
                 if (result.wasCancelled) {
-                    addToast(MANUAL_IMPORT_CANCELLED_MESSAGE, 'info');
+                    addToast(t(MANUAL_IMPORT_CANCELLED_MESSAGE), 'info');
                     return;
                 }
                 await commitImportResult(result);
@@ -146,7 +154,7 @@ export const useImportOps = ({
             const result = await processWebFiles(files);
             await commitImportResult(result);
         } catch (error) {
-            addToast("Import failed", "error");
+            addToast(t('Import failed'), "error");
         } finally {
             finishImportRun(importRunId);
             e.target.value = "";
@@ -163,7 +171,7 @@ export const useImportOps = ({
             abortController: abortCtrl
         });
         if (!importRunId) {
-            addToast('Import already in progress', 'info');
+            addToast(t('Import already in progress'), 'info');
             return;
         }
 
@@ -174,7 +182,7 @@ export const useImportOps = ({
                     setImportProgressForRun(importRunId, { current, total, message });
                 }, undefined, abortCtrl.signal);
                 if (result.wasCancelled) {
-                    addToast(MANUAL_IMPORT_CANCELLED_MESSAGE, 'info');
+                    addToast(t(MANUAL_IMPORT_CANCELLED_MESSAGE), 'info');
                     return;
                 }
                 await commitImportResult(result);
@@ -184,7 +192,7 @@ export const useImportOps = ({
             const result = await processWebFiles(files);
             await commitImportResult(result);
         } catch (error) {
-            addToast("Import failed", "error");
+            addToast(t('Import failed'), "error");
         } finally {
             finishImportRun(importRunId);
         }
@@ -222,7 +230,7 @@ export const useImportOps = ({
                 mode,
                 pathCount: paths.length
             });
-            if (isManual) addToast('Import already in progress', 'info');
+            if (isManual) addToast(t('Import already in progress'), 'info');
             return;
         }
 
@@ -249,7 +257,7 @@ export const useImportOps = ({
                 deferFacetCacheRefresh
             );
             if (result.wasCancelled) {
-                if (isManual) addToast(MANUAL_IMPORT_CANCELLED_MESSAGE, 'info');
+                if (isManual) addToast(t(MANUAL_IMPORT_CANCELLED_MESSAGE), 'info');
                 return result;
             }
             await commitImportResult(result, { toastMode: isManual ? 'detailed' : 'none' });
@@ -257,7 +265,7 @@ export const useImportOps = ({
         } catch (error) {
             console.error("Import error", error);
             if (isManual) {
-                addToast(abortSignal?.aborted ? MANUAL_IMPORT_CANCELLED_MESSAGE : 'Import failed or cancelled', abortSignal?.aborted ? 'info' : 'error');
+                addToast(abortSignal?.aborted ? t(MANUAL_IMPORT_CANCELLED_MESSAGE) : t('Import failed or cancelled'), abortSignal?.aborted ? 'info' : 'error');
             }
         } finally {
             if (importRunId) {
@@ -288,7 +296,7 @@ export const useImportOps = ({
                 mode,
                 folderCount: folders.length
             });
-            if (isManual) addToast('Import already in progress', 'info');
+            if (isManual) addToast(t('Import already in progress'), 'info');
             return;
         }
 
@@ -330,28 +338,28 @@ export const useImportOps = ({
             }
 
             if (result.wasCancelled) {
-                if (isManual) addToast(MANUAL_IMPORT_CANCELLED_MESSAGE, 'info');
+                if (isManual) addToast(t(MANUAL_IMPORT_CANCELLED_MESSAGE), 'info');
                 return result;
             }
 
             if (isManual) {
                 const failedFileCount = result.failedPaths.length > 0 ? result.failedPaths.length : result.stats.errors;
                 if (result.images.length > 0 && failedFileCount > 0) {
-                    addToast(`Imported ${result.images.length} items (${formatDetectedImageKindCounts(result.images)}) from ${folders.length} folder(s), but ${failedFileCount} file(s) failed`, 'warning');
+                    addToast(t('Imported {{length}} items ({{v1}}) from {{v2}} folder(s), but {{failedFileCount}} file(s) failed', { length: result.images.length, v1: formatDetectedImageKindCounts(result.images), v2: folders.length, failedFileCount: failedFileCount }), 'warning');
                 } else if (result.images.length > 0) {
-                    addToast(`Imported ${result.images.length} items (${formatDetectedImageKindCounts(result.images)}) from ${folders.length} folder(s)`, 'success');
+                    addToast(t('Imported {{length}} items ({{v1}}) from {{v2}} folder(s)', { length: result.images.length, v1: formatDetectedImageKindCounts(result.images), v2: folders.length }), 'success');
                 } else if (result.stats.skipped > 0) {
-                    addToast(`Scan complete. No new items found.`, 'info');
+                    addToast(t('Scan complete. No new items found.'), 'info');
                 } else if (result.stats.errors > 0) {
-                    addToast(`Scan complete with ${result.stats.errors} errors.`, 'warning');
+                    addToast(t('Scan complete with {{errors}} errors.', { errors: result.stats.errors }), 'warning');
                 } else {
-                    addToast('No supported media found in selected folders', 'info');
+                    addToast(t('No supported media found in selected folders'), 'info');
                 }
             }
             return result;
         } catch (error) {
             console.error('[ImportFolders] Error:', error);
-            if (isManual) addToast('Import failed', 'error');
+            if (isManual) addToast(t('Import failed'), 'error');
         } finally {
             finishImportRun(importRunId);
         }
@@ -364,7 +372,7 @@ export const useImportOps = ({
             abortController: abortCtrl
         });
         if (!importRunId) {
-            addToast('Import already in progress', 'info');
+            addToast(t('Import already in progress'), 'info');
             return;
         }
 
@@ -395,7 +403,7 @@ export const useImportOps = ({
             abortController: abortCtrl
         });
         if (!importRunId) {
-            addToast('Import already in progress', 'info');
+            addToast(t('Import already in progress'), 'info');
             return { newFiles: 0, totalScanned: 0 };
         }
 

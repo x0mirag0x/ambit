@@ -16,6 +16,8 @@ import {
     type TouchedFacetResources
 } from '../../../utils/touchedFacetTypes';
 import { formatHashResolutionMessage, isHashResolutionPartial } from '../utils/hashResolution';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../../i18n';
 
 const RESOURCE_TOUCH_KEYS = [
     'checkpoints',
@@ -82,15 +84,15 @@ const formatResourceScanToast = (result: ThumbnailScanResult, indexedRows: numbe
 const formatResourcePurgeToast = (result: ResourcePurgeResult): string => {
     const details: string[] = [];
     if (result.removedModels > 0) {
-        details.push(`${result.removedModels} local ${result.removedModels === 1 ? 'asset' : 'assets'} purged`);
+        details.push(i18n.t('resources.purgedAssets', { count: result.removedModels }));
     }
     if (result.preservedModels > 0) {
-        details.push(`${result.preservedModels} customized ${result.preservedModels === 1 ? 'asset' : 'assets'} preserved`);
+        details.push(i18n.t('resources.preservedAssets', { count: result.preservedModels }));
     }
 
     return details.length > 0
-        ? `Removed resource folder: ${details.join(', ')}`
-        : 'Removed resource folder; no indexed local assets needed cleanup';
+        ? i18n.t('resources.removedFolderDetails', { details: details.join(', ') })
+        : i18n.t('Removed resource folder; no indexed local assets needed cleanup');
 };
 
 const formatResourceIndexMessage = (resources: TouchedFacetResources): string => {
@@ -141,6 +143,7 @@ export const useResourcesTabLogic = ({
     settings,
     setSettings
 }: UseResourcesTabLogicProps) => {
+    const { t } = useTranslation();
     const { addToast } = useToast();
     const queryClient = useQueryClient();
     const [newResourcePath, setNewResourcePath] = React.useState('');
@@ -182,7 +185,7 @@ export const useResourcesTabLogic = ({
         const resources = resourcesForScanResult(scanResult);
         if (!hasTouchedFacetResources(resources)) {
             if (scanResult.found > 0) {
-                addToast('Resource scan found model files, but none could be classified for indexing', 'warning');
+                addToast(t('Resource scan found model files, but none could be classified for indexing'), 'warning');
             }
             useLibraryStore.getState().incrementFacetCacheVersion();
             return 0;
@@ -245,7 +248,7 @@ export const useResourcesTabLogic = ({
         const pathToAdd = normalizePath(newResourcePath.trim());
         const existing = (settings.resourceFolders || []).some(path => normalizePath(path) === pathToAdd);
         if (existing) {
-            addToast('Resource folder is already added', 'info');
+            addToast(t('Resource folder is already added'), 'info');
             setNewResourcePath('');
             return;
         }
@@ -256,12 +259,12 @@ export const useResourcesTabLogic = ({
             resourceFolders: nextResourceFolders
         }));
         setNewResourcePath('');
-        addToast('Added resource folder', 'success');
+        addToast(t('Added resource folder'), 'success');
         setIsScanningDiscovery(true);
         try {
             const { result, indexedRows } = await runResourceDiscoveryScan([pathToAdd]);
             await showResourceScanComplete(result, indexedRows);
-            addToast(formatResourceScanToast(result, indexedRows), 'success');
+            addToast(t(formatResourceScanToast(result, indexedRows)), 'success');
         } catch (e) {
             console.error('Resource scan failed', e);
             addToast(
@@ -307,10 +310,10 @@ export const useResourcesTabLogic = ({
                     configuredPath => normalizePath(configuredPath) !== normalizedPath
                 )
             }));
-            addToast(purgeResult ? formatResourcePurgeToast(purgeResult) : 'Removed resource folder', 'success');
+            addToast(purgeResult ? formatResourcePurgeToast(purgeResult) : t('Removed resource folder'), 'success');
         } catch (error) {
             console.error('Failed to remove resource folder', error);
-            addToast('Failed to remove resource folder', 'error');
+            addToast(t('Failed to remove resource folder'), 'error');
         } finally {
             removingResourcePathRef.current = null;
             setRemovingResourcePath(null);
@@ -331,7 +334,7 @@ export const useResourcesTabLogic = ({
         try {
             const { result, indexedRows } = await runResourceDiscoveryScan(settings.resourceFolders);
             await showResourceScanComplete(result, indexedRows);
-            addToast(formatResourceScanToast(result, indexedRows), 'success');
+            addToast(t(formatResourceScanToast(result, indexedRows)), 'success');
         } catch (e) {
             console.error('Resource scan failed', e);
             addToast(
@@ -353,7 +356,7 @@ export const useResourcesTabLogic = ({
 
     const requestResolveOnline = React.useCallback(() => {
         if (isHashResolutionBlocked) {
-            addToast('Wait for the current library task to finish before resolving hashes', 'warning');
+            addToast(t('Wait for the current library task to finish before resolving hashes'), 'warning');
             return;
         }
         setIsResolveConfirmOpen(true);
@@ -366,7 +369,7 @@ export const useResourcesTabLogic = ({
                 success: false,
                 message: 'Resolution paused: wait for the current sync, import, scan, or cache rebuild to finish, then run it again.'
             });
-            addToast('Hash resolution is paused while the library is busy', 'warning');
+            addToast(t('Hash resolution is paused while the library is busy'), 'warning');
             return;
         }
 
@@ -377,7 +380,7 @@ export const useResourcesTabLogic = ({
             message: 'Starting hash resolution...'
         });
         setResolutionResult(null);
-        addToast('Resolving unknown hashes...', 'info');
+        addToast(t('Resolving unknown hashes...'), 'info');
 
         try {
             const res = await unwrap(commands.resolveHashesOnline(false));
@@ -403,7 +406,7 @@ export const useResourcesTabLogic = ({
                 const refreshMessage = refreshError instanceof Error ? refreshError.message : String(refreshError);
                 console.error(refreshError);
                 message = `${message} UI refresh pending: ${refreshMessage}`;
-                addToast('Lookup finished, but the UI refresh needs another pass', 'warning');
+                addToast(t('Lookup finished, but the UI refresh needs another pass'), 'warning');
             }
 
             setResolutionResult({
@@ -413,19 +416,19 @@ export const useResourcesTabLogic = ({
 
             if (!refreshFailed) {
                 if (isPartial) {
-                    addToast(`Lookup finished with ${res.failedCount} failed and ${res.unknownCount} unknown`, 'warning');
+                    addToast(t('Lookup finished with {{failedCount}} failed and {{unknownCount}} unknown', { failedCount: res.failedCount, unknownCount: res.unknownCount }), 'warning');
                 } else {
-                    addToast(`Lookup finished: ${res.resolvedCount} verified online`, 'success');
+                    addToast(t('Lookup finished: {{resolvedCount}} verified online', { resolvedCount: res.resolvedCount }), 'success');
                 }
             }
         } catch (e: unknown) {
             const errorMessage = e instanceof Error ? e.message : String(e);
             if (errorMessage.toLowerCase().includes('cancelled')) {
-                addToast('Resolution cancelled', 'info');
+                addToast(t('Resolution cancelled'), 'info');
             } else {
                 console.error(e);
                 setResolutionResult({ success: false, message: `Lookup failed: ${errorMessage}` });
-                addToast('Lookup failed', 'error');
+                addToast(t('Lookup failed'), 'error');
             }
         } finally {
             setIsResolving(false);

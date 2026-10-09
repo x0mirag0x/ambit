@@ -5,6 +5,7 @@ import { AIImage } from '../../../types';
 import { VirtualGrid } from '../../library/components/VirtualGrid';
 import { MaintenanceItem } from './MaintenanceItem';
 import { MaintenanceHeader } from './MaintenanceHeader';
+import { useTranslation } from 'react-i18next';
 
 interface IntermediatesTabProps {
     images: AIImage[];
@@ -39,6 +40,7 @@ export const IntermediatesTab: React.FC<IntermediatesTabProps> = ({
     scope,
     onScopeChange
 }) => {
+    const { t } = useTranslation();
     const renderItem = useCallback((img: AIImage, style: React.CSSProperties, index: number) => {
         const isSelected = selectedIds.has(img.id);
 
@@ -50,8 +52,7 @@ export const IntermediatesTab: React.FC<IntermediatesTabProps> = ({
                 }}
                 className="px-4 py-2 bg-white/90 dark:bg-zinc-900/90 text-gray-900 dark:text-white rounded-full text-xs font-bold shadow-xl transform scale-90 hover:scale-100 transition-all flex items-center gap-2 hover:bg-white dark:hover:bg-zinc-800"
             >
-                <Eye className="w-4 h-4" /> View Image
-            </button>
+                <Eye className="w-4 h-4" /> {t('View Image')}</button>
         );
 
         return (
@@ -67,8 +68,7 @@ export const IntermediatesTab: React.FC<IntermediatesTabProps> = ({
                 {!isSelected && (
                     <div className="absolute inset-x-0 bottom-6 flex justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
                         <span className="flex items-center gap-1 rounded bg-gray-900/80 px-2 py-1 text-[10px] font-bold text-white shadow-lg backdrop-blur-md">
-                            <Layers className="w-3 h-3" /> Intermediate
-                        </span>
+                            <Layers className="w-3 h-3" /> {t('Intermediate')}</span>
                     </div>
                 )}
             </MaintenanceItem>
@@ -81,19 +81,18 @@ export const IntermediatesTab: React.FC<IntermediatesTabProps> = ({
                 <div className="mb-6 rounded-full border border-harbor-200 bg-harbor-50 p-6 shadow-inner dark:border-harbor-500/20 dark:bg-harbor-500/10">
                     <Layers className="h-16 w-16 text-harbor-600 dark:text-harbor-300" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">No Intermediate Images</h2>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">{t('No Intermediate Images')}</h2>
                 <p className="max-w-md text-center text-gray-500 dark:text-gray-400 text-sm">
                     {scope === 'global'
-                        ? "Your library is clean! No images are currently flagged as intermediates."
-                        : "There are no intermediate images in the current filtered view."}
+                        ? t('Your library is clean! No images are currently flagged as intermediates.')
+                        : t('There are no intermediate images in the current filtered view.')}
                 </p>
                 {scope === 'filtered' && (
                     <button
                         onClick={() => onScopeChange('global')}
                         className="mt-6 rounded-full bg-sage-600 px-6 py-2 text-xs font-black uppercase tracking-widest text-white transition-colors hover:bg-sage-500"
                     >
-                        Switch to Global Scan
-                    </button>
+                        {t('Switch to Global Scan')}</button>
                 )}
             </div>
         );
@@ -107,21 +106,18 @@ export const IntermediatesTab: React.FC<IntermediatesTabProps> = ({
                         onClick={onUnmarkSelected}
                         className="flex items-center gap-2 rounded-xl bg-sage-600 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-sage-500"
                     >
-                        <CheckCircle className="w-4 h-4" /> Move to Gallery
-                        <span className="px-1.5 py-0.5 bg-white/20 rounded-md text-[9px] font-black">{selectedIds.size}</span>
+                        <CheckCircle className="w-4 h-4" /> {t('Move to Gallery')}<span className="px-1.5 py-0.5 bg-white/20 rounded-md text-[9px] font-black">{selectedIds.size}</span>
                     </button>
                     <div className="w-px h-6 bg-gray-200 dark:bg-white/10 mx-1" />
                     <button
                         onClick={onDeleteSelected}
                         className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-lg shadow-red-500/20"
                     >
-                        <Trash2 className="w-4 h-4" /> Delete
-                    </button>
+                        <Trash2 className="w-4 h-4" /> {t('Delete')}</button>
                 </>
             ) : (
                 <div className="px-4 py-2 text-gray-400 text-xs font-bold italic tracking-tight">
-                    Select images to process
-                </div>
+                    {t('Select images to process')}</div>
             )}
         </div>
     );
@@ -132,22 +128,20 @@ export const IntermediatesTab: React.FC<IntermediatesTabProps> = ({
                 onClick={() => onScopeChange('filtered')}
                 className={`flex items-center gap-2 rounded-xl px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-colors ${scope === 'filtered' ? 'bg-sage-600 text-white' : 'text-gray-400 hover:text-gray-600'}`}
             >
-                <Filter className="w-3 h-3" /> Filtered
-            </button>
+                <Filter className="w-3 h-3" /> {t('Filtered')}</button>
             <button
                 onClick={() => onScopeChange('global')}
                 className={`flex items-center gap-2 rounded-xl px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-colors ${scope === 'global' ? 'bg-sage-600 text-white' : 'text-gray-400 hover:text-gray-600'}`}
             >
-                <Globe className="w-3 h-3" /> Global
-            </button>
+                <Globe className="w-3 h-3" /> {t('Global')}</button>
         </div>
     );
 
     return (
         <div className="w-full pb-32 animate-in slide-in-from-bottom-4 flex flex-col items-stretch">
             <MaintenanceHeader
-                title="Intermediate Images"
-                description={`Found ${images.length} images flagged as intermediates (no InvokeAI metadata).`}
+                title={t('Intermediate Images')}
+                description={t('Found {{length}} images flagged as intermediates (no InvokeAI metadata).', { length: images.length })}
                 icon={<Layers className="w-6 h-6" />}
                 count={images.length}
                 onSelectAll={onSelectAll}

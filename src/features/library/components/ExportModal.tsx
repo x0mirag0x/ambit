@@ -2,6 +2,7 @@ import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { X, Share, Archive, FolderOpen, CheckCircle2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ExportModalProps {
     isOpen: boolean;
@@ -18,6 +19,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     onConfirm,
     isExporting
 }) => {
+    const { t } = useTranslation();
     const [filename, setFilename] = useState(`ambit_export_${new Date().toISOString().slice(0, 10)}`);
     const [folder, setFolder] = useState<string | null>(null);
     const closeButtonRef = React.useRef<HTMLButtonElement>(null);
@@ -73,22 +75,21 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                                 <div className="p-4 rounded-2xl bg-sage-50 dark:bg-sage-500/10 text-sage-600 dark:text-sage-400 mb-6 shadow-xl">
                                     <Archive className="w-8 h-8" />
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 tracking-tight">Export Selection</h3>
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 tracking-tight">{t('Export Selection')}</h3>
                                 <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
-                                    Export <strong>{count}</strong> items and metadata into a single ZIP archive.
-                                </p>
+                                    {t('Export')} <strong>{count}</strong> {t('items and metadata into a single ZIP archive.')}</p>
                             </div>
 
                             <div className="space-y-6">
                                 {/* Filename Input */}
                                 <div>
-                                    <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1">Archive Name</label>
+                                    <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1">{t('Archive Name')}</label>
                                     <div className="relative group">
                                         <input
                                             type="text"
                                             value={filename}
                                             onChange={(e) => setFilename(e.target.value)}
-                                            placeholder="Enter filename..."
+                                            placeholder={t('Enter filename...')}
                                             className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/5 rounded-2xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:ring-2 ring-sage-500/20 focus:border-sage-500/50 outline-none transition-all"
                                             disabled={isExporting}
                                         />
@@ -98,7 +99,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
                                 {/* Folder Picker */}
                                 <div>
-                                    <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1">Destination</label>
+                                    <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1">{t('Destination')}</label>
                                     <button
                                         onClick={handlePickFolder}
                                         disabled={isExporting}
@@ -109,7 +110,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                                     >
                                         <FolderOpen className={`w-4 h-4 shrink-0 ${folder ? 'text-sage-500' : 'text-gray-400'}`} />
                                         <span className="text-xs truncate flex-1">
-                                            {folder || "Choose destination folder..."}
+                                            {folder || t('Choose destination folder...')}
                                         </span>
                                         {folder && <CheckCircle2 className="w-3.5 h-3.5 text-sage-500 shrink-0" />}
                                     </button>
@@ -127,15 +128,14 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                                             <Share className="w-4 h-4" />
                                         </motion.div>
                                     ) : <Share className="w-4 h-4" />}
-                                    {isExporting ? 'Exporting...' : 'Begin Export'}
+                                    {isExporting ? t('Exporting...') : t('Begin Export')}
                                 </button>
                                 <button
                                     onClick={onClose}
                                     disabled={isExporting}
                                     className="w-full py-3 px-6 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors rounded-2xl"
                                 >
-                                    Cancel
-                                </button>
+                                    {t('Cancel')}</button>
                             </div>
                         </div>
 
@@ -144,7 +144,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                             <button
                                 ref={closeButtonRef}
                                 type="button"
-                                aria-label="Close Export"
+                                aria-label={t('Close Export')}
                                 onClick={onClose}
                                 className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-all"
                             >

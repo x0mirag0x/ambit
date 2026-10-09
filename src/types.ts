@@ -417,6 +417,8 @@ export interface InvokeOwnerDiscovery {
 export interface AppSettings {
   hasCompletedOnboarding: boolean;
   theme: 'dark' | 'light';
+  /** Persisted UI language. When omitted, Ambit follows the system language if it is Russian and English otherwise. */
+  uiLanguage?: 'en' | 'ru';
   thumbnailSize: number;
   autoCheckForUpdates?: boolean;
   confirmDelete: boolean;

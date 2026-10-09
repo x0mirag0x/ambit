@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ArrowRight, Layers, CheckCircle2, Maximize, Check, X, Hash } from 'lucide-react';
 import { AIImage } from '../../../types';
 import { StackGroup as IStackGroup } from '../../../hooks/useStacking';
+import { useTranslation } from 'react-i18next';
 
 interface StackGroupProps {
     group: IStackGroup;
@@ -10,6 +11,7 @@ interface StackGroupProps {
 }
 
 export const StackGroup: React.FC<StackGroupProps> = ({ group, onConfirm }) => {
+    const { t } = useTranslation();
     const { baseImage, relatedImages } = group;
     // We combine all initially detected images
     const allImages = [baseImage, ...relatedImages];
@@ -52,10 +54,10 @@ export const StackGroup: React.FC<StackGroupProps> = ({ group, onConfirm }) => {
                     </div>
                     <div>
                         <div className="text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
-                            {group.reason || 'Workflow Detected'}
+                            {group.reason || t('Workflow Detected')}
                         </div>
                         <div className="text-[10px] text-gray-400">
-                            {allImages.length} candidates found • {new Date(baseImage.timestamp).toLocaleTimeString()}
+                            {allImages.length} {t('candidates found •')} {new Date(baseImage.timestamp).toLocaleTimeString()}
                         </div>
                     </div>
                 </div>
@@ -65,7 +67,7 @@ export const StackGroup: React.FC<StackGroupProps> = ({ group, onConfirm }) => {
                     className="flex items-center gap-2 px-3 py-1.5 bg-sage-600 hover:bg-sage-500 disabled:bg-gray-300 disabled:dark:bg-zinc-800 disabled:text-gray-500 text-white rounded-lg text-xs font-bold shadow-sm transition-colors"
                 >
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    Group ({selectedCount})
+                    {t('Group (')}{selectedCount})
                 </button>
             </div>
 
@@ -108,13 +110,12 @@ export const StackGroup: React.FC<StackGroupProps> = ({ group, onConfirm }) => {
                                 {/* Upscale Badge */}
                                 {isUpscale && isSelected && (
                                     <div className="absolute -top-2 -right-2 bg-sage-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-sm flex items-center gap-1 z-10">
-                                        <Maximize className="w-2 h-2" /> Upscale
-                                    </div>
+                                        <Maximize className="w-2 h-2" /> {t('Upscale')}</div>
                                 )}
 
                                 <div className="mt-1.5 text-center">
                                     <div className={`text-[10px] font-bold rounded px-1.5 py-0.5 inline-block ${isSelected ? 'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-white/5' : 'text-gray-400 bg-transparent'}`}>
-                                        {idx === 0 ? 'Base' : `Pass ${idx + 1}`}
+                                        {idx === 0 ? t('Base') : t('Pass {{v0}}', { v0: idx + 1 })}
                                     </div>
                                 </div>
                             </div>

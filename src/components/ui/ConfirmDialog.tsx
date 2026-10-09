@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, Trash2, X, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -25,6 +26,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   zIndex = 60,
   isLoading = false
 }) => {
+  const { t } = useTranslation();
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
   const dialogRef = React.useRef<HTMLDivElement>(null);
   const titleId = React.useId();
@@ -137,7 +139,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                 <button
                   onClick={() => { void onConfirm(); }}
                   disabled={isLoading}
-                  aria-label={isLoading ? 'Processing...' : undefined}
+                  aria-label={isLoading ? t('Processing...') : undefined}
                   className={`w-full py-3.5 px-6 text-sm font-bold text-white rounded-2xl shadow-lg transition-all active:scale-[0.98] ${isDangerous
                     ? 'bg-gradient-to-br from-red-500 to-red-600 hover:shadow-red-500/40'
                     : 'bg-gradient-to-br from-sage-500 to-sage-600 hover:shadow-sage-500/40'
@@ -146,8 +148,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                   {isLoading ? (
                     <span className="flex items-center justify-center gap-2">
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      Processing...
-                    </span>
+                      {t('Processing...')}</span>
                   ) : confirmLabel}
                 </button>
                 <button
@@ -155,8 +156,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                   disabled={isLoading}
                   className={`w-full py-3 px-6 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors rounded-2xl flex items-center justify-center gap-2 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  Cancel
-                </button>
+                  {t('Cancel')}</button>
               </div>
             </div>
 
@@ -164,7 +164,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             <button
               ref={closeButtonRef}
               type="button"
-              aria-label="Close Dialog"
+              aria-label={t('Close Dialog')}
               onClick={onCancel}
               disabled={isLoading}
               className={`absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-all ${isLoading ? 'opacity-0 pointer-events-none' : ''}`}

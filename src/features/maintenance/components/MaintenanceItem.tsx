@@ -4,6 +4,7 @@ import { EyeOff, Eye, CheckSquare, Video } from 'lucide-react';
 import { AIImage, isVideoAsset } from '../../../types';
 import { isImageMasked } from '../../../utils/maskingUtils';
 import { useSettingsStore } from '../../../stores/settingsStore';
+import { useTranslation } from 'react-i18next';
 
 interface MaintenanceItemProps {
     img: AIImage;
@@ -30,6 +31,7 @@ export const MaintenanceItem: React.FC<MaintenanceItemProps> = ({
     overlayActions,
     isMissing = false
 }) => {
+    const { t } = useTranslation();
     const privacyEnabled = useSettingsStore(s => s.privacyEnabled);
     const [isRevealed, setRevealed] = useState(false);
     const effectiveMasked = isImageMasked(img, privacyEnabled, maskedKeywords);
@@ -61,7 +63,7 @@ export const MaintenanceItem: React.FC<MaintenanceItemProps> = ({
 
                     {isMissing && (
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-red-900/10 pointer-events-none">
-                            <span className="bg-red-600 text-white text-[9px] font-bold uppercase px-2 py-0.5 rounded shadow-lg">Missing Source</span>
+                            <span className="bg-red-600 text-white text-[9px] font-bold uppercase px-2 py-0.5 rounded shadow-lg">{t('Missing Source')}</span>
                         </div>
                     )}
 
@@ -76,8 +78,7 @@ export const MaintenanceItem: React.FC<MaintenanceItemProps> = ({
                                 }}
                                 className="px-3 py-1 bg-black/50 hover:bg-black/70 text-white text-[10px] font-bold uppercase tracking-wider rounded-full backdrop-blur-md transition-colors flex items-center gap-1"
                             >
-                                <Eye className="w-3 h-3" /> Reveal
-                            </button>
+                                <Eye className="w-3 h-3" /> {t('Reveal')}</button>
                         </div>
                     )}
 

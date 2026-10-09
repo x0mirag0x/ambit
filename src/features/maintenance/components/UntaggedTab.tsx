@@ -5,6 +5,7 @@ import { AIImage } from '../../../types';
 import { VirtualGrid } from '../../library/components/VirtualGrid';
 import { MaintenanceItem } from './MaintenanceItem';
 import { MaintenanceHeader } from './MaintenanceHeader';
+import { useTranslation } from 'react-i18next';
 
 interface UntaggedTabProps {
     images: AIImage[];
@@ -37,6 +38,7 @@ export const UntaggedTab: React.FC<UntaggedTabProps> = ({
     untaggedScope,
     onScopeChange
 }) => {
+    const { t } = useTranslation();
     const renderItem = useCallback((img: AIImage, style: React.CSSProperties, index: number) => {
         const isSelected = selectedIds.has(img.id);
 
@@ -48,8 +50,7 @@ export const UntaggedTab: React.FC<UntaggedTabProps> = ({
                 }}
                 className="px-4 py-2 bg-white/90 dark:bg-zinc-900/90 text-gray-900 dark:text-white rounded-full text-xs font-bold shadow-xl transform scale-90 hover:scale-100 transition-all flex items-center gap-2 hover:bg-white dark:hover:bg-zinc-800"
             >
-                <Eye className="w-4 h-4" /> View Image
-            </button>
+                <Eye className="w-4 h-4" /> {t('View Image')}</button>
         );
 
         return (
@@ -66,8 +67,7 @@ export const UntaggedTab: React.FC<UntaggedTabProps> = ({
                 {!isSelected && (
                     <div className="absolute inset-x-0 bottom-6 flex justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
                         <span className="bg-black/60 text-white text-[10px] px-2 py-1 rounded backdrop-blur-md font-bold flex items-center gap-1">
-                            <Wand2 className="w-3 h-3" /> Recover
-                        </span>
+                            <Wand2 className="w-3 h-3" /> {t('Recover')}</span>
                     </div>
                 )}
             </MaintenanceItem>
@@ -80,15 +80,14 @@ export const UntaggedTab: React.FC<UntaggedTabProps> = ({
                 <div className="mb-6 rounded-full border border-ember-200 bg-ember-50 p-6 dark:border-ember-500/20 dark:bg-ember-500/10">
                     <Tag className="h-16 w-16 text-ember-600 dark:text-ember-300" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">No Untagged Images</h2>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">{t('No Untagged Images')}</h2>
                 <p className="max-w-md text-center text-gray-500 dark:text-gray-400">
-                    All your images {untaggedScope === 'filtered' ? 'in this filter' : ''} appear to have metadata or positive prompts.
-                </p>
+                    {t('All your images')} {untaggedScope === 'filtered' ? t('in this filter') : ''} {t('appear to have metadata or positive prompts.')}</p>
                 <button
                     onClick={() => onScopeChange(untaggedScope === 'global' ? 'filtered' : 'global')}
                     className="mt-6 text-xs font-bold text-ember-600 hover:underline dark:text-ember-300"
                 >
-                    Switch to {untaggedScope === 'global' ? 'Filtered' : 'Global'} scope
+                    {t('Switch to')} {untaggedScope === 'global' ? t('Filtered') : t('Global')} scope
                 </button>
             </div>
         );
@@ -101,13 +100,11 @@ export const UntaggedTab: React.FC<UntaggedTabProps> = ({
                     onClick={onRemoveFromLibrary}
                     className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2"
                 >
-                    <Trash2 className="w-4 h-4" /> Remove from Library
-                    <span className="px-1.5 py-0.5 bg-white/20 rounded-md text-[9px]">{selectedIds.size}</span>
+                    <Trash2 className="w-4 h-4" /> {t('Remove from Library')}<span className="px-1.5 py-0.5 bg-white/20 rounded-md text-[9px]">{selectedIds.size}</span>
                 </button>
             ) : (
                 <div className="px-4 py-2 text-gray-400 text-xs font-medium italic">
-                    Select images to remove from Ambit while keeping the source files
-                </div>
+                    {t('Select images to remove from Ambit while keeping the source files')}</div>
             )}
         </div>
     );
@@ -118,22 +115,20 @@ export const UntaggedTab: React.FC<UntaggedTabProps> = ({
                 onClick={() => onScopeChange('filtered')}
                 className={`flex items-center gap-2 rounded-xl px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-colors ${untaggedScope === 'filtered' ? 'bg-sage-600 text-white' : 'text-gray-400 hover:text-gray-600'}`}
             >
-                <Filter className="w-3 h-3" /> Filtered
-            </button>
+                <Filter className="w-3 h-3" /> {t('Filtered')}</button>
             <button
                 onClick={() => onScopeChange('global')}
                 className={`flex items-center gap-2 rounded-xl px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-colors ${untaggedScope === 'global' ? 'bg-sage-600 text-white' : 'text-gray-400 hover:text-gray-600'}`}
             >
-                <Globe className="w-3 h-3" /> Global
-            </button>
+                <Globe className="w-3 h-3" /> {t('Global')}</button>
         </div>
     );
 
     return (
         <div className="w-full pb-32 animate-in slide-in-from-bottom-4 flex flex-col items-stretch">
             <MaintenanceHeader
-                title="Untagged Images"
-                description={`Found ${images.length} images without descriptive metadata.`}
+                title={t('Untagged Images')}
+                description={t('Found {{length}} images without descriptive metadata.', { length: images.length })}
                 icon={<Tag className="w-6 h-6" />}
                 count={images.length}
                 onSelectAll={onSelectAll}

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { TooltipButton } from './InfoTooltip';
 import type { SourceKind } from '../../types';
+import { useTranslation } from 'react-i18next';
 
 interface ContextMenuProps {
   x: number;
@@ -79,6 +80,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   sourceKindOverride,
   onSetImageKind,
 }) => {
+  const { t } = useTranslation();
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close on click outside
@@ -122,44 +124,44 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
           <ActionButton
             icon={<Heart className={`w-4 h-4 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />}
             onClick={() => onToggleFavorite?.()}
-            label={isFavorite ? "Unfavorite" : "Favorite"}
+            label={isFavorite ? t('Unfavorite') : t('Favorite')}
             pressed={Boolean(isFavorite)}
           />
           <ActionButton
             icon={<Pin className={`w-4 h-4 ${isPinned ? 'fill-sage-400 text-white' : 'text-gray-400'}`} />}
             onClick={onTogglePin}
-            label={isPinned ? "Unpin" : "Pin to Top"}
+            label={isPinned ? t('Unpin') : t('Pin to Top')}
             pressed={Boolean(isPinned)}
           />
           <ActionButton
             icon={<Folder className="w-4 h-4 text-gray-400" />}
             onClick={onShowInFolder}
-            label="Show in Folder"
+            label={t('Show in Folder')}
           />
         </div>
         <ActionButton
           icon={<Trash2 className="w-4 h-4 text-gray-400" />}
           onClick={onDelete}
-          label="Remove from Library"
+          label={t('Remove from Library')}
           className="hover:!bg-red-500/20 hover:!text-red-400"
         />
       </div>
 
       {/* Main Menu Groups */}
-      <SubMenu label="Copy Data" icon={<Share2 className="w-4 h-4 text-gray-400" />} side={side}>
-        {onCopyPrompt && <MenuItem icon={<Copy className="w-4 h-4 text-gray-400" />} label="Copy Prompt" onClick={onCopyPrompt} />}
-        {onCopySeed && <MenuItem icon={<Copy className="w-4 h-4 text-gray-400" />} label="Copy Seed" onClick={onCopySeed} />}
-        {onCopyGenerationInfo && <MenuItem icon={<Copy className="w-4 h-4 text-gray-400" />} label="Copy All Info" onClick={onCopyGenerationInfo} />}
+      <SubMenu label={t('Copy Data')} icon={<Share2 className="w-4 h-4 text-gray-400" />} side={side}>
+        {onCopyPrompt && <MenuItem icon={<Copy className="w-4 h-4 text-gray-400" />} label={t('Copy Prompt')} onClick={onCopyPrompt} />}
+        {onCopySeed && <MenuItem icon={<Copy className="w-4 h-4 text-gray-400" />} label={t('Copy Seed')} onClick={onCopySeed} />}
+        {onCopyGenerationInfo && <MenuItem icon={<Copy className="w-4 h-4 text-gray-400" />} label={t('Copy All Info')} onClick={onCopyGenerationInfo} />}
         <div className="h-px bg-white/5 my-1" />
-        {onCopyImage && <MenuItem icon={<ImageIcon className="w-4 h-4 text-gray-400" />} label="Copy Image" onClick={onCopyImage} />}
-        {onCopyFilePath && <MenuItem icon={<Copy className="w-4 h-4 text-gray-500" />} label="Copy File Path" onClick={onCopyFilePath} />}
+        {onCopyImage && <MenuItem icon={<ImageIcon className="w-4 h-4 text-gray-400" />} label={t('Copy Image')} onClick={onCopyImage} />}
+        {onCopyFilePath && <MenuItem icon={<Copy className="w-4 h-4 text-gray-500" />} label={t('Copy File Path')} onClick={onCopyFilePath} />}
       </SubMenu>
 
       {onSetImageKind && detectedSourceKind && (
-        <SubMenu label="Image Kind" icon={<ImageIcon className="w-4 h-4 text-gray-400" />} side={side}>
+        <SubMenu label={t('Image Kind')} icon={<ImageIcon className="w-4 h-4 text-gray-400" />} side={side}>
           <MenuItem
             icon={<Check className={`w-4 h-4 ${sourceKindOverride === undefined ? 'opacity-100' : 'opacity-0'}`} />}
-            label={`Automatic (${detectedSourceKind === 'photograph' ? 'Photo' : detectedSourceKind === 'generated' ? 'Generated' : 'Other'})`}
+            label={t('Automatic ({{kind}})', { kind: t(detectedSourceKind === 'photograph' ? 'Photo' : detectedSourceKind === 'generated' ? 'Generated' : 'Other') })}
             onClick={() => onSetImageKind(null)}
             checked={sourceKindOverride === undefined}
           />
@@ -167,7 +169,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
             <MenuItem
               key={kind}
               icon={<Check className={`w-4 h-4 ${sourceKindOverride === kind ? 'opacity-100' : 'opacity-0'}`} />}
-              label={kind === 'photograph' ? 'Photo' : kind === 'generated' ? 'Generated' : 'Other'}
+              label={kind === 'photograph' ? t('Photo') : kind === 'generated' ? t('Generated') : t('Other')}
               onClick={() => onSetImageKind(kind)}
               checked={sourceKindOverride === kind}
             />
@@ -175,15 +177,15 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
         </SubMenu>
       )}
 
-      <SubMenu label="Organize" icon={<Layout className="w-4 h-4 text-gray-400" />} side={side}>
-        <MenuItem icon={<FolderPlus className="w-4 h-4 text-gray-400" />} label="Add to Collection..." onClick={onAddToCollection} />
+      <SubMenu label={t('Organize')} icon={<Layout className="w-4 h-4 text-gray-400" />} side={side}>
+        <MenuItem icon={<FolderPlus className="w-4 h-4 text-gray-400" />} label={t('Add to Collection...')} onClick={onAddToCollection} />
         {onMoveToCollection && (
-          <MenuItem icon={<Layout className="w-4 h-4 text-gray-400" />} label="Move to Collection..." onClick={onMoveToCollection} />
+          <MenuItem icon={<Layout className="w-4 h-4 text-gray-400" />} label={t('Move to Collection...')} onClick={onMoveToCollection} />
         )}
         {activeCollectionName && onRemoveFromCollection && (
           <MenuItem
             icon={<FolderMinus className="w-4 h-4 text-gray-400" />}
-            label="Remove from Collection"
+            label={t('Remove from Collection')}
             onClick={onRemoveFromCollection}
             className="hover:!bg-red-500/10 hover:!text-red-200"
           />
@@ -191,17 +193,17 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
         <div className="h-px bg-white/5 my-1" />
         {/* Collection Thumbnail */}
         {onSetThumbnail && (
-          <MenuItem icon={<ImageIcon className="w-4 h-4 text-gray-400" />} label="Set as Collection Thumb" onClick={onSetThumbnail} />
+          <MenuItem icon={<ImageIcon className="w-4 h-4 text-gray-400" />} label={t('Set as Collection Thumb')} onClick={onSetThumbnail} />
         )}
         {onUnsetThumbnail && (
-          <MenuItem icon={<ImageOff className="w-4 h-4 text-gray-500" />} label="Reset Collection Thumb" onClick={onUnsetThumbnail} />
+          <MenuItem icon={<ImageOff className="w-4 h-4 text-gray-500" />} label={t('Reset Collection Thumb')} onClick={onUnsetThumbnail} />
         )}
 
         {/* Model Thumbnails */}
         {modelsForThumbnail && modelsForThumbnail.length > 0 && onSetModelThumbnail && (
           <>
             <div className="h-px bg-white/5 my-1" />
-            <div className="px-2 py-1 text-[10px] uppercase font-bold text-gray-500">Set Model Thumbnail</div>
+            <div className="px-2 py-1 text-[10px] uppercase font-bold text-gray-500">{t('Set Model Thumbnail')}</div>
             {modelsForThumbnail.map((m, i) => (
               <MenuItem
                 key={i}
@@ -214,21 +216,21 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
         )}
       </SubMenu>
 
-      <SubMenu label="Privacy & AI" icon={<Shield className="w-4 h-4 text-gray-400" />} side={side}>
+      <SubMenu label={t('Privacy & AI')} icon={<Shield className="w-4 h-4 text-gray-400" />} side={side}>
         {onToggleMask && (
           <>
             {userMasked !== undefined && (
               <MenuItem
                 icon={<MinusCircle className="w-4 h-4 text-gray-400" />}
-                label="Reset Mask to Auto"
+                label={t('Reset Mask to Auto')}
                 onClick={() => onToggleMask(null)}
               />
             )}
             {!isMasked && (
-              <MenuItem icon={<EyeOff className="w-4 h-4 text-gray-400" />} label="Mask Content" onClick={() => onToggleMask(true)} />
+              <MenuItem icon={<EyeOff className="w-4 h-4 text-gray-400" />} label={t('Mask Content')} onClick={() => onToggleMask(true)} />
             )}
             {isMasked && (
-              <MenuItem icon={<Eye className="w-4 h-4 text-gray-400" />} label="Unmask Content" onClick={() => onToggleMask(false)} />
+              <MenuItem icon={<Eye className="w-4 h-4 text-gray-400" />} label={t('Unmask Content')} onClick={() => onToggleMask(false)} />
             )}
           </>
         )}
@@ -237,7 +239,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
             <div className="h-px bg-white/5 my-1" />
             <MenuItem
               icon={<ImageOff className={`w-4 h-4 ${isIntermediate ? 'text-gray-400' : 'text-gray-400'}`} />}
-              label={isIntermediate ? "Unmark as Intermediate" : "Mark as Intermediate"}
+              label={isIntermediate ? t('Unmark as Intermediate') : t('Mark as Intermediate')}
               onClick={onToggleIntermediate}
             />
           </>
@@ -247,7 +249,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
             <div className="h-px bg-white/5 my-1" />
             <MenuItem
               icon={<Wand2 className="w-4 h-4 text-gray-400" />}
-              label="Recover Metadata (AI)"
+              label={t('Recover Metadata (AI)')}
               onClick={onRecoverMetadata}
               className="text-gray-400"
             />
@@ -261,7 +263,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
         onOpenInDefaultApp && (
           <MenuItem
             icon={<ExternalLink className="w-4 h-4 text-gray-400" />}
-            label="Open in Default App"
+            label={t('Open in Default App')}
             onClick={onOpenInDefaultApp}
           />
         )

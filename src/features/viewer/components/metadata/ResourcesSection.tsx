@@ -3,6 +3,7 @@ import { Boxes, type LucideIcon } from 'lucide-react';
 import { MetadataDisclosureSection } from './MetadataDisclosureSection';
 import { MetadataSourceBadge } from './MetadataSourceBadge';
 import { buildResourceSearchTerm, ResourceChips, type ResourceFilterKind } from './ResourceChips';
+import { useTranslation } from 'react-i18next';
 
 export interface MetadataResourceGroup {
     title: string;
@@ -27,6 +28,7 @@ export const ResourcesSection: React.FC<ResourcesSectionProps> = ({
     expanded,
     onExpandedChange,
 }) => {
+    const { t } = useTranslation();
     const visibleGroups = groups.filter(group => Array.isArray(group.items) && group.items.length > 0);
     const totalCount = visibleGroups.reduce((total, group) => total + (group.items?.length ?? 0), 0);
 
@@ -34,7 +36,7 @@ export const ResourcesSection: React.FC<ResourcesSectionProps> = ({
 
     return (
         <MetadataDisclosureSection
-            title="Resources"
+            title={t('Resources')}
             icon={Boxes}
             count={totalCount}
             expanded={expanded}
@@ -45,11 +47,11 @@ export const ResourcesSection: React.FC<ResourcesSectionProps> = ({
                 const Icon = group.icon;
                 const items = group.items ?? [];
                 return (
-                    <section key={group.title} aria-label={group.title} className="space-y-2">
+                    <section key={group.title} aria-label={t(group.title)} className="space-y-2">
                         <div className="flex items-center justify-between gap-2">
                             <h4 className="flex min-w-0 items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-500">
                                 <Icon aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />
-                                <span className="truncate">{group.title}</span>
+                                <span className="truncate">{t(group.title)}</span>
                                 <span aria-hidden="true" className="text-[10px] font-medium text-gray-400 dark:text-zinc-600">{items.length}</span>
                             </h4>
                             {group.source ? <MetadataSourceBadge source={group.source} /> : null}

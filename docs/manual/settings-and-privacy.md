@@ -8,7 +8,7 @@ Settings controls Ambit's app preferences, integrations, privacy behavior, optio
 
 The Settings window contains:
 
-- General: app-level preferences.
+- General: app-level preferences, including theme and interface language.
 - Connections: folders, Resources, InvokeAI, SD WebUI, and ComfyUI setup.
 - Intelligence: optional AI features and model/prompt configuration.
 - Privacy: content masking behavior and masked keywords.
@@ -16,6 +16,10 @@ The Settings window contains:
 - Dev Tools: development-only tools when enabled.
 
 For image generator setup details, see [Generator Integrations](generator-integrations.md). For model and resource folder setup, see [Assets And Resource Discovery](assets-resource-discovery.md).
+
+## Language
+
+General includes a language choice for the interface. Ambit ships with English and Russian. On a first launch, Ambit uses Russian when the system language is Russian and English otherwise. The choice is saved with the rest of your settings and kept for later launches. The product name Ambit stays as Ambit, and the rest of the interface follows the selected language.
 
 ## Local-First Behavior
 

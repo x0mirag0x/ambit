@@ -11,6 +11,7 @@ import { useSettingsStore } from '../../../stores/settingsStore';
 import { InfoTooltip } from '../../../components/ui/InfoTooltip';
 import { cleanupOrphanThumbnails, pruneBrokenThumbnails, syncExistingThumbnailsToDB } from '../../../services/thumbnailService';
 import { areDeveloperFeaturesEnabled } from '../../../utils/settingsUtils';
+import { useTranslation } from 'react-i18next';
 
 interface ThumbnailsTabProps {
     images: AIImage[];
@@ -49,6 +50,7 @@ export const ThumbnailsTab: React.FC<ThumbnailsTabProps> = ({
     onIncludeUpgradeableChange,
     onRepairComplete
 }) => {
+    const { t } = useTranslation();
     const developerFeaturesEnabled = useSettingsStore(s => areDeveloperFeaturesEnabled(s.settings));
 
     const renderItem = useCallback((img: AIImage, style: React.CSSProperties, index: number) => {
@@ -95,12 +97,12 @@ export const ThumbnailsTab: React.FC<ThumbnailsTabProps> = ({
         try {
             const count = await cleanupOrphanThumbnails();
             if (count > 0) {
-                addToast(`Cleaned up ${count} orphan thumbnail${count === 1 ? '' : 's'}`, 'success');
+                addToast(t('toast.cleanedThumbnails', { count }), 'success');
             } else {
-                addToast('No orphan thumbnails found', 'info');
+                addToast(t('No orphan thumbnails found'), 'info');
             }
         } catch (e) {
-            addToast('Failed to clean up thumbnails', 'error');
+            addToast(t('Failed to clean up thumbnails'), 'error');
         } finally {
             setMaintenanceOperation(null);
         }
@@ -111,12 +113,12 @@ export const ThumbnailsTab: React.FC<ThumbnailsTabProps> = ({
         try {
             const count = await syncExistingThumbnailsToDB();
             if (count > 0) {
-                addToast(`Synced ${count} existing thumbnail${count === 1 ? '' : 's'} to database`, 'success');
+                addToast(t('toast.syncedThumbnails', { count }), 'success');
             } else {
-                addToast('All thumbnails already synced to database', 'info');
+                addToast(t('All thumbnails already synced to database'), 'info');
             }
         } catch (e) {
-            addToast('Failed to sync thumbnails', 'error');
+            addToast(t('Failed to sync thumbnails'), 'error');
         } finally {
             setMaintenanceOperation(null);
         }
@@ -125,17 +127,17 @@ export const ThumbnailsTab: React.FC<ThumbnailsTabProps> = ({
     const handleRepairBrokenThumbnails = async () => {
         if (!claimMaintenanceOperation('repair')) return;
         try {
-            addToast('Checking thumbnail files...', 'info');
+            addToast(t('Checking thumbnail files...'), 'info');
             const count = await pruneBrokenThumbnails();
             if (count > 0) {
-                addToast(`Repaired ${count} broken thumbnail reference${count === 1 ? '' : 's'}.`, 'success');
+                addToast(t('toast.repairedThumbnails', { count }), 'success');
             } else {
-                addToast('No broken thumbnail references found', 'info');
+                addToast(t('No broken thumbnail references found'), 'info');
             }
             await onRepairComplete?.();
         } catch (e) {
             console.error(e);
-            addToast('Failed to repair broken thumbnails', 'error');
+            addToast(t('Failed to repair broken thumbnails'), 'error');
         } finally {
             setMaintenanceOperation(null);
         }
@@ -151,16 +153,14 @@ export const ThumbnailsTab: React.FC<ThumbnailsTabProps> = ({
                     onClick={() => onScopeChange('global')}
                     className={`px-3 py-1.5 text-[10px] font-bold rounded-lg transition-all ${thumbnailsScope === 'global' ? 'bg-white dark:bg-zinc-800 text-sage-600 shadow-sm' : 'text-gray-400'} ${controlsDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                    Library
-                </button>
+                    {t('Library')}</button>
                 <button
                     disabled={controlsDisabled}
                     title={disabledReason}
                     onClick={() => onScopeChange('filtered')}
                     className={`px-3 py-1.5 text-[10px] font-bold rounded-lg transition-all ${thumbnailsScope === 'filtered' ? 'bg-white dark:bg-zinc-800 text-sage-600 shadow-sm' : 'text-gray-400'} ${controlsDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                    Filtered View
-                </button>
+                    {t('Filtered View')}</button>
             </div>
 
             <div className="flex items-center gap-2 mr-2 px-2 py-1 bg-white/50 dark:bg-black/20 border border-sage-200/50 dark:border-white/5 rounded-xl">
@@ -174,11 +174,10 @@ export const ThumbnailsTab: React.FC<ThumbnailsTabProps> = ({
                     className="w-3.5 h-3.5 rounded-md border-gray-300 text-sage-600 focus:ring-sage-500 cursor-pointer"
                 />
                 <label htmlFor="includeUpgradeable" className="text-[10px] font-medium text-gray-600 dark:text-gray-300 cursor-pointer select-none">
-                    Include upgradeable
-                </label>
+                    {t('Include upgradeable')}</label>
                 <InfoTooltip
-                    label="About upgradeable thumbnails"
-                    content="Also includes imported or legacy thumbnails and images missing micro-thumbnails, even when a thumbnail already exists."
+                    label={t('About upgradeable thumbnails')}
+                    content={t('Also includes imported or legacy thumbnails and images missing micro-thumbnails, even when a thumbnail already exists.')}
                 />
             </div>
 
@@ -190,7 +189,7 @@ export const ThumbnailsTab: React.FC<ThumbnailsTabProps> = ({
                     className="px-4 py-2 bg-sage-500 hover:bg-sage-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 group shadow-md shadow-sage-500/20"
                 >
                     <Zap className={`w-4 h-4 ${!isRegeneratingThumbnails && 'group-hover:rotate-12'} transition-transform`} />
-                    {isRegeneratingThumbnails ? 'Processing...' : 'Regenerate Selected'}
+                    {isRegeneratingThumbnails ? t('Processing...') : t('Regenerate Selected')}
                     <span className="px-1.5 py-0.5 bg-white/20 rounded-md text-[9px]">{selectedIds.size}</span>
                 </button>
             ) : (
@@ -201,7 +200,7 @@ export const ThumbnailsTab: React.FC<ThumbnailsTabProps> = ({
                     className="px-4 py-2 bg-sage-500 hover:bg-sage-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2 group shadow-md shadow-sage-500/20"
                 >
                     <RefreshCw className={`w-4 h-4 ${!isRegeneratingThumbnails && 'group-hover:rotate-180'} transition-transform duration-700`} />
-                    {isRegeneratingThumbnails ? 'Optimizing Library...' : 'Regenerate All Unoptimized'}
+                    {isRegeneratingThumbnails ? t('Optimizing Library...') : t('Regenerate All Unoptimized')}
                     {totalCount > 0 && <span className="px-1.5 py-0.5 bg-white/20 rounded-md text-[9px]">{totalCount.toLocaleString()}</span>}
                 </button>
             )}
@@ -210,10 +209,10 @@ export const ThumbnailsTab: React.FC<ThumbnailsTabProps> = ({
                 disabled={controlsDisabled}
                 onClick={handleRepairBrokenThumbnails}
                 className="flex items-center gap-2 rounded-xl border border-ember-200 bg-ember-50 px-4 py-2 text-xs font-bold text-ember-600 transition-colors hover:bg-ember-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-ember-500/20 dark:bg-ember-500/10 dark:text-ember-300 dark:hover:bg-ember-500/20"
-                title={disabledReason ?? 'Check thumbnail files on disk and reset missing thumbnail references'}
+                title={disabledReason ?? t('Check thumbnail files on disk and reset missing thumbnail references')}
             >
                 <AlertTriangle className={`w-4 h-4 ${maintenanceOperation === 'repair' ? 'animate-pulse' : ''}`} />
-                {maintenanceOperation === 'repair' ? 'Repairing...' : 'Repair Broken Thumbnails'}
+                {maintenanceOperation === 'repair' ? t('Repairing...') : t('Repair Broken Thumbnails')}
             </button>
 
             {/* Sync DB Button - heals thumbnails that exist on disk but aren't in DB */}
@@ -222,10 +221,10 @@ export const ThumbnailsTab: React.FC<ThumbnailsTabProps> = ({
                     disabled={controlsDisabled}
                     onClick={handleSync}
                     className="flex items-center gap-2 rounded-xl border border-ember-200 bg-ember-100 px-3 py-2 text-xs font-bold text-ember-600 transition-colors hover:bg-ember-200 disabled:cursor-not-allowed disabled:opacity-50 dark:border-ember-500/20 dark:bg-ember-500/15 dark:text-ember-300 dark:hover:bg-ember-500/25"
-                    title={disabledReason ?? 'Sync existing thumbnail files to database (heals thumbnails created before the persistence fix)'}
+                    title={disabledReason ?? t('Sync existing thumbnail files to database (heals thumbnails created before the persistence fix)')}
                 >
                     <Database className={`w-4 h-4 ${maintenanceOperation === 'sync' ? 'animate-pulse' : ''}`} />
-                    {maintenanceOperation === 'sync' ? 'Syncing...' : 'Sync DB'}
+                    {maintenanceOperation === 'sync' ? t('Syncing...') : t('Sync DB')}
                 </button>
             )}
         </div>
@@ -234,10 +233,10 @@ export const ThumbnailsTab: React.FC<ThumbnailsTabProps> = ({
     return (
         <div className="w-full pb-32 animate-in slide-in-from-bottom-4 flex flex-col items-stretch">
             <MaintenanceHeader
-                title="Thumbnail Optimization"
+                title={t('Thumbnail Optimization')}
                 description={totalCount > images.length
-                    ? `Found ${totalCount.toLocaleString()} images ${thumbnailsScope === 'filtered' ? 'in current filter' : ''} that need optimization. Showing first ${images.length}.`
-                    : `Found ${totalCount.toLocaleString()} images ${thumbnailsScope === 'filtered' ? 'in current filter' : ''} that could benefit from thumbnail regeneration.`
+                    ? t(thumbnailsScope === 'filtered' ? 'thumbnails.foundNeedOptimizationFiltered' : 'thumbnails.foundNeedOptimization', { total: totalCount.toLocaleString(), shown: images.length })
+                    : t(thumbnailsScope === 'filtered' ? 'thumbnails.foundBenefitFiltered' : 'thumbnails.foundBenefit', { total: totalCount.toLocaleString() })
                 }
                 icon={<Image className="w-6 h-6" />}
                 count={totalCount}
@@ -265,10 +264,9 @@ export const ThumbnailsTab: React.FC<ThumbnailsTabProps> = ({
                     <div className="mb-6 rounded-full border border-sage-200 bg-sage-50 p-6 dark:border-sage-500/20 dark:bg-sage-500/10">
                         <Check className="h-16 w-16 text-sage-600 dark:text-sage-300" />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Optimized</h2>
+                    <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">{t('Optimized')}</h2>
                     <p className="max-w-md text-center text-gray-500 dark:text-gray-400">
-                        All images in this scope have high-quality thumbnails.
-                    </p>
+                        {t('All images in this scope have high-quality thumbnails.')}</p>
                     <button
                         onClick={handleCleanup}
                         disabled={controlsDisabled}
@@ -276,7 +274,7 @@ export const ThumbnailsTab: React.FC<ThumbnailsTabProps> = ({
                         className="mt-4 flex items-center gap-2 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50"
                     >
                         <Trash2 className={`w-3.5 h-3.5 ${maintenanceOperation === 'cleanup' ? 'animate-pulse' : ''}`} />
-                        {maintenanceOperation === 'cleanup' ? 'Cleaning up...' : 'Clean up unused thumbnails'}
+                        {maintenanceOperation === 'cleanup' ? t('Cleaning up...') : t('Clean up unused thumbnails')}
                     </button>
                 </div>
             )}

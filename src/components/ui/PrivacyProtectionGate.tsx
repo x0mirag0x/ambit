@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Loader2, RotateCcw, ShieldAlert } from 'lucide-react';
 import { useSettingsStore } from '../../stores/settingsStore';
+import { useTranslation } from 'react-i18next';
 
 interface PrivacyProtectionGateProps {
     onOpenSettings?: () => void;
@@ -11,6 +12,7 @@ export const PrivacyProtectionGate: React.FC<PrivacyProtectionGateProps> = ({
     onOpenSettings,
     className = '',
 }) => {
+    const { t } = useTranslation();
     const status = useSettingsStore(state => state.privacyMaskIndexStatus);
     const error = useSettingsStore(state => state.privacyMaskIndexError);
     const retry = useSettingsStore(state => state.retryPrivacyMaskIndex);
@@ -30,12 +32,12 @@ export const PrivacyProtectionGate: React.FC<PrivacyProtectionGateProps> = ({
                     <Loader2 className="w-10 h-10 mx-auto mb-4 text-sage-500 animate-spin" />
                 )}
                 <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                    {failed ? 'Privacy protection needs attention' : 'Preparing privacy protection'}
+                    {failed ? t('Privacy protection needs attention') : t('Preparing privacy protection')}
                 </h2>
                 <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                     {failed
-                        ? 'Library content remains hidden because the privacy index could not be refreshed.'
-                        : 'Library content will appear after the latest masking rules are ready.'}
+                        ? t('Library content remains hidden because the privacy index could not be refreshed.')
+                        : t('Library content will appear after the latest masking rules are ready.')}
                 </p>
                 {failed && error && (
                     <p className="mt-3 text-xs text-red-600 dark:text-red-300 break-words">{error}</p>
@@ -47,16 +49,14 @@ export const PrivacyProtectionGate: React.FC<PrivacyProtectionGateProps> = ({
                             onClick={retry}
                             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sage-600 hover:bg-sage-500 text-white text-sm font-bold"
                         >
-                            <RotateCcw className="w-4 h-4" /> Retry
-                        </button>
+                            <RotateCcw className="w-4 h-4" /> {t('Retry')}</button>
                         {onOpenSettings && (
                             <button
                                 type="button"
                                 onClick={onOpenSettings}
                                 className="px-4 py-2 rounded-xl bg-gray-200 hover:bg-gray-300 dark:bg-white/10 dark:hover:bg-white/15 text-sm font-bold text-gray-800 dark:text-gray-200"
                             >
-                                Open Privacy Settings
-                            </button>
+                                {t('Open Privacy Settings')}</button>
                         )}
                     </div>
                 )}

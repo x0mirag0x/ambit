@@ -3,6 +3,7 @@ import { AIImage, isVideoAsset, type SourceKind } from '../../../types';
 import { isImageMasked } from '../../../utils/maskingUtils';
 import { useSettingsStore } from '../../../stores/settingsStore';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
+import { useTranslation } from 'react-i18next';
 
 const BUTTON_BASE_CLASS = "p-2 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500/50";
 const NEUTRAL_BUTTON_CLASS = `${BUTTON_BASE_CLASS} text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10`;
@@ -50,6 +51,7 @@ export function SelectionBar({
     onCompare,
     activeCollectionId
 }: SelectionBarProps) {
+    const { t } = useTranslation();
     const privacyEnabled = useSettingsStore(s => s.privacyEnabled);
     if (selectedIds.size === 0) return null;
 
@@ -108,19 +110,19 @@ export function SelectionBar({
             <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-gray-200 dark:border-white/10 shadow-2xl rounded-full px-2 py-1.5 flex items-center gap-1 animate-in slide-in-from-bottom-4 zoom-in-95 duration-500 ease-spring">
                 <div className="pl-4 pr-3 text-xs font-bold text-gray-900 dark:text-white whitespace-nowrap border-r border-gray-300 dark:border-white/10">
                     <span className="text-sage-600 dark:text-sage-400">{selectedIds.size}</span>{' '}
-                    <span className="text-gray-500 dark:text-gray-400 font-normal">Selected</span>
+                    <span className="text-gray-500 dark:text-gray-400 font-normal">{t('Selected')}</span>
                 </div>
 
                 {selectedIds.size === 2 && !hasSelectedVideo && (
-                    <TooltipButton label="Compare Selected Images" content="Compare Selected Images" onClick={onCompare} className={NEUTRAL_BUTTON_CLASS}>
+                    <TooltipButton label={t('Compare Selected Images')} content={t('Compare Selected Images')} onClick={onCompare} className={NEUTRAL_BUTTON_CLASS}>
                         <SplitSquareHorizontal className="w-5 h-5" />
                     </TooltipButton>
                 )}
 
-                <TooltipButton label={allFavorite ? "Remove Selected from Favorites" : "Add Selected to Favorites"} content={allFavorite ? "Remove Selected from Favorites" : "Add Selected to Favorites"} aria-pressed={favoritePressed} onClick={onToggleFavorite} className={allFavorite ? ACTIVE_FAVORITE_BUTTON_CLASS : NEUTRAL_BUTTON_CLASS}>
+                <TooltipButton label={allFavorite ? t('Remove Selected from Favorites') : t('Add Selected to Favorites')} content={allFavorite ? t('Remove Selected from Favorites') : t('Add Selected to Favorites')} aria-pressed={favoritePressed} onClick={onToggleFavorite} className={allFavorite ? ACTIVE_FAVORITE_BUTTON_CLASS : NEUTRAL_BUTTON_CLASS}>
                     <Heart className={`w-5 h-5 ${allFavorite ? 'fill-current' : ''}`} />
                 </TooltipButton>
-                <TooltipButton label={allPinned ? "Unpin Selected Items" : "Pin Selected Items"} content={allPinned ? "Unpin Selected Items" : "Pin Selected Items"} aria-pressed={pinPressed} onClick={onTogglePin} className={allPinned ? ACTIVE_PIN_BUTTON_CLASS : NEUTRAL_BUTTON_CLASS}>
+                <TooltipButton label={allPinned ? t('Unpin Selected Items') : t('Pin Selected Items')} content={allPinned ? t('Unpin Selected Items') : t('Pin Selected Items')} aria-pressed={pinPressed} onClick={onTogglePin} className={allPinned ? ACTIVE_PIN_BUTTON_CLASS : NEUTRAL_BUTTON_CLASS}>
                     <Pin className={`w-5 h-5 ${allPinned ? 'fill-current' : ''}`} />
                 </TooltipButton>
                 <TooltipButton
@@ -134,7 +136,7 @@ export function SelectionBar({
 
                 {onSetImageKind && !hasSelectedVideo && (
                     <select
-                        aria-label="Set image kind for selected images"
+                        aria-label={t('Set image kind for selected images')}
                         value=""
                         onChange={(event) => {
                             const value = event.target.value;
@@ -143,27 +145,27 @@ export function SelectionBar({
                         }}
                         className="max-w-28 rounded-full border border-gray-200 bg-white px-2 py-1.5 text-xs text-gray-600 outline-none focus-visible:ring-2 focus-visible:ring-sage-500/50 dark:border-white/10 dark:bg-zinc-800 dark:text-gray-300"
                     >
-                        <option value="">Image kind…</option>
-                        <option value="automatic">Automatic</option>
-                        <option value="generated">Generated</option>
-                        <option value="photograph">Photo</option>
-                        <option value="other">Other</option>
+                        <option value="">{t('Image kind…')}</option>
+                        <option value="automatic">{t('Automatic')}</option>
+                        <option value="generated">{t('Generated')}</option>
+                        <option value="photograph">{t('Photo')}</option>
+                        <option value="other">{t('Other')}</option>
                     </select>
                 )}
 
-                <TooltipButton label="Add Selected to Collection" content="Add Selected to Collection" onClick={onAddToCollection} className={NEUTRAL_BUTTON_CLASS}>
+                <TooltipButton label={t('Add Selected to Collection')} content={t('Add Selected to Collection')} onClick={onAddToCollection} className={NEUTRAL_BUTTON_CLASS}>
                     <Folder className="w-5 h-5" />
                 </TooltipButton>
                 {activeCollectionId && onRemoveFromCollection && (
-                    <TooltipButton label="Remove Selected from Collection" content="Remove Selected from Collection" onClick={onRemoveFromCollection} className={NEUTRAL_BUTTON_CLASS}>
+                    <TooltipButton label={t('Remove Selected from Collection')} content={t('Remove Selected from Collection')} onClick={onRemoveFromCollection} className={NEUTRAL_BUTTON_CLASS}>
                         <FolderMinus className="w-5 h-5" />
                     </TooltipButton>
                 )}
 
 
                 <TooltipButton
-                    label="Export Selected Items"
-                    content="Export Selected Items"
+                    label={t('Export Selected Items')}
+                    content={t('Export Selected Items')}
                     onClick={onExport}
                     disabled={isExporting}
                     className={`${NEUTRAL_BUTTON_CLASS} disabled:opacity-50`}
@@ -171,11 +173,11 @@ export function SelectionBar({
                     <Share className="w-5 h-5" />
                 </TooltipButton>
 
-                <TooltipButton label="Remove Selected from Library" content="Remove Selected from Library" onClick={onDelete} className="p-2 text-red-500/70 dark:text-red-400/80 hover:text-red-700 dark:hover:text-red-200 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500/50">
+                <TooltipButton label={t('Remove Selected from Library')} content={t('Remove Selected from Library')} onClick={onDelete} className="p-2 text-red-500/70 dark:text-red-400/80 hover:text-red-700 dark:hover:text-red-200 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500/50">
                     <Trash2 className="w-5 h-5" />
                 </TooltipButton>
 
-                <button type="button" aria-label="Clear Selection" onClick={onClearSelection} className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500/50 ml-1">
+                <button type="button" aria-label={t('Clear Selection')} onClick={onClearSelection} className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500/50 ml-1">
                     <X className="w-5 h-5" />
                 </button>
             </div>

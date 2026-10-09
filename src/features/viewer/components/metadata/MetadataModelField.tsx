@@ -4,6 +4,7 @@ import { TooltipButton } from '../../../../components/ui/InfoTooltip';
 import { formatModelName } from '../../../../utils/formatUtils';
 import { MetadataField } from './MetadataField';
 import type { ModelPresentation } from './modelPresentation';
+import { useTranslation } from 'react-i18next';
 
 interface MetadataModelFieldProps {
     presentation: ModelPresentation;
@@ -33,6 +34,7 @@ export const MetadataModelField: React.FC<MetadataModelFieldProps> = ({
     modified,
     onSave,
 }) => {
+    const { t } = useTranslation();
     const availableOptions = React.useMemo(
         () => normalizeOptions(options, presentation),
         [options, presentation.isHashFallback, presentation.value]
@@ -132,10 +134,10 @@ export const MetadataModelField: React.FC<MetadataModelFieldProps> = ({
     };
 
     return (
-        <MetadataField label="Model" icon={Box} source={source} modified={modified}>
+        <MetadataField label={t('Model')} icon={Box} source={source} modified={modified}>
             <div ref={editorRef} className="group relative">
                 {onSave && !isEditing ? (
-                    <button type="button" aria-label="Edit Model" onClick={startEditing} className="absolute right-3 top-1/2 z-10 -translate-y-1/2 text-gray-400 opacity-0 transition-opacity hover:text-gray-700 focus-visible:opacity-100 group-hover:opacity-100 dark:text-zinc-500 dark:hover:text-white">
+                    <button type="button" aria-label={t('Edit Model')} onClick={startEditing} className="absolute right-3 top-1/2 z-10 -translate-y-1/2 text-gray-400 opacity-0 transition-opacity hover:text-gray-700 focus-visible:opacity-100 group-hover:opacity-100 dark:text-zinc-500 dark:hover:text-white">
                         <Pencil className="h-3.5 w-3.5" />
                     </button>
                 ) : null}
@@ -144,7 +146,7 @@ export const MetadataModelField: React.FC<MetadataModelFieldProps> = ({
                         {isCustom ? (
                             <input
                                 ref={inputRef}
-                                aria-label="Custom model name"
+                                aria-label={t('Custom model name')}
                                 value={draft}
                                 onChange={event => setDraft(event.target.value)}
                                 onKeyDown={event => {
@@ -153,7 +155,7 @@ export const MetadataModelField: React.FC<MetadataModelFieldProps> = ({
                                         cancel();
                                     }
                                 }}
-                                placeholder="Enter model name…"
+                                placeholder={t('Enter model name…')}
                                 className="w-full rounded border border-gray-200 bg-white p-2 text-xs text-gray-900 outline-none focus:border-sage-500 dark:border-white/10 dark:bg-zinc-900 dark:text-white"
                             />
                         ) : (
@@ -161,7 +163,7 @@ export const MetadataModelField: React.FC<MetadataModelFieldProps> = ({
                                 <input
                                     ref={inputRef}
                                     role="combobox"
-                                    aria-label="Search models"
+                                    aria-label={t('Search models')}
                                     aria-autocomplete="list"
                                     aria-expanded={isOpen}
                                     aria-controls={listboxId}
@@ -170,7 +172,7 @@ export const MetadataModelField: React.FC<MetadataModelFieldProps> = ({
                                     onFocus={() => setIsOpen(true)}
                                     onChange={event => { setQuery(event.target.value); setDraft(''); setIsOpen(true); setActiveIndex(0); }}
                                     onKeyDown={handleSearchKeyDown}
-                                    placeholder="Search library models…"
+                                    placeholder={t('Search library models…')}
                                     autoFocus
                                     className="w-full rounded border border-gray-200 bg-white p-2 text-xs text-gray-900 outline-none focus:border-sage-500 dark:border-white/10 dark:bg-zinc-900 dark:text-white"
                                 />
@@ -195,15 +197,14 @@ export const MetadataModelField: React.FC<MetadataModelFieldProps> = ({
                                             onClick={chooseCustom}
                                             className={`cursor-pointer rounded border-t border-gray-200 px-2 py-1.5 text-xs dark:border-white/5 ${activeIndex === filteredOptions.length ? 'bg-sage-100 text-sage-600 dark:bg-sage-500/20 dark:text-sage-300' : 'text-gray-500 hover:bg-gray-100 dark:text-zinc-400 dark:hover:bg-white/5'}`}
                                         >
-                                            Custom model…
-                                        </li>
+                                            {t('Custom model…')}</li>
                                     </ul>
                                 ) : null}
                             </div>
                         )}
                         <div className="flex justify-end gap-2">
-                            <button type="button" onClick={cancel} className="px-2 py-1 text-xs text-gray-500 hover:text-gray-900 dark:text-zinc-500 dark:hover:text-white">Cancel</button>
-                            <button type="button" disabled={!draft.trim()} onClick={save} className="flex items-center gap-1 rounded bg-sage-600 px-2 py-1 text-xs text-white hover:bg-sage-500 disabled:cursor-not-allowed disabled:opacity-40"><Check className="h-3 w-3" /> Save</button>
+                            <button type="button" onClick={cancel} className="px-2 py-1 text-xs text-gray-500 hover:text-gray-900 dark:text-zinc-500 dark:hover:text-white">{t('Cancel')}</button>
+                            <button type="button" disabled={!draft.trim()} onClick={save} className="flex items-center gap-1 rounded bg-sage-600 px-2 py-1 text-xs text-white hover:bg-sage-500 disabled:cursor-not-allowed disabled:opacity-40"><Check className="h-3 w-3" /> {t('Save')}</button>
                         </div>
                     </div>
                 ) : (
@@ -212,13 +213,12 @@ export const MetadataModelField: React.FC<MetadataModelFieldProps> = ({
                             {presentation.isHashFallback ? presentation.value : formatModelName(presentation.value)}
                         </div>
                         {presentation.isHashFallback ? <TooltipButton
-                            label="About unresolved model hash"
-                            content="Model name unresolved. Use Settings → Connections → Resources → Resolve Online to look it up through CivitAI. Only the hash is sent."
+                            label={t('About unresolved model hash')}
+                            content={t('Model name unresolved. Use Settings → Connections → Resources → Resolve Online to look it up through CivitAI. Only the hash is sent.')}
                             persistOnClick
                             className="shrink-0 rounded border border-harbor-200 bg-harbor-50 px-1.5 py-0.5 text-[10px] text-harbor-600 hover:border-harbor-300 hover:text-harbor-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500/70 dark:border-harbor-800 dark:bg-harbor-900/30 dark:text-harbor-300 dark:hover:border-harbor-600 dark:hover:text-harbor-300"
                         >
-                            Unresolved hash
-                        </TooltipButton> : null}
+                            {t('Unresolved hash')}</TooltipButton> : null}
                     </div>
                 )}
             </div>

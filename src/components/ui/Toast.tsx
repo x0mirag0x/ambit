@@ -2,6 +2,8 @@ import * as React from 'react';
 import { useEffect, useRef } from 'react';
 import { X, CheckCircle, AlertCircle, Info } from 'lucide-react';
 import { ToastMessage } from '../../types';
+import { useTranslation } from 'react-i18next';
+import { translateRuntimeMessage } from '../../i18n/statusMessages';
 
 interface ToastContainerProps {
   toasts: ToastMessage[];
@@ -19,6 +21,7 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, removeTo
 };
 
 const ToastItem: React.FC<{ toast: ToastMessage; onRemove: () => void }> = ({ toast, onRemove }) => {
+  const { t } = useTranslation();
   const [isHovered, setIsHovered] = React.useState(false);
   const onRemoveRef = useRef(onRemove);
   const action = toast.action;
@@ -54,7 +57,7 @@ const ToastItem: React.FC<{ toast: ToastMessage; onRemove: () => void }> = ({ to
       </div>
 
       <div className="flex items-center gap-3">
-        <span className="text-sm font-medium tracking-tight">{toast.message}</span>
+        <span className="text-sm font-medium tracking-tight">{translateRuntimeMessage(toast.message)}</span>
 
         {action && (
           <button
@@ -65,14 +68,14 @@ const ToastItem: React.FC<{ toast: ToastMessage; onRemove: () => void }> = ({ to
             }}
             className="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-[10px] font-black uppercase tracking-wider text-sage-400 hover:text-white transition-all border border-white/5 active:scale-95"
           >
-            {action.label}
+            {t(action.label)}
           </button>
         )}
       </div>
 
       <button
         type="button"
-        aria-label="Dismiss Notification"
+        aria-label={t('Dismiss Notification')}
         onClick={onRemove}
         className="ml-1 p-1 rounded-full hover:bg-white/10 text-gray-500 hover:text-white transition-colors"
       >

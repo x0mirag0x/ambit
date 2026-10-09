@@ -187,6 +187,18 @@
       <p class="static-loading__subtitle">Initializing library...</p>
     </div>
   </div>
+  <script>
+    (function () {
+      var cached = null;
+      try { cached = localStorage.getItem('ambit.uiLanguage'); } catch (error) { cached = null; }
+      var systemRussian = ((navigator.language || '') + ' ' + (navigator.languages || []).join(' ')).toLowerCase().indexOf('ru') !== -1;
+      var russian = cached === 'ru' || (cached !== 'en' && systemRussian);
+      document.documentElement.lang = russian ? 'ru' : 'en';
+      document.title = russian ? 'Ambit | Локальная рабочая среда для ИИ' : 'Ambit | Local AI Workspace';
+      var subtitle = document.querySelector('.static-loading__subtitle');
+      if (subtitle && russian) subtitle.textContent = 'Подготовка библиотеки...';
+    })();
+  </script>
   <script src="/startup-bootstrap.js"></script>
   <script id="startup-diagnostic-entry" type="module" src="/src/startupDiagnosticEntry.ts"></script>
 </body>

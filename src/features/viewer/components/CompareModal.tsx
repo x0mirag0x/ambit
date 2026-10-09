@@ -14,6 +14,7 @@ import {
 } from '../../../utils/zoomMath';
 import { useSettingsStore } from '../../../stores/settingsStore';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
+import { useTranslation } from 'react-i18next';
 
 interface CompareModalProps {
     imageA: AIImage;
@@ -160,11 +161,11 @@ const ImageActions = ({
     side: 'left' | 'right',
     onToggleFavorite: (id: string) => void,
     onTogglePin?: (id: string, isPinned: boolean) => void
-}) => (
+}) => { const { t } = useTranslation(); return ((
     <div className={`absolute top-3 ${side === 'left' ? 'left-3' : 'right-3'} z-50 flex gap-2 pointer-events-auto`}>
         <TooltipButton
-            label={img.isFavorite ? "Remove from Favorites" : "Add to Favorites"}
-            content={img.isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+            label={img.isFavorite ? t('Remove from Favorites') : t('Add to Favorites')}
+            content={img.isFavorite ? t('Remove from Favorites') : t('Add to Favorites')}
             aria-pressed={img.isFavorite}
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
@@ -179,8 +180,8 @@ const ImageActions = ({
 
         {onTogglePin && (
             <TooltipButton
-                label={img.isPinned ? "Unpin" : "Pin to Top"}
-                content={img.isPinned ? "Unpin" : "Pin to Top"}
+                label={img.isPinned ? t('Unpin') : t('Pin to Top')}
+                content={img.isPinned ? t('Unpin') : t('Pin to Top')}
                 aria-pressed={Boolean(img.isPinned)}
                 onMouseDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
@@ -194,7 +195,7 @@ const ImageActions = ({
             </TooltipButton>
         )}
     </div>
-);
+)); };
 
 // Extracted Component to prevent re-renders
 const ImageContainer = ({
@@ -238,6 +239,7 @@ export const CompareModal: React.FC<CompareModalProps> = ({
     onToggleFavorite,
     onTogglePin
 }) => {
+    const { t } = useTranslation();
     const privacyExposureBlocked = useSettingsStore(state => (
         state.privacyEnabled && state.privacyMaskIndexStatus !== 'ready'
     ));
@@ -488,7 +490,7 @@ export const CompareModal: React.FC<CompareModalProps> = ({
             <div className="space-y-4">
                 {/* Left Prompt (A) */}
                 <div className="space-y-1">
-                    <div className="text-[10px] uppercase text-gray-500 font-bold">Original (Image A)</div>
+                    <div className="text-[10px] uppercase text-gray-500 font-bold">{t('Original (Image A)')}</div>
                     <div className="p-3 bg-zinc-900/50 rounded-lg border border-white/5 text-xs text-gray-400 font-mono leading-relaxed">
                         {renderDiffWords(promptA, setB, 'bg-red-500/50')}
                     </div>
@@ -496,7 +498,7 @@ export const CompareModal: React.FC<CompareModalProps> = ({
 
                 {/* Right Prompt (B) */}
                 <div className="space-y-1">
-                    <div className="text-[10px] uppercase text-gray-500 font-bold">New (Image B)</div>
+                    <div className="text-[10px] uppercase text-gray-500 font-bold">{t('New (Image B)')}</div>
                     <div className="p-3 bg-zinc-900/50 rounded-lg border border-white/5 text-xs text-gray-400 font-mono leading-relaxed">
                         {renderDiffWords(promptB, setA, 'bg-sage-500/50')}
                     </div>
@@ -565,30 +567,29 @@ export const CompareModal: React.FC<CompareModalProps> = ({
                 <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2 text-gray-200 font-bold">
                         <ArrowRightLeft className="w-5 h-5 text-sage-500" />
-                        Comparison
-                    </div>
+                        {t('Comparison')}</div>
 
                     <div className="flex bg-black rounded-lg p-0.5 border border-white/10">
-                        <button type="button" aria-pressed={mode === 'split'} onClick={() => setMode('split')} className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${mode === 'split' ? 'bg-white/10 text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`} title="Side by Side">Split</button>
-                        <button type="button" aria-pressed={mode === 'slider'} onClick={() => setMode('slider')} className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${mode === 'slider' ? 'bg-white/10 text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`} title="Slider Swipe">Swipe</button>
-                        <button type="button" aria-pressed={mode === 'overlay'} onClick={() => setMode('overlay')} className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${mode === 'overlay' ? 'bg-white/10 text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`} title="Hover Overlay">Overlay</button>
+                        <button type="button" aria-pressed={mode === 'split'} onClick={() => setMode('split')} className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${mode === 'split' ? 'bg-white/10 text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`} title={t('Side by Side')}>{t('Split')}</button>
+                        <button type="button" aria-pressed={mode === 'slider'} onClick={() => setMode('slider')} className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${mode === 'slider' ? 'bg-white/10 text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`} title={t('Slider Swipe')}>{t('Swipe')}</button>
+                        <button type="button" aria-pressed={mode === 'overlay'} onClick={() => setMode('overlay')} className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all ${mode === 'overlay' ? 'bg-white/10 text-white shadow-sm' : 'text-gray-500 hover:text-gray-300'}`} title={t('Hover Overlay')}>{t('Overlay')}</button>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2 bg-black rounded-full px-3 py-1 border border-white/10">
-                        <TooltipButton label="Zoom Out" content="Zoom Out" onClick={() => applyZoom(scale - COMPARE_BUTTON_ZOOM_STEP)} className="p-1 hover:text-white text-gray-500"><ZoomOut className="w-4 h-4" /></TooltipButton>
+                        <TooltipButton label={t('Zoom Out')} content={t('Zoom Out')} onClick={() => applyZoom(scale - COMPARE_BUTTON_ZOOM_STEP)} className="p-1 hover:text-white text-gray-500"><ZoomOut className="w-4 h-4" /></TooltipButton>
                         <span className="text-xs font-mono text-gray-400 w-12 text-center">{Math.round(scale * 100)}%</span>
-                        <TooltipButton label="Zoom In" content="Zoom In" onClick={() => applyZoom(scale + COMPARE_BUTTON_ZOOM_STEP)} className="p-1 hover:text-white text-gray-500"><ZoomIn className="w-4 h-4" /></TooltipButton>
+                        <TooltipButton label={t('Zoom In')} content={t('Zoom In')} onClick={() => applyZoom(scale + COMPARE_BUTTON_ZOOM_STEP)} className="p-1 hover:text-white text-gray-500"><ZoomIn className="w-4 h-4" /></TooltipButton>
                         <div className="w-px h-3 bg-white/10 mx-1" />
-                        <TooltipButton label="Reset Zoom" content="Reset Zoom" onClick={resetZoom} className="p-1 hover:text-white text-gray-500"><RotateCcw className="w-4 h-4" /></TooltipButton>
+                        <TooltipButton label={t('Reset Zoom')} content={t('Reset Zoom')} onClick={resetZoom} className="p-1 hover:text-white text-gray-500"><RotateCcw className="w-4 h-4" /></TooltipButton>
                     </div>
 
                     <div className="h-6 w-px bg-white/10" />
 
                     <TooltipButton
-                        label={isPanelOpen ? "Hide Diff Sidebar" : "Show Diff Sidebar"}
-                        content={isPanelOpen ? "Hide Diff Sidebar" : "Show Diff Sidebar"}
+                        label={isPanelOpen ? t('Hide Diff Sidebar') : t('Show Diff Sidebar')}
+                        content={isPanelOpen ? t('Hide Diff Sidebar') : t('Show Diff Sidebar')}
                         aria-pressed={isPanelOpen}
                         onClick={() => setIsPanelOpen(!isPanelOpen)}
                         className={`p-2 rounded-lg transition-colors ${isPanelOpen ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-white'}`}
@@ -596,7 +597,7 @@ export const CompareModal: React.FC<CompareModalProps> = ({
                         <Sidebar className="w-5 h-5" />
                     </TooltipButton>
 
-                    <button ref={closeButtonRef} type="button" aria-label="Close Comparison" onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg text-gray-500 hover:text-white transition-colors">
+                    <button ref={closeButtonRef} type="button" aria-label={t('Close Comparison')} onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg text-gray-500 hover:text-white transition-colors">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
@@ -685,8 +686,7 @@ export const CompareModal: React.FC<CompareModalProps> = ({
                                 className="absolute z-40 bg-black/80 text-white px-4 py-2 rounded-full text-xs pointer-events-none border border-white/10 backdrop-blur-md"
                                 style={overlayHintStyle}
                             >
-                                Hover to reveal comparison
-                            </div>
+                                {t('Hover to reveal comparison')}</div>
                         </div>
                     )}
 
@@ -708,8 +708,7 @@ export const CompareModal: React.FC<CompareModalProps> = ({
                     <div className="p-4 border-b border-white/10 flex items-center justify-between bg-zinc-950 min-w-[300px]">
                         <h3 className="font-bold text-gray-200 text-sm flex items-center gap-2 uppercase tracking-wide">
                             <GitCompare className="w-4 h-4 text-sage-500" />
-                            Differences
-                        </h3>
+                            {t('Differences')}</h3>
                     </div>
 
                     <div className="flex-1 overflow-y-auto custom-scrollbar min-w-[300px]">
@@ -718,31 +717,31 @@ export const CompareModal: React.FC<CompareModalProps> = ({
                             <div className="truncate text-center" title={imageB.filename}>{getFilename(imageB.filename)}</div>
                         </div>
 
-                        <DiffRow label="Model" valA={imageA.metadata.model} valB={imageB.metadata.model} />
-                        <DiffRow label="Seed" valA={imageA.metadata.seed ?? 'Unknown'} valB={imageB.metadata.seed ?? 'Unknown'} />
-                        <DiffRow label="Steps" valA={imageA.metadata.steps} valB={imageB.metadata.steps} />
-                        <DiffRow label="CFG" valA={imageA.metadata.cfg} valB={imageB.metadata.cfg} />
-                        <DiffRow label="Size" valA={`${imageA.width}x${imageA.height}`} valB={`${imageB.width}x${imageB.height}`} />
+                        <DiffRow label={t('Model')} valA={imageA.metadata.model} valB={imageB.metadata.model} />
+                        <DiffRow label={t('Seed')} valA={imageA.metadata.seed ?? 'Unknown'} valB={imageB.metadata.seed ?? 'Unknown'} />
+                        <DiffRow label={t('Steps')} valA={imageA.metadata.steps} valB={imageB.metadata.steps} />
+                        <DiffRow label={t('CFG')} valA={imageA.metadata.cfg} valB={imageB.metadata.cfg} />
+                        <DiffRow label={t('Size')} valA={`${imageA.width}x${imageA.height}`} valB={`${imageB.width}x${imageB.height}`} />
 
                         <div className="p-4">
                             <div className="flex items-center justify-between mb-3">
-                                <div className="text-xs text-gray-500 font-bold uppercase tracking-wider">Prompt Diff</div>
+                                <div className="text-xs text-gray-500 font-bold uppercase tracking-wider">{t('Prompt Diff')}</div>
                                 <div className="flex items-center gap-2">
                                     {diffMode === 'diff' && (
                                         <div className="flex gap-2 text-[10px] mr-2">
-                                            <span className="text-red-400 bg-red-900/20 px-1.5 py-0.5 rounded">Removed</span>
-                                            <span className="text-sage-300 bg-sage-900/20 px-1.5 py-0.5 rounded">Added</span>
+                                            <span className="text-red-400 bg-red-900/20 px-1.5 py-0.5 rounded">{t('Removed')}</span>
+                                            <span className="text-sage-300 bg-sage-900/20 px-1.5 py-0.5 rounded">{t('Added')}</span>
                                         </div>
                                     )}
                                     <div className="flex bg-black rounded-lg p-0.5 border border-white/10">
-                                        <TooltipButton label="Show Diff View" content="Show Diff View" aria-pressed={diffMode === 'diff'} onClick={() => setDiffMode('diff')} className={`p-1 rounded ${diffMode === 'diff' ? 'bg-white/10 text-white' : 'text-gray-500'}`}><Eye className="w-3 h-3" /></TooltipButton>
-                                        <TooltipButton label="Show Raw View" content="Show Raw View" aria-pressed={diffMode === 'raw'} onClick={() => setDiffMode('raw')} className={`p-1 rounded ${diffMode === 'raw' ? 'bg-white/10 text-white' : 'text-gray-500'}`}><EyeOff className="w-3 h-3" /></TooltipButton>
+                                        <TooltipButton label={t('Show Diff View')} content={t('Show Diff View')} aria-pressed={diffMode === 'diff'} onClick={() => setDiffMode('diff')} className={`p-1 rounded ${diffMode === 'diff' ? 'bg-white/10 text-white' : 'text-gray-500'}`}><Eye className="w-3 h-3" /></TooltipButton>
+                                        <TooltipButton label={t('Show Raw View')} content={t('Show Raw View')} aria-pressed={diffMode === 'raw'} onClick={() => setDiffMode('raw')} className={`p-1 rounded ${diffMode === 'raw' ? 'bg-white/10 text-white' : 'text-gray-500'}`}><EyeOff className="w-3 h-3" /></TooltipButton>
                                     </div>
                                 </div>
                             </div>
 
                             {imageA.metadata.positivePrompt === imageB.metadata.positivePrompt ? (
-                                <div className="text-sm text-gray-600 italic text-center py-4 bg-zinc-900/30 rounded-lg">Prompts are identical</div>
+                                <div className="text-sm text-gray-600 italic text-center py-4 bg-zinc-900/30 rounded-lg">{t('Prompts are identical')}</div>
                             ) : (
                                 diffMode === 'diff' ? (
                                     renderPromptDiff(imageA.metadata.positivePrompt, imageB.metadata.positivePrompt)

@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Check, Code, Copy } from 'lucide-react';
 import { AIImage } from '../../../../types';
 import { TooltipButton } from '../../../../components/ui/InfoTooltip';
+import { useTranslation } from 'react-i18next';
 
 interface MetadataRawInspectorProps {
     image: AIImage;
 }
 
 export const MetadataRawInspector = ({ image }: MetadataRawInspectorProps) => {
+    const { t } = useTranslation();
     const [showRaw, setShowRaw] = useState(false);
     const [rawViewMode, setRawViewMode] = useState<'parsed' | 'source' | 'json'>('parsed');
     const [copiedMode, setCopiedMode] = useState<typeof rawViewMode | null>(null);
@@ -53,8 +55,7 @@ export const MetadataRawInspector = ({ image }: MetadataRawInspectorProps) => {
     return (
         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-white/5">
             <button onClick={() => setShowRaw(!showRaw)} className="flex items-center gap-2 text-gray-500 hover:text-gray-900 dark:hover:text-white text-xs py-2 transition-colors font-medium">
-                <Code className="w-3 h-3" /> {showRaw ? "Hide" : "View"} Internal Metadata
-            </button>
+                <Code className="w-3 h-3" /> {showRaw ? t('Hide') : t('View')} {t('Internal Metadata')}</button>
 
             {showRaw && (
                 <div className="mt-2 p-3 bg-gray-50 dark:bg-black rounded-xl border border-gray-200 dark:border-white/10">
@@ -64,26 +65,23 @@ export const MetadataRawInspector = ({ image }: MetadataRawInspectorProps) => {
                                 onClick={() => setRawViewMode('parsed')}
                                 className={`text-[10px] px-2 py-1 rounded transition-colors ${rawViewMode === 'parsed' ? 'bg-sage-100 dark:bg-sage-900/30 text-sage-600' : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-300'}`}
                             >
-                                Parsed
-                            </button>
+                                {t('Parsed')}</button>
                             <button
                                 onClick={() => setRawViewMode('source')}
                                 className={`text-[10px] px-2 py-1 rounded transition-colors ${rawViewMode === 'source' ? 'bg-sage-100 dark:bg-sage-900/30 text-sage-600' : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-300'}`}
                             >
-                                Text
-                            </button>
+                                {t('Text')}</button>
                             {image.metadata.workflowJson && (
                                 <button
                                     onClick={() => setRawViewMode('json')}
                                     className={`text-[10px] px-2 py-1 rounded transition-colors ${rawViewMode === 'json' ? 'bg-sage-100 dark:bg-sage-900/30 text-sage-600' : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-300'}`}
                                 >
-                                    JSON
-                                </button>
+                                    {t('JSON')}</button>
                             )}
                         </div>
                         <TooltipButton
                             label={copyLabel}
-                            content={rawContent ? copyLabel : 'No metadata is available to copy'}
+                            content={rawContent ? copyLabel : t('No metadata is available to copy')}
                             disabled={!rawContent}
                             onClick={() => void copyRawContent()}
                             className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-40 dark:text-zinc-500 dark:hover:bg-white/5 dark:hover:text-zinc-300"
@@ -93,7 +91,7 @@ export const MetadataRawInspector = ({ image }: MetadataRawInspectorProps) => {
                     </div>
 
                     <pre className="text-gray-600 dark:text-sage-500 text-[10px] overflow-x-auto whitespace-pre-wrap max-h-60 custom-scrollbar font-mono leading-relaxed">
-                        {rawContent ?? 'No raw source available.'}
+                        {rawContent ?? t('No raw source available.')}
                     </pre>
                 </div>
             )}

@@ -11,6 +11,7 @@ import { TooltipButton } from './InfoTooltip';
 import { LibraryScopeDropdown } from '../../features/filters/components/ImageKindScopeDropdown';
 import { useInvokeOwnerScopeStore } from '../../stores/invokeOwnerScopeStore';
 import { getInvokeOwnerQueryScopeKey } from '../../utils/invokeOwnerQueryScope';
+import { useTranslation } from 'react-i18next';
 
 const SearchBar = React.lazy(() => import('../../features/filters/components/SearchBar').then(module => ({ default: module.SearchBar })));
 
@@ -102,6 +103,7 @@ export const AppHeader = React.memo(({
     isFiltering,
     onSearchDraftPendingChange,
 }: AppHeaderProps) => {
+    const { t } = useTranslation();
     const headerRef = React.useRef<HTMLElement>(null);
     const actionsMenuRef = React.useRef<HTMLDivElement>(null);
     const actionsTriggerRef = React.useRef<HTMLButtonElement>(null);
@@ -178,7 +180,7 @@ export const AppHeader = React.memo(({
 
     const toggleLiveWatch = () => {
         if (browserMockMode) {
-            addToast('Unavailable in browser mock mode.', 'info');
+            addToast(t('Unavailable in browser mock mode.'), 'info');
             return;
         }
         setIsLiveWatching(!isLiveWatching);
@@ -192,16 +194,16 @@ export const AppHeader = React.memo(({
     const actionButtons = (
         <>
             <TooltipButton
-                label="Import Images"
-                content="Import images. For automatic sync with favorites and boards, set up an Integration in Settings."
+                label={t('Import Images')}
+                content={t('Import images. For automatic sync with favorites and boards, set up an Integration in Settings.')}
                 onClick={onImport}
                 className={`p-2 rounded-xl transition-all border relative group ${shouldHighlightImport ? 'animate-pulse text-sage-600 bg-sage-500/20' : 'bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-white/10 text-gray-500 hover:text-gray-900 dark:hover:text-white'}`}
             >
                 <Import className="w-4 h-4" />
             </TooltipButton>
             <TooltipButton
-                label={isLiveWatching ? 'Disable Live Watch' : 'Enable Live Watch'}
-                content={isLiveWatching ? 'Disable automatic monitoring of generator output folders.' : 'Automatically detect and import new images from generator output folders.'}
+                label={isLiveWatching ? t('Disable Live Watch') : t('Enable Live Watch')}
+                content={isLiveWatching ? t('Disable automatic monitoring of generator output folders.') : t('Automatically detect and import new images from generator output folders.')}
                 aria-pressed={isLiveWatching}
                 onClick={toggleLiveWatch}
                 className={`p-2 rounded-xl transition-all border relative group ${liveWatchButtonClass}`}
@@ -262,8 +264,7 @@ export const AppHeader = React.memo(({
                     )}
                     {browserMockMode && (
                         <span className="shrink-0 rounded-md border border-ember-500/30 bg-ember-500/10 px-2 py-1 text-[11px] font-semibold text-ember-600 dark:text-ember-300">
-                            Browser Mock
-                        </span>
+                            {t('Browser Mock')}</span>
                     )}
                 </div>
 
@@ -272,19 +273,19 @@ export const AppHeader = React.memo(({
                         <div className="ml-1 flex items-center gap-1">{actionButtons}</div>
                     ) : (
                         <div ref={actionsMenuRef} className="relative">
-                            <button ref={actionsTriggerRef} type="button" aria-expanded={showActionsMenu} aria-label={`Library actions; Live Watch ${isLiveWatching ? 'on' : 'off'}`} onClick={() => setShowActionsMenu(open => !open)} className="flex h-9 items-center gap-1 rounded-xl border border-gray-200 bg-gray-100 px-2 text-gray-600 transition-colors hover:text-gray-900 dark:border-white/10 dark:bg-zinc-800/50 dark:text-zinc-300 dark:hover:text-white">
+                            <button ref={actionsTriggerRef} type="button" aria-expanded={showActionsMenu} aria-label={t(isLiveWatching ? 'Library actions; Live Watch on' : 'Library actions; Live Watch off')} onClick={() => setShowActionsMenu(open => !open)} className="flex h-9 items-center gap-1 rounded-xl border border-gray-200 bg-gray-100 px-2 text-gray-600 transition-colors hover:text-gray-900 dark:border-white/10 dark:bg-zinc-800/50 dark:text-zinc-300 dark:hover:text-white">
                                 <MoreHorizontal className="h-4 w-4" />
                                 <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${isLiveWatching ? 'bg-sage-500' : 'bg-gray-400 dark:bg-zinc-500'}`} />
-                                <span className="sr-only">Library actions; Live Watch {isLiveWatching ? 'on' : 'off'}</span>
+                                <span className="sr-only">{t(isLiveWatching ? 'Library actions; Live Watch on' : 'Library actions; Live Watch off')}</span>
                             </button>
                             {showActionsMenu && (
                                 <div className="absolute right-0 top-full z-[100] mt-2 w-52 rounded-xl border border-gray-200 bg-white p-2 shadow-2xl dark:border-white/10 dark:bg-zinc-900">
-                                    <div className="flex items-center justify-between gap-2 px-2 pb-2 text-[10px] font-bold uppercase tracking-wider text-gray-400"><span>Library actions</span><span className={isLiveWatching ? 'text-sage-600 dark:text-sage-300' : undefined}>{isLiveWatching ? 'Live Watch on' : 'Live Watch off'}</span></div>
+                                    <div className="flex items-center justify-between gap-2 px-2 pb-2 text-[10px] font-bold uppercase tracking-wider text-gray-400"><span>{t('Library actions')}</span><span className={isLiveWatching ? 'text-sage-600 dark:text-sage-300' : undefined}>{isLiveWatching ? t('Live Watch on') : t('Live Watch off')}</span></div>
                                     <div className="flex items-center gap-2">{actionButtons}</div>
-                                    {showSlideshowButton && <TooltipButton label="Start Slideshow" content="Start Slideshow" onClick={() => { setShowActionsMenu(false); onSlideshow(); }} className="mt-2 flex w-full items-center gap-2 rounded-lg px-2 py-2 text-xs text-gray-600 hover:bg-gray-100 dark:text-zinc-300 dark:hover:bg-white/5"><Play aria-hidden className="h-3.5 w-3.5" />Start Slideshow</TooltipButton>}
+                                    {showSlideshowButton && <TooltipButton label={t('Start Slideshow')} content={t('Start Slideshow')} onClick={() => { setShowActionsMenu(false); onSlideshow(); }} className="mt-2 flex w-full items-center gap-2 rounded-lg px-2 py-2 text-xs text-gray-600 hover:bg-gray-100 dark:text-zinc-300 dark:hover:bg-white/5"><Play aria-hidden className="h-3.5 w-3.5" />{t('Start Slideshow')}</TooltipButton>}
                                     {toolbarDensity === 'compact' && (
                                         <div className="mt-3 border-t border-gray-100 pt-2 dark:border-white/5">
-                                            <span className="px-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">Sort</span>
+                                            <span className="px-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">{t('Sort')}</span>
                                             <div className="mt-1 flex flex-col gap-1"><SortOptionList sortOption={sortOption} onSelect={selectOverflowSort} compact /></div>
                                         </div>
                                     )}

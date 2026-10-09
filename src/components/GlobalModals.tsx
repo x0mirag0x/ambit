@@ -5,6 +5,7 @@ import { AppUpdaterStatus } from '../hooks/useAppUpdater';
 import type { ImportResult } from '../services/importService';
 import { createDefaultFilters } from '../utils/filterState';
 import type { AmbitCollectionScopeTarget } from '../services/db/collectionRepo';
+import { useTranslation } from 'react-i18next';
 
 const SettingsModal = React.lazy(() => import('../features/settings/components/SettingsModal').then(module => ({ default: module.SettingsModal })));
 const ExportModal = React.lazy(() => import('../features/library/components/ExportModal').then(module => ({ default: module.ExportModal })));
@@ -118,6 +119,7 @@ export const GlobalModals: React.FC<GlobalModalsProps> = ({
     onOpenUpdatePrompt,
     onNavigateToMaintenance
 }) => {
+    const { t } = useTranslation();
     const deletePendingRef = React.useRef(false);
     const collectionDeletePendingRef = React.useRef(false);
     const [isDeletePending, setIsDeletePending] = React.useState(false);
@@ -193,8 +195,8 @@ export const GlobalModals: React.FC<GlobalModalsProps> = ({
                 isOpen={modals.deleteConfirm}
                 onCancel={() => closeModal('deleteConfirm')}
                 onConfirm={handleDeleteConfirm}
-                title="Remove from Library?"
-                message={`Remove ${deleteTargetCount} ${deleteTargetCount === 1 ? 'item' : 'items'} from Ambit while keeping the original ${deleteTargetCount === 1 ? 'file' : 'files'} on disk? You can restore them later from Maintenance > Removed.`}
+                title={t('Remove from Library?')}
+                message={t('dialog.removeFromLibrary', { count: deleteTargetCount })}
                 isDangerous={true}
                 isLoading={isDeletePending}
             />
@@ -203,9 +205,9 @@ export const GlobalModals: React.FC<GlobalModalsProps> = ({
                 isOpen={modals.deleteCollection}
                 onCancel={() => closeModal('deleteCollection')}
                 onConfirm={handleCollectionDeleteConfirm}
-                title="Delete Collection"
-                message={`Delete collection "${collectionToDelete?.name ?? 'Unknown collection'}"? Images will remain in your library.`}
-                confirmLabel="Delete Collection"
+                title={t('Delete Collection')}
+                message={t('Delete collection "{{v0}}"? Images will remain in your library.', { v0: collectionToDelete?.name ?? 'Unknown collection' })}
+                confirmLabel={t('Delete Collection')}
                 isDangerous={true}
                 isLoading={isCollectionDeletePending}
             />

@@ -9,6 +9,7 @@ import { CollectionThumbnailSkeleton } from '../../../components/ui/CollectionTh
 import { useCollectionStore } from '../../../stores/collectionStore';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import { compareCollectionsByCount, getCollectionCount, getCollectionCountLabel } from '../../../utils/collectionCount';
+import { useTranslation } from 'react-i18next';
 
 interface AddToCollectionModalProps {
     isOpen: boolean;
@@ -44,6 +45,7 @@ export const AddToCollectionModal: React.FC<AddToCollectionModalProps> = ({
     mode = 'add',
     sourceCollectionId
 }) => {
+    const { t } = useTranslation();
     const [searchQuery, setSearchQuery] = useState('');
     const [sort, setSort] = useState<CollectionSort>('date_desc');
     const [showSortMenu, setShowSortMenu] = useState(false);
@@ -117,11 +119,11 @@ export const AddToCollectionModal: React.FC<AddToCollectionModalProps> = ({
                 <div className="px-6 py-4 border-b border-gray-100 dark:border-white/5 flex items-center justify-between">
                     <div>
                         <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                            {mode === 'move' ? 'Move to Collection' : 'Add to Collection'}
+                            {mode === 'move' ? t('Move to Collection') : t('Add to Collection')}
                         </h3>
                         <p className="text-xs text-gray-500">{selectedIds.length} {selectedIds.length === 1 ? 'item' : 'items'} selected</p>
                     </div>
-                    <button ref={closeButtonRef} type="button" aria-label="Close Add to Collection" onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition-colors">
+                    <button ref={closeButtonRef} type="button" aria-label={t('Close Add to Collection')} onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full transition-colors">
                         <X className="w-5 h-5 text-gray-400" />
                     </button>
                 </div>
@@ -131,14 +133,14 @@ export const AddToCollectionModal: React.FC<AddToCollectionModalProps> = ({
                     <SearchInput
                         value={searchQuery}
                         onChange={setSearchQuery}
-                        placeholder="Search collections..."
+                        placeholder={t('Search collections...')}
                         className="flex-1"
                     />
 
                     <div className="relative">
                         <TooltipButton
-                            label="Sort Collections"
-                            content="Sort Collections"
+                            label={t('Sort Collections')}
+                            content={t('Sort Collections')}
                             aria-expanded={showSortMenu}
                             onClick={() => setShowSortMenu(!showSortMenu)}
                             className={`p-2 rounded-lg border transition-all ${showSortMenu ? 'bg-sage-600 text-white border-sage-600' : 'bg-white dark:bg-zinc-800 border-gray-200 dark:border-white/10 text-gray-500'}`}
@@ -147,8 +149,8 @@ export const AddToCollectionModal: React.FC<AddToCollectionModalProps> = ({
                         </TooltipButton>
 
                         <TooltipButton
-                            label={showArchived ? "Hide Archived Collections" : "Show Archived Collections"}
-                            content={showArchived ? "Hide Archived Collections" : "Show Archived Collections"}
+                            label={showArchived ? t('Hide Archived Collections') : t('Show Archived Collections')}
+                            content={showArchived ? t('Hide Archived Collections') : t('Show Archived Collections')}
                             aria-pressed={showArchived}
                             onClick={() => setShowArchived(!showArchived)}
                             className={`p-2 rounded-lg border transition-all ${showArchived ? 'bg-sage-600 text-white border-sage-600' : 'bg-white dark:bg-zinc-800 border-gray-200 dark:border-white/10 text-gray-500'}`}
@@ -175,7 +177,7 @@ export const AddToCollectionModal: React.FC<AddToCollectionModalProps> = ({
                                                 }}
                                                 className={`w-full text-left px-4 py-2 text-xs flex items-center justify-between hover:bg-gray-100 dark:hover:bg-white/5 transition-colors ${sort === opt.id ? 'text-sage-600 dark:text-sage-400 font-bold bg-sage-50/50 dark:bg-sage-900/10' : 'text-gray-600 dark:text-gray-400'}`}
                                             >
-                                                {opt.label}
+                                                {t(opt.label)}
                                                 {sort === opt.id && <Check className="w-3 h-3" />}
                                             </button>
                                         ))}
@@ -246,7 +248,7 @@ export const AddToCollectionModal: React.FC<AddToCollectionModalProps> = ({
                                                         {col.name}
                                                     </div>
                                                     {col.isArchived && (
-                                                        <span className="text-[8px] bg-gray-200 dark:bg-white/10 text-gray-500 px-1 rounded uppercase tracking-tighter">Archived</span>
+                                                        <span className="text-[8px] bg-gray-200 dark:bg-white/10 text-gray-500 px-1 rounded uppercase tracking-tighter">{t('Archived')}</span>
                                                     )}
                                                 </div>
                                                 <div
@@ -254,7 +256,7 @@ export const AddToCollectionModal: React.FC<AddToCollectionModalProps> = ({
                                                     aria-label={getCollectionCountLabel(col)}
                                                     title={getCollectionCountLabel(col)}
                                                 >
-                                                    {count === undefined ? '\u2014' : `${count} images`}
+                                                    {count === undefined ? '\u2014' : t('{{count}} images', { count: count })}
                                                 </div>
                                             </div>
                                         </div>
@@ -268,14 +270,14 @@ export const AddToCollectionModal: React.FC<AddToCollectionModalProps> = ({
                     ) : (
                         <div className="py-12 flex flex-col items-center justify-center text-gray-400">
                             <Folder className="w-12 h-12 mb-2 opacity-20" />
-                            <p className="text-sm italic">No matching collections found</p>
+                            <p className="text-sm italic">{t('No matching collections found')}</p>
                         </div>
                     )}
                 </div>
 
                 {/* Footer Tips */}
                 <div className="px-6 py-3 bg-gray-50 dark:bg-white/[0.02] border-t border-gray-100 dark:border-white/5">
-                    <p className="text-[10px] text-gray-400 text-center uppercase tracking-widest">Tip: You can also drag and drop images directly onto the sidebar</p>
+                    <p className="text-[10px] text-gray-400 text-center uppercase tracking-widest">{t('Tip: You can also drag and drop images directly onto the sidebar')}</p>
                 </div>
             </motion.div>
         </div>

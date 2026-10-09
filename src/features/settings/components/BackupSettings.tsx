@@ -5,8 +5,10 @@ import { useToast } from '../../../hooks/useToast';
 import { isOsOpenUnavailable, showPathInFolder } from '../../../services/osOpen';
 import { isBrowserMockMode } from '../../../services/runtime';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
+import { useTranslation } from 'react-i18next';
 
 export const BackupSettings: React.FC = () => {
+    const { t } = useTranslation();
     const [backups, setBackups] = React.useState<BackupInfo[]>([]);
     const [isLoading, setIsLoading] = React.useState(false);
     const [isCreating, setIsCreating] = React.useState(false);
@@ -26,7 +28,7 @@ export const BackupSettings: React.FC = () => {
             setBackups(result.data);
         } else {
             console.error(result.error);
-            addToast('Failed to load backups', 'error');
+            addToast(t('Failed to load backups'), 'error');
         }
         setIsLoading(false);
     }, [addToast, browserMockMode]);
@@ -39,11 +41,11 @@ export const BackupSettings: React.FC = () => {
         setIsCreating(true);
         const result = await commands.backupDatabase();
         if (result.status === 'ok') {
-            addToast('Backup created successfully', 'success');
+            addToast(t('Backup created successfully'), 'success');
             loadBackups();
         } else {
             console.error(result.error);
-            addToast(`Backup failed: ${result.error}`, 'error');
+            addToast(t('Backup failed: {{error}}', { error: result.error }), 'error');
         }
         setIsCreating(false);
     };
@@ -51,9 +53,9 @@ export const BackupSettings: React.FC = () => {
     const handleOpenFolder = async () => {
         const result = await showPathInFolder(backups[0].path);
         if (result.status === 'ok') {
-            addToast('Opening backup folder...', 'info');
+            addToast(t('Opening backup folder...'), 'info');
         } else {
-            addToast(result.error, isOsOpenUnavailable(result.error) ? 'info' : 'error');
+            addToast(t(result.error), isOsOpenUnavailable(result.error) ? 'info' : 'error');
         }
     };
 
@@ -73,13 +75,13 @@ export const BackupSettings: React.FC = () => {
         <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Database & Backups</h4>
-                    <p className="text-sm text-gray-500">Manage snapshots of your library database</p>
+                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">{t('Database & Backups')}</h4>
+                    <p className="text-sm text-gray-500">{t('Manage snapshots of your library database')}</p>
                 </div>
                 <div className="flex gap-2">
                     <TooltipButton
-                        label="Refresh Backup List"
-                        content="Refresh Backup List"
+                        label={t('Refresh Backup List')}
+                        content={t('Refresh Backup List')}
                         onClick={loadBackups}
                         disabled={isLoading}
                         className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
@@ -92,8 +94,7 @@ export const BackupSettings: React.FC = () => {
                             className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-white/10 rounded-lg hover:bg-gray-200 dark:hover:bg-white/20 transition-colors"
                         >
                             <FolderOpen className="w-4 h-4" />
-                            Folder
-                        </button>
+                            {t('Folder')}</button>
                     )}
                     <button
                         onClick={handleCreateBackup}
@@ -101,7 +102,7 @@ export const BackupSettings: React.FC = () => {
                         className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-sage-600 rounded-lg hover:bg-sage-500 transition-colors disabled:opacity-50"
                     >
                         <Database className="w-4 h-4" />
-                        {isCreating ? 'Creating...' : 'Backup Now'}
+                        {isCreating ? t('Creating...') : t('Backup Now')}
                     </button>
                 </div>
             </div>
@@ -110,7 +111,7 @@ export const BackupSettings: React.FC = () => {
                 {backups.length === 0 ? (
                     <div className="text-center py-8 text-gray-500 border border-dashed border-gray-200 dark:border-white/10 rounded-lg">
                         <Database className="w-8 h-8 mx-auto mb-2 opacity-20" />
-                        <p>{browserMockMode ? 'Backups are unavailable in browser mock mode' : 'No backups found'}</p>
+                        <p>{browserMockMode ? t('Backups are unavailable in browser mock mode') : t('No backups found')}</p>
                     </div>
                 ) : (
                     backups.slice(0, 3).map((backup) => (
@@ -132,16 +133,14 @@ export const BackupSettings: React.FC = () => {
                 )}
                 {backups.length > 3 && (
                     <div className="text-center text-xs text-gray-500 pt-2">
-                        + {backups.length - 3} more archived backups
-                    </div>
+                        + {backups.length - 3} {t('more archived backups')}</div>
                 )}
             </div>
 
             <div className="mt-4 flex items-start gap-2 p-3 bg-harbor-50 dark:bg-harbor-900/10 text-harbor-600 dark:text-harbor-300 rounded-lg text-xs">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                 <p>
-                    Production builds create backups automatically once every 24 hours. The newest 3 backups are kept.
-                    Development builds only create backups when you use Backup Now. To restore, please manually replace the <code>images.db</code> file.
+                    {t('Production builds create backups automatically once every 24 hours. The newest 3 backups are kept. Development builds only create backups when you use Backup Now. To restore, please manually replace the')}<code>images.db</code> file.
                 </p>
             </div>
         </section>

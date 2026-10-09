@@ -20,6 +20,7 @@ import { MetadataGeneratorField } from './MetadataGeneratorField';
 import { MetadataModelField } from './MetadataModelField';
 import { MetadataDisclosureSection } from './MetadataDisclosureSection';
 import type { MetadataDisclosureController } from '../../hooks/useMetadataDisclosureState';
+import { useTranslation } from 'react-i18next';
 
 interface MetadataInfoTabProps {
     image: AIImage;
@@ -73,6 +74,7 @@ export const MetadataInfoTab = ({
     onOpenReferencedImage
 }: MetadataInfoTabProps) => {
     // Feedback State
+    const { t } = useTranslation();
     const [copiedPrompt, setCopiedPrompt] = useState(false);
     const [copiedData, setCopiedData] = useState(false);
     const [isPromptDirty, setIsPromptDirty] = useState(false);
@@ -288,27 +290,27 @@ export const MetadataInfoTab = ({
         <>
             {hasInvokeSource ? (
                 <section className="rounded-xl border border-gray-200 bg-white/50 p-4 dark:border-white/5 dark:bg-zinc-800/30" aria-labelledby="invoke-source-heading">
-                    <MetadataSectionHeader title="Source" icon={Link} headingId="invoke-source-heading" className="mb-3" />
+                    <MetadataSectionHeader title={t('Source')} icon={Link} headingId="invoke-source-heading" className="mb-3" />
                     <dl className="space-y-2 text-xs">
                         <div className="flex items-start justify-between gap-4">
-                            <dt className="text-gray-400">System</dt>
-                            <dd className="text-right font-medium text-gray-700 dark:text-gray-200">InvokeAI</dd>
+                            <dt className="text-gray-400">{t('System')}</dt>
+                            <dd className="text-right font-medium text-gray-700 dark:text-gray-200">{t('InvokeAI')}</dd>
                         </div>
                         {invokeImageName ? (
                             <div className="flex items-start justify-between gap-4">
-                                <dt className="text-gray-400">Image name</dt>
+                                <dt className="text-gray-400">{t('Image name')}</dt>
                                 <dd className="min-w-0 break-all text-right font-mono text-gray-700 dark:text-gray-200">{invokeImageName}</dd>
                             </div>
                         ) : null}
                         {invokeImageCategory ? (
                             <div className="flex items-start justify-between gap-4">
-                                <dt className="text-gray-400">Category</dt>
+                                <dt className="text-gray-400">{t('Category')}</dt>
                                 <dd className="min-w-0 break-words text-right font-medium text-gray-700 dark:text-gray-200">{invokeImageCategory}</dd>
                             </div>
                         ) : null}
                         {invokeImageOrigin ? (
                             <div className="flex items-start justify-between gap-4">
-                                <dt className="text-gray-400">Origin</dt>
+                                <dt className="text-gray-400">{t('Origin')}</dt>
                                 <dd className="min-w-0 break-words text-right font-medium text-gray-700 dark:text-gray-200">{invokeImageOrigin}</dd>
                             </div>
                         ) : null}
@@ -341,16 +343,16 @@ export const MetadataInfoTab = ({
                         headerAction={<div className="flex items-center gap-1">
                             {image.originalMetadata && image.originalMetadata.positivePrompt !== image.metadata.positivePrompt ? (
                             <div className="flex rounded-lg border border-gray-200 bg-gray-100 p-0.5 dark:border-white/10 dark:bg-white/5">
-                                <button type="button" onClick={() => setShowOriginalPrompt(false)} className={`rounded px-2 py-0.5 text-[10px] font-bold ${!showOriginalPrompt ? 'bg-sage-600 text-white' : 'text-gray-500 dark:text-zinc-500'}`}>Current</button>
-                                <button type="button" onClick={() => setShowOriginalPrompt(true)} className={`rounded px-2 py-0.5 text-[10px] font-bold ${showOriginalPrompt ? 'bg-sage-600 text-white' : 'text-gray-500 dark:text-zinc-500'}`}>Original</button>
+                                <button type="button" onClick={() => setShowOriginalPrompt(false)} className={`rounded px-2 py-0.5 text-[10px] font-bold ${!showOriginalPrompt ? 'bg-sage-600 text-white' : 'text-gray-500 dark:text-zinc-500'}`}>{t('Current')}</button>
+                                <button type="button" onClick={() => setShowOriginalPrompt(true)} className={`rounded px-2 py-0.5 text-[10px] font-bold ${showOriginalPrompt ? 'bg-sage-600 text-white' : 'text-gray-500 dark:text-zinc-500'}`}>{t('Original')}</button>
                                 </div>
                             ) : null}
-                                {onRecoverMetadata ? <TooltipButton label="Recover Prompt with AI" content="Recover Prompt with AI" onClick={onRecoverMetadata} className="rounded p-1.5 text-amethyst-600 hover:bg-gray-100 dark:text-amethyst-300 dark:hover:bg-white/5"><Wand2 className="h-3.5 w-3.5" /></TooltipButton> : null}
+                                {onRecoverMetadata ? <TooltipButton label={t('Recover Prompt with AI')} content={t('Recover Prompt with AI')} onClick={onRecoverMetadata} className="rounded p-1.5 text-amethyst-600 hover:bg-gray-100 dark:text-amethyst-300 dark:hover:bg-white/5"><Wand2 className="h-3.5 w-3.5" /></TooltipButton> : null}
                             {onUpdatePrompt && onUpdateNegativePrompt && (image.metadata.tool === GeneratorTool.AUTOMATIC1111
                                 || image.metadata.tool === GeneratorTool.FORGE
-                                    || image.metadata.tool === GeneratorTool.UNKNOWN) ? <TooltipButton label="Parse Prompt from Clipboard" content="Parse Prompt from Clipboard" onClick={() => void handleParseClipboard()} className="rounded p-1.5 text-sage-600 hover:bg-gray-100 dark:text-sage-300 dark:hover:bg-white/5"><ClipboardList className="h-3.5 w-3.5" /></TooltipButton> : null}
-                                {image.originalMetadata && !isLoading && hasModifications() && onRevertMetadata ? <TooltipButton label="Revert All Metadata to Original" content="Revert All Metadata to Original" onClick={() => onRevertMetadata(image.id)} className="rounded p-1.5 text-ember-600 hover:bg-gray-100 dark:text-ember-300 dark:hover:bg-white/5"><Undo2 className="h-3.5 w-3.5" /></TooltipButton> : null}
-                                <TooltipButton label="Copy Prompt" content="Copy Prompt" onClick={handleCopyPrompt} className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-zinc-500 dark:hover:bg-white/5 dark:hover:text-zinc-300">{copiedPrompt ? <Check className="h-3.5 w-3.5 text-sage-600 dark:text-sage-300" /> : <Copy className="h-3.5 w-3.5" />}</TooltipButton>
+                                    || image.metadata.tool === GeneratorTool.UNKNOWN) ? <TooltipButton label={t('Parse Prompt from Clipboard')} content={t('Parse Prompt from Clipboard')} onClick={() => void handleParseClipboard()} className="rounded p-1.5 text-sage-600 hover:bg-gray-100 dark:text-sage-300 dark:hover:bg-white/5"><ClipboardList className="h-3.5 w-3.5" /></TooltipButton> : null}
+                                {image.originalMetadata && !isLoading && hasModifications() && onRevertMetadata ? <TooltipButton label={t('Revert All Metadata to Original')} content={t('Revert All Metadata to Original')} onClick={() => onRevertMetadata(image.id)} className="rounded p-1.5 text-ember-600 hover:bg-gray-100 dark:text-ember-300 dark:hover:bg-white/5"><Undo2 className="h-3.5 w-3.5" /></TooltipButton> : null}
+                                <TooltipButton label={t('Copy Prompt')} content={t('Copy Prompt')} onClick={handleCopyPrompt} className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-zinc-500 dark:hover:bg-white/5 dark:hover:text-zinc-300">{copiedPrompt ? <Check className="h-3.5 w-3.5 text-sage-600 dark:text-sage-300" /> : <Copy className="h-3.5 w-3.5" />}</TooltipButton>
                         </div>}
                         overlay={promptSuggestions.length > 0 ? <div ref={promptSuggestionsRef} className="absolute bottom-full left-0 right-0 z-20 mb-1 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-xl dark:border-white/10 dark:bg-zinc-900">
                             {promptSuggestions.map(suggestion => <button key={suggestion} type="button" className="group flex w-full items-center justify-between px-3 py-2 text-left text-xs hover:bg-gray-100 dark:hover:bg-white/5" onMouseDown={event => event.preventDefault()} onBlur={event => {
@@ -405,14 +407,14 @@ export const MetadataInfoTab = ({
                         { label: 'Hires Upscaler', value: image.metadata.hiresUpscaler || 'Unknown', modified: isModified('hiresUpscaler'), optional: true },
                         { label: 'Model Hash', value: modelPresentation.isHashFallback ? 'Unknown' : (image.metadata.modelHash || 'Unknown'), optional: true },
                     ]} expanded={disclosure?.isExpanded('generationParameters')} onExpandedChange={expanded => disclosure?.setExpanded('generationParameters', expanded)} headerAction={
-                    <TooltipButton label="Copy generation data" content="Copy prompts and generation settings in the best available source-compatible format." onClick={handleCopyGenData} className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-zinc-500 dark:hover:bg-white/5 dark:hover:text-zinc-300">
+                    <TooltipButton label={t('Copy generation data')} content={t('Copy prompts and generation settings in the best available source-compatible format.')} onClick={handleCopyGenData} className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-zinc-500 dark:hover:bg-white/5 dark:hover:text-zinc-300">
                         {copiedData ? <Check className="h-3.5 w-3.5 text-sage-600 dark:text-sage-300" /> : <ClipboardList className="h-3.5 w-3.5" />}
                         </TooltipButton>
                     } />
 
                     {/* Tags */}
                     {smartTags.length > 0 && (
-                        <MetadataDisclosureSection title="Smart Tags" icon={Tag} count={smartTags.length} expanded={disclosure?.isExpanded('smartTags')} onExpandedChange={expanded => disclosure?.setExpanded('smartTags', expanded)}>
+                        <MetadataDisclosureSection title={t('Smart Tags')} icon={Tag} count={smartTags.length} expanded={disclosure?.isExpanded('smartTags')} onExpandedChange={expanded => disclosure?.setExpanded('smartTags', expanded)}>
                             <div className="flex flex-wrap gap-2">
                                 {smartTags.map((tag, i) => <MetadataChip key={i} onClick={() => { onSearch(tag); onClose(); }} className="max-w-[150px]">
                                     <span className="truncate px-2 py-1.5 text-xs text-gray-600 group-hover:text-sage-600 dark:text-gray-400 dark:group-hover:text-sage-300">{tag}</span>
@@ -447,11 +449,11 @@ export const MetadataInfoTab = ({
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                         <Sparkles className="w-4 h-4 text-amethyst-600 dark:text-amethyst-300" />
-                        <h3 className="text-xs font-bold uppercase text-amethyst-600 dark:text-amethyst-300 tracking-wider">Creative Assistant</h3>
+                        <h3 className="text-xs font-bold uppercase text-amethyst-600 dark:text-amethyst-300 tracking-wider">{t('Creative Assistant')}</h3>
                     </div>
                     {onOpenAIResult && (
                         <button onClick={onOpenAIResult} className="flex items-center gap-1 text-xs text-amethyst-600 hover:text-amethyst-600 hover:underline dark:text-amethyst-300 dark:hover:text-amethyst-300">
-                            View last result <Eye className="w-3 h-3" />
+                            {t('View last result')} <Eye className="w-3 h-3" />
                         </button>
                     )}
                 </div>
@@ -461,10 +463,10 @@ export const MetadataInfoTab = ({
                         onClick={onAIAnalysis} disabled={isAnalyzing}
                         className="p-4 bg-white/60 dark:bg-zinc-800/40 rounded-xl border border-gray-200 dark:border-white/5 hover:border-amethyst-300 dark:hover:border-amethyst-500/30 transition-all flex flex-col justify-between h-24 text-left group"
                     >
-                        <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Prompt Analysis</span>
+                        <span className="text-xs font-bold text-gray-700 dark:text-gray-300">{t('Prompt Analysis')}</span>
                         <div className="flex items-center justify-between w-full">
                             <span className="text-[10px] text-gray-500 group-hover:text-amethyst-600 dark:text-zinc-400 dark:group-hover:text-amethyst-300">
-                                {isAnalyzing ? "Analyzing..." : "Get insights"}
+                                {isAnalyzing ? t('Analyzing...') : t('Get insights')}
                             </span>
                             {isAnalyzing ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-amethyst-600 border-t-transparent dark:border-amethyst-300" /> : <Wand2 className="w-4 h-4 text-amethyst-600 dark:text-amethyst-300" />}
                         </div>
@@ -474,10 +476,10 @@ export const MetadataInfoTab = ({
                         onClick={onGenerateVariations} disabled={isAnalyzing}
                         className="p-4 bg-white/60 dark:bg-zinc-800/40 rounded-xl border border-gray-200 dark:border-white/5 hover:border-amethyst-300 dark:hover:border-amethyst-500/30 transition-all flex flex-col justify-between h-24 text-left group"
                     >
-                        <span className="text-xs font-bold text-gray-700 dark:text-gray-300">Variations</span>
+                        <span className="text-xs font-bold text-gray-700 dark:text-gray-300">{t('Variations')}</span>
                         <div className="flex items-center justify-between w-full">
                             <span className="text-[10px] text-gray-500 group-hover:text-amethyst-600 dark:text-zinc-400 dark:group-hover:text-amethyst-300">
-                                {isAnalyzing ? "Creating..." : "Create twists"}
+                                {isAnalyzing ? t('Creating...') : t('Create twists')}
                             </span>
                             {isAnalyzing ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-amethyst-600 border-t-transparent dark:border-amethyst-300" /> : <Shuffle className="w-4 h-4 text-amethyst-600 dark:text-amethyst-300" />}
                         </div>

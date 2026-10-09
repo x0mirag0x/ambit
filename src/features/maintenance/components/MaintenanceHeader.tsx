@@ -1,5 +1,6 @@
 import React from 'react';
 import { MaintenanceTab } from '../../../hooks/useMaintenanceData';
+import { useTranslation } from 'react-i18next';
 
 interface MaintenanceHeaderProps {
     title: string;
@@ -26,6 +27,7 @@ export const MaintenanceHeader: React.FC<MaintenanceHeaderProps> = ({
     onClearSelection,
     variant = 'sage'
 }) => {
+    const { t } = useTranslation();
     const bgColors = {
         sage: 'bg-sage-500/10 text-sage-600 dark:text-sage-300',
         harbor: 'bg-harbor-100 text-harbor-600 dark:bg-harbor-500/10 dark:text-harbor-300',
@@ -64,15 +66,13 @@ export const MaintenanceHeader: React.FC<MaintenanceHeaderProps> = ({
                                     onClick={onClearSelection}
                                     className="text-xs font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                                 >
-                                    Deselect All
-                                </button>
+                                    {t('Deselect All')}</button>
                             ) : (
                                 <button
                                     onClick={onSelectAll}
                                     className="text-xs font-bold text-sage-600 hover:text-sage-500"
                                 >
-                                    Select All
-                                </button>
+                                    {t('Select All')}</button>
                             )}
                         </div>
                     )}

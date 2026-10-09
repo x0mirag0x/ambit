@@ -9,6 +9,7 @@ import { SmartImage } from '../../../features/library/components/SmartImage';
 import { formatModelName } from '../../../utils/formatUtils';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import { getInvokeImageAssetLabel } from '../../../utils/invokeImageSource';
+import { useTranslation } from 'react-i18next';
 
 interface ImageCardProps {
   image: AIImage;
@@ -43,6 +44,7 @@ export const ImageCard: React.FC<ImageCardProps> = ({
   onMouseDown,
   onImageError
 }) => {
+  const { t } = useTranslation();
   const [isRevealed, setIsRevealed] = useState(false);
 
   const shouldBlur = isMasked && !isRevealed;
@@ -84,7 +86,10 @@ export const ImageCard: React.FC<ImageCardProps> = ({
     >
       <button
         type="button"
-        aria-label={`Open ${image.filename}, ${isVideo ? 'Video' : sourceKind === 'photograph' ? 'Photo' : sourceKind === 'generated' ? 'Generated image' : 'Other image'}`}
+        aria-label={t('Open {{filename}}, {{kind}}', {
+          filename: image.filename,
+          kind: isVideo ? t('Video') : sourceKind === 'photograph' ? t('Photo') : sourceKind === 'generated' ? t('Generated image') : t('Other image'),
+        })}
         onClick={(e) => onClick(e, isMasked && isRevealed)}
         className="absolute inset-0 z-[1] cursor-pointer rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sage-400"
       />
@@ -124,7 +129,7 @@ export const ImageCard: React.FC<ImageCardProps> = ({
             <div className="p-3 bg-sage-100 dark:bg-sage-900/50 rounded-full mb-2 backdrop-blur-sm border border-sage-200 dark:border-sage-500/30">
               <Trash2 className="w-6 h-6 text-sage-600 dark:text-sage-400" />
             </div>
-            <span className="text-[10px] font-bold text-white bg-black/50 px-2 py-1 rounded">Trash</span>
+            <span className="text-[10px] font-bold text-white bg-black/50 px-2 py-1 rounded">{t('Trash')}</span>
           </div>
         )}
 
@@ -133,8 +138,7 @@ export const ImageCard: React.FC<ImageCardProps> = ({
           <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-gray-100/50 dark:bg-slate-950/20 backdrop-blur-sm animate-in fade-in duration-300 p-2 text-center overflow-hidden [container-type:size]">
             <EyeOff className="w-8 h-8 text-sage-500 dark:text-sage-400 mb-2 drop-shadow-md shrink-0" />
             <span className="text-[10px] sm:text-xs font-bold text-sage-600 dark:text-sage-200 uppercase tracking-widest drop-shadow-md whitespace-nowrap px-1 w-full truncate hide-on-narrow">
-              Hidden Content
-            </span>
+              {t('Hidden Content')}</span>
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -142,8 +146,7 @@ export const ImageCard: React.FC<ImageCardProps> = ({
               }}
               className="pointer-events-auto mt-2 px-3 py-1 bg-black/50 hover:bg-black/80 text-white text-[10px] font-bold rounded-full border border-white/20 transition-colors shadow-lg backdrop-blur-md cursor-pointer shrink-0"
             >
-              Reveal
-            </button>
+              {t('Reveal')}</button>
           </div>
         )}
       </div>
@@ -153,14 +156,14 @@ export const ImageCard: React.FC<ImageCardProps> = ({
 
         {/* Missing Indicator */}
         {isMissing && (
-          <div className="p-1.5 bg-red-500/90 text-white rounded-full shadow-lg shadow-red-500/20 backdrop-blur-md pointer-events-auto" title="Source file not found">
+          <div className="p-1.5 bg-red-500/90 text-white rounded-full shadow-lg shadow-red-500/20 backdrop-blur-md pointer-events-auto" title={t('Source file not found')}>
             <Unlink className="w-3 h-3" />
           </div>
         )}
 
         {/* Pin Icon */}
         {image.isPinned && !isMissing && (
-          <div className="p-1.5 bg-sage-500 text-white rounded-full shadow-lg shadow-sage-500/50 animate-in zoom-in duration-300 pointer-events-auto" title="Pinned">
+          <div className="p-1.5 bg-sage-500 text-white rounded-full shadow-lg shadow-sage-500/50 animate-in zoom-in duration-300 pointer-events-auto" title={t('Pinned')}>
             <Pin className="w-3 h-3 fill-current" />
           </div>
         )}
@@ -169,7 +172,7 @@ export const ImageCard: React.FC<ImageCardProps> = ({
         {image.isFavorite && !isMissing && (
           <div
             role="img"
-            aria-label="Favorite"
+            aria-label={t('Favorite')}
             className="transition-all duration-300 animate-in zoom-in"
           >
             <Heart className="w-5 h-5 fill-red-500 text-red-500 drop-shadow-md" />
@@ -179,14 +182,14 @@ export const ImageCard: React.FC<ImageCardProps> = ({
 
       {/* Collection Thumbnail Indicator */}
       {isThumbnail && !isMissing && (
-        <div className="absolute bottom-2 left-2 z-20 p-1.5 bg-sage-500/80 backdrop-blur-md text-white rounded-full shadow-lg border border-white/20 animate-in zoom-in duration-300 transition-opacity group-hover:opacity-0" title="Collection Thumbnail">
+        <div className="absolute bottom-2 left-2 z-20 p-1.5 bg-sage-500/80 backdrop-blur-md text-white rounded-full shadow-lg border border-white/20 animate-in zoom-in duration-300 transition-opacity group-hover:opacity-0" title={t('Collection Thumbnail')}>
           <ImageIcon className="w-3 h-3" />
         </div>
       )}
 
       <button
         type="button"
-        aria-label={isSelected ? "Deselect Image" : "Select Image"}
+        aria-label={isSelected ? t('Deselect Image') : t('Select Image')}
         aria-pressed={isSelected}
         className={`absolute top-2 left-2 z-20 transition-all duration-300 ease-spring cursor-pointer p-1 ${isSelected ? 'opacity-100 scale-100' : 'opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100 focus-visible:opacity-100 focus-visible:scale-100'}`}
         onKeyDown={(e) => {
@@ -205,8 +208,8 @@ export const ImageCard: React.FC<ImageCardProps> = ({
       {invokeAssetLabel && (
         <span
           className="pointer-events-none absolute left-1/2 top-2 z-20 max-w-[calc(100%-6rem)] -translate-x-1/2 truncate whitespace-nowrap rounded-md border border-white/20 bg-black/70 px-2 py-1 text-[9px] font-bold uppercase tracking-wide text-white shadow-lg backdrop-blur-md"
-          title={`InvokeAI image asset category: ${invokeAssetLabel}`}
-          aria-label={`InvokeAI image asset category: ${invokeAssetLabel}`}
+          title={t('InvokeAI image asset category: {{invokeAssetLabel}}', { invokeAssetLabel: invokeAssetLabel })}
+          aria-label={t('InvokeAI image asset category: {{invokeAssetLabel}}', { invokeAssetLabel: invokeAssetLabel })}
         >
           {invokeAssetMarkerLabel}
         </span>
@@ -235,16 +238,16 @@ export const ImageCard: React.FC<ImageCardProps> = ({
                 })()}
               </div>
               <div className="text-[10px] text-gray-300 font-mono">
-                {!isVideo && sourceKind !== 'generated' ? `${formatImageDisplayDate(image)} · ` : ''}
-                {image.width}x{image.height}{isVideo ? ` · ${formatVideoDuration(image.durationMs)}` : ''}
+                {!isVideo && sourceKind !== 'generated' ? t('{{v0}} · ', { v0: formatImageDisplayDate(image) }) : ''}
+                {image.width}x{image.height}{isVideo ? t(' · {{v0}}', { v0: formatVideoDuration(image.durationMs) }) : ''}
               </div>
             </div>
             <div className="pointer-events-auto flex items-center gap-1 shrink-0">
               {/* Manual Hide Button (Only if it was masked originally) */}
               {isMasked && (
                 <TooltipButton
-                  label="Hide Content"
-                  content="Hide Content"
+                  label={t('Hide Content')}
+                  content={t('Hide Content')}
                   className="p-1.5 hover:bg-white/20 rounded-full transition-colors text-white cursor-pointer"
                   onClick={(e) => { e.stopPropagation(); setIsRevealed(false); }}
                 >
@@ -254,8 +257,8 @@ export const ImageCard: React.FC<ImageCardProps> = ({
 
               {onTogglePin && (
                 <TooltipButton
-                  label={image.isPinned ? "Unpin" : "Pin to Top"}
-                  content={image.isPinned ? "Unpin" : "Pin to Top"}
+                  label={image.isPinned ? t('Unpin') : t('Pin to Top')}
+                  content={image.isPinned ? t('Unpin') : t('Pin to Top')}
                   aria-pressed={Boolean(image.isPinned)}
                   className={`p-1.5 rounded-full transition-colors cursor-pointer ${image.isPinned ? 'text-sage-400 bg-white/10' : 'text-white hover:bg-white/20'}`}
                   onClick={(e) => { e.stopPropagation(); onTogglePin(e); }}
@@ -264,8 +267,8 @@ export const ImageCard: React.FC<ImageCardProps> = ({
                 </TooltipButton>
               )}
               <TooltipButton
-                label={image.isFavorite ? "Remove from Favorites" : "Add to Favorites"}
-                content={image.isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+                label={image.isFavorite ? t('Remove from Favorites') : t('Add to Favorites')}
+                content={image.isFavorite ? t('Remove from Favorites') : t('Add to Favorites')}
                 aria-pressed={image.isFavorite}
                 className="p-1.5 hover:bg-white/20 rounded-full transition-colors cursor-pointer active:scale-95"
                 onClick={(e) => {

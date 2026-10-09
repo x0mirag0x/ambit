@@ -18,6 +18,7 @@ import { useLibraryStore } from '../stores/libraryStore';
 import { isBrowserMockMode } from '../services/runtime';
 import type { ImportProgressCallback, ImportResult } from '../services/importService';
 import type { InvokeSyncOutcome } from '../contexts/SyncContext';
+import { useTranslation } from 'react-i18next';
 
 interface ImportOptions {
     mode?: ImportMode;
@@ -61,6 +62,7 @@ const markInitialScanCancelled = (folderIds: string[]) => {
 };
 
 export function useFolderMonitor({ isLoaded, monitoredFolders, onScan, handleImportPaths, addToast, refreshMetadata, invokeAiPath, startInvokeSync }: UseFolderMonitorProps) {
+    const { t } = useTranslation();
     const prevFoldersRef = useRef(monitoredFolders);
     const hasScannedOnStartup = useRef(false);
     const updateFolderLastScanned = useSettingsStore(s => s.updateFolderLastScanned);
@@ -321,9 +323,9 @@ export function useFolderMonitor({ isLoaded, monitoredFolders, onScan, handleImp
             if (activeNew.length > 0) {
                 void (async () => {
                     if (activeNew.length === 1) {
-                        addToast(`Scanning new folder: ${activeNew[0].path}`, 'info');
+                        addToast(t('Scanning new folder: {{path}}', { path: activeNew[0].path }), 'info');
                     } else {
-                        addToast(`Scanning ${activeNew.length} new folders`, 'info');
+                        addToast(t('Scanning {{length}} new folders', { length: activeNew.length }), 'info');
                     }
 
                     const scanData = activeNew.map(f => ({ path: f.path, variant: f.variant }));
@@ -483,7 +485,7 @@ export function useFolderMonitor({ isLoaded, monitoredFolders, onScan, handleImp
 
             await refreshMetadata();
 
-            addToast(`${source}: Synced ${totalFilesFound} new items`, 'success');
+            addToast(t('{{source}}: Synced {{totalFilesFound}} new items', { source: source, totalFilesFound: totalFilesFound }), 'success');
         } else {
             console.log(`[FolderMonitor] ${source}: No new files found.`);
         }

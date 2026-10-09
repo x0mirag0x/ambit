@@ -18,6 +18,7 @@ import { removeImagesFromQueryCaches, updateImagesQueryCaches } from '../utils/i
 import type { ActiveImageStateAdapter } from './activeImageState';
 import { invalidateInvokeReferenceQueries } from '../services/db/invokeReferenceRepo';
 import type { DeleteRemovedImagesResult, ExactDuplicateResolution, ExactDuplicateResolutionResult } from '../bindings';
+import { useTranslation } from 'react-i18next';
 
 interface UseAppHandlersProps {
     images: AIImage[];
@@ -28,6 +29,7 @@ interface UseAppHandlersProps {
 }
 
 export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, refreshHiddenAvailability, activeImageState }: UseAppHandlersProps) => {
+    const { t } = useTranslation();
     const { addToast } = useToast();
     const queryClient = useQueryClient();
     const incrementFacetCacheVersion = useLibraryStore(state => state.incrementFacetCacheVersion);
@@ -66,7 +68,7 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
 
         updateImage(id, () => updatedImg);
         await updateImageMetadataFields(id, { positivePrompt: prompt });
-        addToast('Updated', 'success');
+        addToast(t('Updated'), 'success');
     };
 
     const handleUpdateNegativePrompt = async (id: string, negativePrompt: string) => {
@@ -89,7 +91,7 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
 
         updateImage(id, () => updatedImg);
         await updateImageMetadataFields(id, { negativePrompt });
-        addToast('Updated', 'success');
+        addToast(t('Updated'), 'success');
     };
 
     const handleUpdateModel = async (id: string, model: string) => {
@@ -117,7 +119,7 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
         // Ensure filter panel is updated
         rebuildFacetCacheIncremental('checkpoints').then(() => incrementFacetCacheVersion());
 
-        addToast('Updated', 'success');
+        addToast(t('Updated'), 'success');
     };
 
     const handleUpdateTool = async (id: string, tool: GeneratorTool) => {
@@ -144,7 +146,7 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
         // Ensure filter panel is updated
         rebuildFacetCacheIncremental('tools').then(() => incrementFacetCacheVersion());
 
-        addToast('Updated', 'success');
+        addToast(t('Updated'), 'success');
     };
 
     const handleUpdateVideoGenerationMode = async (id: string, generationMode: string) => {
@@ -166,7 +168,7 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
         } as AIImage;
         updateImage(id, () => updatedImg);
         await updateImageMetadataFields(id, { generationMode, generationType: generationMode });
-        addToast('Updated', 'success');
+        addToast(t('Updated'), 'success');
     };
 
     const handleGroupImages = (ids: string[]) => {
@@ -174,7 +176,7 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
         setImages(prev => prev.map(img =>
             ids.includes(img.id) ? { ...img, groupId } : img
         ));
-        addToast(`Grouped ${ids.length} images into a stack`, 'success');
+        addToast(t('Grouped {{length}} images into a stack', { length: ids.length }), 'success');
     };
 
     const handleResolveDuplicate = async (resolutions: ExactDuplicateResolution[]) => {
@@ -184,7 +186,7 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
             result = await resolveExactDuplicateGroups(resolutions);
         } catch (error) {
             console.error('Failed to resolve exact duplicates', error);
-            addToast('Could not resolve duplicates. Run the scan again and retry.', 'error');
+            addToast(t('Could not resolve duplicates. Run the scan again and retry.'), 'error');
             throw error;
         }
 
@@ -212,7 +214,7 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
         } catch (error) {
             console.error('Failed to refresh image queries after resolving duplicates', error);
         }
-        addToast(`Moved ${result.removedIds.length} duplicate${result.removedIds.length === 1 ? '' : 's'} to Removed`, 'success');
+        addToast(t('toast.movedDuplicates', { count: result.removedIds.length }), 'success');
         refreshMaintenanceCounts();
         refreshFacets();
     };
@@ -220,7 +222,7 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
     const handleRestoreImages = async (ids: string[]) => {
         const result = await restoreRemovedImages(ids).catch(error => {
             console.error('[Restore] Failed to restore removed images', error);
-            addToast('Could not restore the selected items. Their Removed entries were kept.', 'error');
+            addToast(t('Could not restore the selected items. Their Removed entries were kept.'), 'error');
             throw error;
         });
         let refreshFailed = false;
@@ -234,12 +236,12 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
             refreshFailed = true;
             console.error('[Restore] Restored images, but failed to refresh dependent views', error);
         }
-        addToast(`Restored ${result.affectedIds.length} item${result.affectedIds.length === 1 ? '' : 's'} to the library`, 'success');
+        addToast(t('toast.restoredItems', { count: result.affectedIds.length }), 'success');
         if (refreshFailed) {
-            addToast('Items were restored, but some views may need a refresh.', 'warning');
+            addToast(t('Items were restored, but some views may need a refresh.'), 'warning');
         }
         if (result.membershipWarningIds.length > 0) {
-            addToast(`${result.membershipWarningIds.length} restored ${result.membershipWarningIds.length === 1 ? 'item has' : 'items have'} legacy collection data that could not be recovered.`, 'warning');
+            addToast(t('toast.membershipWarning', { count: result.membershipWarningIds.length }), 'warning');
         }
         refreshMaintenanceCounts();
         void refreshFacetCacheForResourcesStrict(result.touchedResources)
@@ -250,14 +252,14 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
     const handleRemoveFromLibrary = async (ids: string[]) => {
         const result = await removeImagesFromLibrary(ids).catch(error => {
             console.error('[Removed] Failed to remove images from the library', error);
-            addToast('Could not remove the selected items. The library was left unchanged.', 'error');
+            addToast(t('Could not remove the selected items. The library was left unchanged.'), 'error');
             throw error;
         });
 
         const affectedIds = new Set(result.affectedIds);
         setImages(p => p.filter(i => !affectedIds.has(i.id)));
         removeImagesFromQueryCaches(queryClient, affectedIds);
-        addToast(`Removed ${result.affectedIds.length} item${result.affectedIds.length === 1 ? '' : 's'} from the library`, 'success');
+        addToast(t('toast.removedItems', { count: result.affectedIds.length }), 'success');
         refreshMaintenanceCounts();
         try {
             await Promise.all([
@@ -266,7 +268,7 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
             ]);
         } catch (error) {
             console.error('[Removed] Images were removed, but dependent views failed to refresh', error);
-            addToast('Items were removed, but some views may need a refresh.', 'warning');
+            addToast(t('Items were removed, but some views may need a refresh.'), 'warning');
         }
         void refreshFacetCacheForResourcesStrict(result.touchedResources)
             .then(() => incrementFacetCacheVersion())
@@ -298,40 +300,49 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
             if (unresolvedCount === 0 && result.thumbnailWarningIds.length === 0 && result.notFoundIds.length === 0) {
                 const recoveredCount = result.alreadyMissingIds.length;
                 const message = recoveredCount > 0
-                    ? `Removed ${result.clearedIds.length} ${result.clearedIds.length === 1 ? 'entry' : 'entries'} from Ambit; ${recoveredCount} source ${recoveredCount === 1 ? 'file was' : 'files were'} already missing.`
-                    : `Moved ${result.trashedIds.length} file${result.trashedIds.length === 1 ? '' : 's'} to OS trash and removed ${result.clearedIds.length === 1 ? 'it' : 'them'} from Ambit`;
+                    ? t('toast.removedEntriesWithMissing', {
+                        entries: t('count.entries', { count: result.clearedIds.length }),
+                        missing: t('toast.sourceFilesMissing', { count: recoveredCount }),
+                    })
+                    : t('toast.movedToOsTrash', {
+                        count: result.trashedIds.length,
+                        context: result.clearedIds.length === 1 ? 'singular' : 'plural',
+                    });
                 addToast(message, 'success');
             } else if (result.clearedIds.length > 0 || result.cleanupPendingIds.length > 0 || result.notFoundIds.length > 0) {
                 const details = [
-                    unresolvedCount > 0 ? `${unresolvedCount} still need attention` : null,
+                    unresolvedCount > 0 ? t('toast.stillNeedAttention', { count: unresolvedCount }) : null,
                     result.thumbnailWarningIds.length > 0
-                        ? `${result.thumbnailWarningIds.length} had thumbnail cleanup warnings`
+                        ? t('toast.thumbnailCleanupWarnings', { count: result.thumbnailWarningIds.length })
                         : null,
                     result.notFoundIds.length > 0
-                        ? `${result.notFoundIds.length} selected ${result.notFoundIds.length === 1 ? 'entry was' : 'entries were'} already unavailable`
+                        ? t('toast.entriesUnavailable', { count: result.notFoundIds.length })
                         : null,
                 ].filter((detail): detail is string => detail !== null);
                 addToast(
-                    `Removed ${result.clearedIds.length} ${result.clearedIds.length === 1 ? 'entry' : 'entries'} from Ambit; ${details.join(' and ')}.`,
+                    t('toast.removedEntriesDetails', {
+                        entries: t('count.entries', { count: result.clearedIds.length }),
+                        details: details.join(t('join.and')),
+                    }),
                     'warning'
                 );
             } else {
-                addToast('Failed to move selected files to OS trash. The Removed entries were kept.', 'error');
+                addToast(t('Failed to move selected files to OS trash. The Removed entries were kept.'), 'error');
             }
             if (dependentRefreshFailed) {
-                addToast('Files were deleted, but some views may need a refresh.', 'warning');
+                addToast(t('Files were deleted, but some views may need a refresh.'), 'warning');
             }
 
             return result;
         } catch (error) {
             console.error('[Removed] Failed to delete selected files', error);
-            addToast('Could not finish deleting the selected files. The Removed entries were kept.', 'error');
+            addToast(t('Could not finish deleting the selected files. The Removed entries were kept.'), 'error');
             throw error;
         }
     };
 
     const handleEmptyTrash = async () => {
-        addToast('Removed items are now handled through the Removed tab actions.', 'info');
+        addToast(t('Removed items are now handled through the Removed tab actions.'), 'info');
         refreshMaintenanceCounts();
     };
 
@@ -344,11 +355,11 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
         updateImage(id, () => updatedImg);
         try {
             await updateImageNotesCol(id, notes);
-            addToast('Saved', 'success');
+            addToast(t('Saved'), 'success');
         } catch (error) {
             console.error('[Notes] Failed to persist notes', error);
             updateImage(id, () => img);
-            addToast('Failed to save notes', 'error');
+            addToast(t('Failed to save notes'), 'error');
         }
     };
 
@@ -356,7 +367,7 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
         await revertImageMetadata(id);
         const [revertedImage] = await getImagesByIds([id]);
         if (!revertedImage) {
-            addToast('Metadata reverted, but the image could not be refreshed.', 'warning');
+            addToast(t('Metadata reverted, but the image could not be refreshed.'), 'warning');
             return;
         }
 
@@ -378,7 +389,7 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
             rebuildFacetCacheIncremental('checkpoints')
         ]).then(() => incrementFacetCacheVersion());
 
-        addToast('Reverted to original', 'success');
+        addToast(t('Reverted to original'), 'success');
     };
 
     return {

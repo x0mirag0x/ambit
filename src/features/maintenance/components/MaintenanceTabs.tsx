@@ -1,6 +1,7 @@
 import React from 'react';
 import { Eraser } from 'lucide-react';
 import { MaintenanceTab } from '../../../hooks/useMaintenanceData';
+import { useTranslation } from 'react-i18next';
 
 interface MaintenanceTabDefinition {
     id: MaintenanceTab;
@@ -14,7 +15,7 @@ export const MAINTENANCE_TABS: readonly MaintenanceTabDefinition[] = [
     { id: 'duplicates', label: 'Duplicates', color: 'text-sage-600 dark:text-sage-300' },
     { id: 'untagged', label: 'Untagged', color: 'text-ember-600 dark:text-ember-300' },
     { id: 'intermediates', label: 'Intermediates', color: 'text-sage-600 dark:text-sage-300' },
-    { id: 'trash', label: 'Removed', color: 'text-red-600 dark:text-red-300' },
+    { id: 'trash', label: 'Removed Items', color: 'text-red-600 dark:text-red-300' },
 ];
 
 interface MaintenanceTabsProps {
@@ -24,6 +25,7 @@ interface MaintenanceTabsProps {
 }
 
 export const MaintenanceTabs: React.FC<MaintenanceTabsProps> = ({ activeTab, onTabChange, intermediatesCount = 0 }) => {
+    const { t } = useTranslation();
     const tabRefs = React.useRef<Partial<Record<MaintenanceTab, HTMLButtonElement | null>>>({});
 
     // Hide Intermediates tab if there are no intermediate images
@@ -58,14 +60,14 @@ export const MaintenanceTabs: React.FC<MaintenanceTabsProps> = ({ activeTab, onT
                         <div className="p-2 bg-sage-100 dark:bg-sage-900/30 rounded-lg text-sage-600 dark:text-sage-400">
                             <Eraser className="w-5 h-5" />
                         </div>
-                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Gallery Maintenance</h2>
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t('Gallery Maintenance')}</h2>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 pl-1">Organize your library, resolve conflicts, and manage removed items.</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 pl-1">{t('Organize your library, resolve conflicts, and manage removed items.')}</p>
                 </div>
 
                 <div
                     role="tablist"
-                    aria-label="Maintenance sections"
+                    aria-label={t('Maintenance sections')}
                     className="grid w-full grid-cols-[repeat(auto-fit,minmax(7.5rem,1fr))] items-center gap-1 self-stretch rounded-xl bg-gray-100 p-1 shadow-inner dark:bg-zinc-800 2xl:flex-1"
                 >
                     {tabs.map((tab) => (
@@ -82,12 +84,12 @@ export const MaintenanceTabs: React.FC<MaintenanceTabsProps> = ({ activeTab, onT
                                 if (activeTab !== tab.id) onTabChange(tab.id);
                             }}
                             onKeyDown={(event) => handleKeyDown(event, tab.id)}
-                            className={`flex min-w-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg px-3 py-2.5 text-sm font-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-zinc-800 ${activeTab === tab.id
+                            className={`flex min-w-0 items-center justify-center gap-2 rounded-lg px-2 py-2.5 text-center text-sm font-black leading-tight transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-zinc-800 ${activeTab === tab.id
                                 ? 'z-10 bg-white text-sage-600 shadow-md dark:bg-zinc-700'
                                 : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
                                 }`}
                         >
-                            <span className={activeTab === tab.id ? tab.color : 'text-current'}>{tab.label}</span>
+                            <span className={activeTab === tab.id ? tab.color : 'text-current'}>{t(tab.label)}</span>
                         </button>
                     ))}
                 </div>

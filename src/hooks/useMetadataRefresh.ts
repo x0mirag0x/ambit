@@ -13,6 +13,7 @@ import { isBrowserMockMode } from '../services/runtime';
 import { listenWithCleanup } from '../utils/tauriListener';
 import { rebuildFacetCacheIncrementalBatchStrict } from '../services/db/imageRepo';
 import { measureStartupPhase } from '../utils/startupDiagnostics';
+import { useTranslation } from 'react-i18next';
 
 interface RefreshProgress {
     current: number;
@@ -71,6 +72,7 @@ const isTransientDatabaseLock = (err: unknown): boolean => {
 };
 
 export function useMetadataRefresh(startupReady = false) {
+    const { t } = useTranslation();
     const { addToast } = useToast();
     const browserMockMode = isBrowserMockMode();
     const startupAnnouncementCountRef = useRef<number | null>(null);
@@ -97,7 +99,7 @@ export function useMetadataRefresh(startupReady = false) {
             console.info(`[Refresh] Refreshed metadata facet cache after reparse: ${refreshed} entries`);
         } catch (err) {
             console.error('[Refresh] Failed to refresh metadata facet cache after reparse', err);
-            addToast('Metadata refresh finished, but asset counts may be stale until the next refresh.', 'warning');
+            addToast(t('Metadata refresh finished, but asset counts may be stale until the next refresh.'), 'warning');
         }
     }, [addToast]);
 
@@ -111,10 +113,10 @@ export function useMetadataRefresh(startupReady = false) {
         deferStartupVisibilityUntilProcessingRef.current = false;
 
         if (wasCancelled) {
-            addToast(`Refresh cancelled: ${processed.toLocaleString()} processed before stop`, 'info');
+            addToast(t('Refresh cancelled: {{v0}} processed before stop', { v0: processed.toLocaleString() }), 'info');
         } else if (processed > 0) {
             addToast(
-                `Refresh complete: ${updated.toLocaleString()} updated, ${errors} errors`,
+                t('Refresh complete: {{v0}} updated, {{errors}} errors', { v0: updated.toLocaleString(), errors: errors }),
                 errors > 0 ? 'warning' : 'success'
             );
         }
@@ -153,7 +155,7 @@ export function useMetadataRefresh(startupReady = false) {
                 if (startupCount !== null && !startupAnnouncementShownRef.current) {
                     startupAnnouncementShownRef.current = true;
                     addToast(
-                        `Ambit is updating metadata for ${startupCount.toLocaleString()} items after a parser update. Your library remains available.`,
+                        t('Ambit is updating metadata for {{v0}} items after a parser update. Your library remains available.', { v0: startupCount.toLocaleString() }),
                         'info'
                     );
                 }
@@ -210,7 +212,7 @@ export function useMetadataRefresh(startupReady = false) {
                 if (startupCount !== null && !startupAnnouncementShownRef.current) {
                     startupAnnouncementShownRef.current = true;
                     addToast(
-                        `Ambit is updating metadata for ${startupCount.toLocaleString()} items after a parser update. Your library remains available.`,
+                        t('Ambit is updating metadata for {{v0}} items after a parser update. Your library remains available.', { v0: startupCount.toLocaleString() }),
                         'info'
                     );
                 }
@@ -241,7 +243,7 @@ export function useMetadataRefresh(startupReady = false) {
         const { showFailureToast = true, deferActiveUntilProgress = false } = options;
 
         if (browserMockMode) {
-            addToast('Unavailable in browser mock mode.', 'info');
+            addToast(t('Unavailable in browser mock mode.'), 'info');
             return { ok: false };
         }
 
@@ -263,7 +265,7 @@ export function useMetadataRefresh(startupReady = false) {
         } catch (err) {
             console.error('[Refresh] Exception:', err);
             if (showFailureToast) {
-                addToast(`Failed to start refresh: ${getErrorMessage(err)}`, 'error');
+                addToast(t('Failed to start refresh: {{v0}}', { v0: getErrorMessage(err) }), 'error');
             }
             setMetadataRefreshPending(false);
             setIsRefreshingMetadata(false);
@@ -290,7 +292,7 @@ export function useMetadataRefresh(startupReady = false) {
     // Force refresh (can be targeted to a folder or tool)
     const forceRefresh = useCallback(async (rootPath?: string, force: boolean = false, filterTool?: string) => {
         if (browserMockMode) {
-            addToast('Unavailable in browser mock mode.', 'info');
+            addToast(t('Unavailable in browser mock mode.'), 'info');
             return;
         }
 
@@ -308,7 +310,7 @@ export function useMetadataRefresh(startupReady = false) {
             completeRefresh(result);
         } catch (err) {
             console.error('[Refresh] Exception:', err);
-            addToast(`Failed to force refresh: ${getErrorMessage(err)}`, 'error');
+            addToast(t('Failed to force refresh: {{v0}}', { v0: getErrorMessage(err) }), 'error');
             setMetadataRefreshPending(false);
             setIsRefreshingMetadata(false);
             setRefreshProgress(null);
@@ -375,7 +377,7 @@ export function useMetadataRefresh(startupReady = false) {
                 startupAnnouncementCountRef.current = null;
                 startupAnnouncementShownRef.current = false;
                 deferStartupVisibilityUntilProcessingRef.current = false;
-                addToast(`Failed to start refresh: ${getErrorMessage(result.error)}`, 'error');
+                addToast(t('Failed to start refresh: {{v0}}', { v0: getErrorMessage(result.error) }), 'error');
             } catch (err) {
                 if (isCancelled) return;
                 if (isTransientDatabaseLock(err) && attempt < STARTUP_REFRESH_MAX_ATTEMPTS) {

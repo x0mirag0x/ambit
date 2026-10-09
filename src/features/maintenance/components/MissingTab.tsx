@@ -5,6 +5,7 @@ import { AIImage } from '../../../types';
 import { VirtualGrid } from '../../library/components/VirtualGrid';
 import { MaintenanceHeader } from './MaintenanceHeader';
 import { MaintenanceItem } from './MaintenanceItem';
+import { useTranslation } from 'react-i18next';
 
 interface MissingTabProps {
     images: AIImage[];
@@ -35,6 +36,7 @@ export const MissingTab: React.FC<MissingTabProps> = ({
     onRangeSelection,
     onBackgroundClick
 }) => {
+    const { t } = useTranslation();
     const renderItem = useCallback((img: AIImage, style: React.CSSProperties, index: number) => {
         const overlayActions = (revealGranted: boolean) => (
             <button
@@ -44,8 +46,7 @@ export const MissingTab: React.FC<MissingTabProps> = ({
                 }}
                 className="px-4 py-2 bg-white/90 dark:bg-zinc-900/90 text-gray-900 dark:text-white rounded-full text-xs font-bold shadow-xl transform scale-90 hover:scale-100 transition-all flex items-center gap-2 hover:bg-white dark:hover:bg-zinc-800"
             >
-                <Eye className="w-4 h-4" /> View Image
-            </button>
+                <Eye className="w-4 h-4" /> {t('View Image')}</button>
         );
 
         return (
@@ -68,10 +69,9 @@ export const MissingTab: React.FC<MissingTabProps> = ({
                 <div className="mb-6 rounded-full border border-sage-200 bg-sage-50 p-6 dark:border-sage-500/20 dark:bg-sage-500/10">
                     <FileWarning className="h-16 w-16 text-sage-600 dark:text-sage-300" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">No Missing Files</h2>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">{t('No Missing Files')}</h2>
                 <p className="max-w-md text-center text-gray-500 dark:text-gray-400">
-                    All scanned images are currently accessible on disk.
-                </p>
+                    {t('All scanned images are currently accessible on disk.')}</p>
             </div>
         );
     }
@@ -83,16 +83,14 @@ export const MissingTab: React.FC<MissingTabProps> = ({
                     onClick={onDeleteSelected}
                     className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-2"
                 >
-                    <Trash2 className="w-4 h-4" /> Remove from Library
-                    <span className="px-1.5 py-0.5 bg-white/20 rounded-md text-[9px]">{selectedIds.size}</span>
+                    <Trash2 className="w-4 h-4" /> {t('Remove from Library')}<span className="px-1.5 py-0.5 bg-white/20 rounded-md text-[9px]">{selectedIds.size}</span>
                 </button>
             ) : (
                 <button
                     onClick={onPurgeMissing}
                     className="px-4 py-2 bg-red-600/10 hover:bg-red-600/20 text-red-600 dark:text-red-400 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border border-red-200 dark:border-red-900/50"
                 >
-                    <FileX className="w-4 h-4" /> Remove all {images.length} from Library
-                </button>
+                    <FileX className="w-4 h-4" /> {t('Remove all')} {images.length} {t('from Library')}</button>
             )}
         </div>
     );
@@ -100,8 +98,8 @@ export const MissingTab: React.FC<MissingTabProps> = ({
     return (
         <div className="w-full pb-32 animate-in slide-in-from-bottom-4 flex flex-col items-stretch">
             <MaintenanceHeader
-                title="Missing Files"
-                description={`Found ${images.length} records whose source file is no longer on disk. These might have been moved or deleted manually.`}
+                title={t('Missing Files')}
+                description={t('Found {{length}} records whose source file is no longer on disk. These might have been moved or deleted manually.', { length: images.length })}
                 icon={<FileWarning className="w-6 h-6" />}
                 count={images.length}
                 onSelectAll={onSelectAll}

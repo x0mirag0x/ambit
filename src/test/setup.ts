@@ -1,5 +1,9 @@
 
 import { vi } from 'vitest';
+import '../i18n';
+import i18n from '../i18n';
+
+i18n.changeLanguage('en');
 
 // Mock Tauri Core
 vi.mock('@tauri-apps/api/core', () => ({

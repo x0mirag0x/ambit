@@ -4,6 +4,7 @@ import type { InvokeOwnerScopeState } from '../../contexts/SyncContext';
 import type { InvokeOwnerSelection } from '../../types';
 import { InvokeOwnerScopeSelector } from './InvokeOwnerScopeSelector';
 import { StartupPreparationCard } from './StartupPreparationCard';
+import { useTranslation } from 'react-i18next';
 
 interface InvokeOwnerScopeGateProps {
     state: InvokeOwnerScopeState;
@@ -13,6 +14,7 @@ interface InvokeOwnerScopeGateProps {
 }
 
 const BusyGate: React.FC<{ state: InvokeOwnerScopeState }> = ({ state }) => {
+    const { t } = useTranslation();
     const progress = state.progress;
     const scopeIdentity = state.scope?.mode === 'owner'
         ? state.scope.ownerId
@@ -48,10 +50,10 @@ const BusyGate: React.FC<{ state: InvokeOwnerScopeState }> = ({ state }) => {
         <StartupPreparationCard
             phaseLabel="InvokeAI library"
             title={state.status === 'applying' && ownerLabel
-                ? `Switching to ${ownerLabel}`
-                : 'Preparing your InvokeAI view'}
+                ? t('Switching to {{ownerLabel}}', { ownerLabel: ownerLabel })
+                : t('Preparing your InvokeAI view')}
             icon={<ShieldCheck className="h-7 w-7" />}
-            description="Ambit is loading the images, boards, and filters available in this view."
+            description={t('Ambit is loading the images, boards, and filters available in this view.')}
             statusMessage={statusMessage}
             reassurance="Your library remains unchanged while this view loads."
             progress={progress}
@@ -65,6 +67,7 @@ export const InvokeOwnerScopeGate: React.FC<InvokeOwnerScopeGateProps> = ({
     onRetry,
     onOpenSettings,
 }) => {
+    const { t } = useTranslation();
     const headingRef = React.useRef<HTMLHeadingElement>(null);
     const isBusy = state.status === 'idle'
         || state.status === 'discovering'
@@ -94,11 +97,9 @@ export const InvokeOwnerScopeGate: React.FC<InvokeOwnerScopeGateProps> = ({
                 <div className="w-full max-w-xl rounded-3xl border border-gray-200 bg-white/90 p-5 shadow-2xl shadow-black/10 dark:border-white/10 dark:bg-zinc-900/90 sm:p-8">
                     <Users className="mb-4 h-8 w-8 text-sage-600 dark:text-sage-400" />
                     <h1 ref={headingRef} tabIndex={-1} className="text-xl font-black text-gray-900 outline-none dark:text-white">
-                        Choose which InvokeAI images to show
-                    </h1>
+                        {t('Choose which InvokeAI images to show')}</h1>
                     <p className="mt-3 text-sm leading-6 text-gray-600 dark:text-gray-300">
-                        This InvokeAI library contains multiple users. Choose one owner or explicitly show all users. Nothing is deleted, and you can change this later in Settings.
-                    </p>
+                        {t('This InvokeAI library contains multiple users. Choose one owner or explicitly show all users. Nothing is deleted, and you can change this later in Settings.')}</p>
                     <div className="mt-6">
                         <InvokeOwnerScopeSelector
                             discovery={state.discovery}
@@ -133,7 +134,7 @@ export const InvokeOwnerScopeGate: React.FC<InvokeOwnerScopeGateProps> = ({
                 <p className="mt-3 text-sm leading-6 text-gray-600 dark:text-gray-300">{description}</p>
                 {state.error && (
                     <details className="mt-5 rounded-xl border border-gray-200 bg-gray-50/80 p-3 text-xs dark:border-white/10 dark:bg-black/20">
-                        <summary className="cursor-pointer font-bold text-gray-700 dark:text-gray-200">Technical details</summary>
+                        <summary className="cursor-pointer font-bold text-gray-700 dark:text-gray-200">{t('Technical details')}</summary>
                         <p className="mt-2 break-words font-mono leading-5 text-gray-500 dark:text-gray-400">{state.error}</p>
                     </details>
                 )}
@@ -143,15 +144,13 @@ export const InvokeOwnerScopeGate: React.FC<InvokeOwnerScopeGateProps> = ({
                         onClick={() => void onRetry()}
                         className="inline-flex items-center justify-center gap-2 rounded-xl bg-sage-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-sage-500"
                     >
-                        <RotateCw className="h-4 w-4" /> Retry
-                    </button>
+                        <RotateCw className="h-4 w-4" /> {t('Retry')}</button>
                     <button
                         type="button"
                         onClick={onOpenSettings}
                         className="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-100 px-4 py-2.5 text-sm font-bold text-gray-700 hover:bg-gray-200 dark:bg-white/10 dark:text-gray-200 dark:hover:bg-white/15"
                     >
-                        <Settings className="h-4 w-4" /> Open Settings
-                    </button>
+                        <Settings className="h-4 w-4" /> {t('Open Settings')}</button>
                 </div>
             </div>
         </main>

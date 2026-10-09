@@ -5,6 +5,7 @@ import { isBrowserMockMode } from '../services/runtime';
 import { useDelayedBusyPresentation } from '../hooks/useDelayedBusyPresentation';
 import { StartupPreparationCard } from './ui/StartupPreparationCard';
 import { measureStartupPhase } from '../utils/startupDiagnostics';
+import { useTranslation } from 'react-i18next';
 
 interface StartupMaintenanceGateProps {
     children: React.ReactNode;
@@ -28,6 +29,7 @@ const STARTUP_PHASE_COPY: Record<StartupDbPhase, string> = {
 };
 
 export const StartupMaintenanceGate: React.FC<StartupMaintenanceGateProps> = ({ children }) => {
+    const { t } = useTranslation();
     const [phase, setPhase] = React.useState<StartupDbPhase>('Preparing library database');
     const [isReady, setIsReady] = React.useState(isBrowserMockMode());
     const [error, setError] = React.useState<string | null>(null);
@@ -83,7 +85,7 @@ export const StartupMaintenanceGate: React.FC<StartupMaintenanceGateProps> = ({ 
                     <StartupPreparationCard
                         phaseLabel="Local database"
                         icon={<Database className="h-7 w-7" />}
-                        description={STARTUP_PHASE_COPY[phase]}
+                        description={t(STARTUP_PHASE_COPY[phase])}
                         statusMessage={STARTUP_PHASE_LABELS[phase]}
                         reassurance="Please keep Ambit open."
                     />
@@ -99,17 +101,14 @@ export const StartupMaintenanceGate: React.FC<StartupMaintenanceGateProps> = ({ 
                             </div>
                             <div className="min-w-0">
                                 <p className="text-xs font-black uppercase tracking-[0.22em] text-gray-500">
-                                    Local database
-                                </p>
+                                    {t('Local database')}</p>
                                 <h1 className="mt-1 text-xl font-black tracking-tight">
-                                    Database startup failed
-                                </h1>
+                                    {t('Database startup failed')}</h1>
                             </div>
                         </div>
 
                         <p className="mt-6 text-sm leading-6 text-gray-600 dark:text-gray-300">
-                            Ambit could not prepare the local library database. Restart the app and contact support if this repeats.
-                        </p>
+                            {t('Ambit could not prepare the local library database. Restart the app and contact support if this repeats.')}</p>
 
                         <pre className="mt-4 max-h-32 overflow-auto rounded-xl bg-black/30 p-3 text-xs text-red-200">
                             {error}

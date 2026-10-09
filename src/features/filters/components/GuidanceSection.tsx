@@ -24,6 +24,7 @@ import {
     Palette,
     Box
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface GuidanceSectionProps {
     filters: FilterState;
@@ -67,6 +68,7 @@ export const GuidanceSection: React.FC<GuidanceSectionProps> = ({
     isOpen,
     onToggle
 }) => {
+    const { t } = useTranslation();
     const { data: ranges, isLoading } = useParameterRangesQuery(filters);
     const [expandedGroups, setExpandedGroups] = React.useState<Record<string, boolean>>({
         controlNets: true,
@@ -267,14 +269,14 @@ export const GuidanceSection: React.FC<GuidanceSectionProps> = ({
     if (!isOpen) {
         return (
             <div className="space-y-1">
-                <SectionHeader title="Guidance" isOpen={isOpen} onToggle={onToggle} isLoading={isLoading} />
+                <SectionHeader title={t('Guidance')} isOpen={isOpen} onToggle={onToggle} isLoading={isLoading} />
             </div>
         );
     }
 
     return (
         <div className="space-y-1">
-            <SectionHeader title="Guidance" isOpen={isOpen} onToggle={onToggle} isLoading={isLoading} />
+            <SectionHeader title={t('Guidance')} isOpen={isOpen} onToggle={onToggle} isLoading={isLoading} />
             <div className="space-y-6 animate-in slide-in-from-top-2 duration-300 ease-spring px-3 pt-2 pb-2">
 
                 {hasControlNets && availableControlNetOptions.length > 0 && (
@@ -285,7 +287,7 @@ export const GuidanceSection: React.FC<GuidanceSectionProps> = ({
                         >
                             <div className="text-[9px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest flex items-center gap-1.5 group-hover:text-gray-600 dark:group-hover:text-zinc-300 transition-colors">
                                 <ChevronRight className={`w-2.5 h-2.5 transition-transform duration-200 ${expandedGroups.controlNets ? 'rotate-90' : ''}`} />
-                                ControlNets ({ranges.controlNets.length})
+                                {t('ControlNets ({{count}})', { count: ranges.controlNets.length })}
                             </div>
                         </div>
                         {expandedGroups.controlNets && (
@@ -308,7 +310,7 @@ export const GuidanceSection: React.FC<GuidanceSectionProps> = ({
                         >
                             <div className="text-[9px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest flex items-center gap-1.5 group-hover:text-gray-600 dark:group-hover:text-zinc-300 transition-colors">
                                 <ChevronRight className={`w-2.5 h-2.5 transition-transform duration-200 ${expandedGroups.ipAdapters ? 'rotate-90' : ''}`} />
-                                IP-Adapters ({ranges.ipAdapters.length})
+                                {t('IP-Adapters ({{count}})', { count: ranges.ipAdapters.length })}
                             </div>
                         </div>
                         {expandedGroups.ipAdapters && (
@@ -325,8 +327,7 @@ export const GuidanceSection: React.FC<GuidanceSectionProps> = ({
 
                 {!hasAnyData && !isLoading && (
                     <div className="text-[10px] text-gray-400 text-center py-3 italic border border-dashed border-gray-200 dark:border-white/10 rounded-xl">
-                        No guidance data available
-                    </div>
+                        {t('No guidance data available')}</div>
                 )}
             </div>
         </div>
