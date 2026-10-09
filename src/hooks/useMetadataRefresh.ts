@@ -155,7 +155,7 @@ export function useMetadataRefresh(startupReady = false) {
                 if (startupCount !== null && !startupAnnouncementShownRef.current) {
                     startupAnnouncementShownRef.current = true;
                     addToast(
-                        t('Ambit is updating metadata for {{v0}} items after a parser update. Your library remains available.', { v0: startupCount.toLocaleString() }),
+                        t('Dvoyna Vault is updating metadata for {{v0}} items after a parser update. Your library remains available.', { v0: startupCount.toLocaleString() }),
                         'info'
                     );
                 }
@@ -212,7 +212,7 @@ export function useMetadataRefresh(startupReady = false) {
                 if (startupCount !== null && !startupAnnouncementShownRef.current) {
                     startupAnnouncementShownRef.current = true;
                     addToast(
-                        t('Ambit is updating metadata for {{v0}} items after a parser update. Your library remains available.', { v0: startupCount.toLocaleString() }),
+                        t('Dvoyna Vault is updating metadata for {{v0}} items after a parser update. Your library remains available.', { v0: startupCount.toLocaleString() }),
                         'info'
                     );
                 }

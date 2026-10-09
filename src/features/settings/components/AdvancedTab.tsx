@@ -9,7 +9,7 @@ import { useLibraryContext } from '../../../hooks/useLibraryContext';
 import { useLibraryStore } from '../../../stores/libraryStore';
 import { BackupSettings } from './BackupSettings';
 import { useToast } from '../../../hooks/useToast';
-import { APP_NAME } from '../../../constants/app';
+import { APP_FULL_NAME } from '../../../constants/app';
 import { AppUpdaterStatus } from '../../../hooks/useAppUpdater';
 import { unwrap } from '../../../utils/spectaUtils';
 import { useTranslation } from 'react-i18next';
@@ -78,7 +78,7 @@ export const AdvancedTab: React.FC<TabProps> = ({
         }
 
         if (updateStatus === 'installing') {
-            return 'Installing update. Ambit may restart or close to finish.';
+            return 'Installing update. Dvoyna Vault may restart or close to finish.';
         }
 
         if (updateStatus === 'error' && updateErrorMessage) {
@@ -89,7 +89,7 @@ export const AdvancedTab: React.FC<TabProps> = ({
             return 'Checking GitHub Releases for a newer build.';
         }
 
-        return 'Automatically checks GitHub Releases once each time Ambit starts.';
+        return 'Automatically checks GitHub Releases once each time Dvoyna Vault starts.';
     })();
 
     const handlePurge = async () => {
@@ -144,7 +144,7 @@ export const AdvancedTab: React.FC<TabProps> = ({
 
             const version = await getVersion().catch(() => 'unknown');
             const diagnosticsText = [
-                `${APP_NAME} Support Diagnostics`,
+                `${APP_FULL_NAME} Support Diagnostics`,
                 `App version: ${version}`,
                 `Console log level: ${settings.logLevel || 'info'}`,
                 `Active catalog: ${diagnostics.activeDbPath || diagnostics.dbPath}`,
@@ -313,7 +313,7 @@ export const AdvancedTab: React.FC<TabProps> = ({
                         <div className="p-6 flex items-center justify-between gap-4">
                             <div>
                                 <div className="text-sm font-bold text-gray-900 dark:text-gray-200">{t('Console Log Level')}</div>
-                                <div className="text-xs text-gray-500 mt-1">{t('Choose how much diagnostic detail Ambit writes to the developer console.')}</div>
+                                <div className="text-xs text-gray-500 mt-1">{t('Choose how much diagnostic detail Dvoyna Vault writes to the developer console.')}</div>
                             </div>
                             <select
                                 value={settings.logLevel || 'info'}
@@ -337,14 +337,14 @@ export const AdvancedTab: React.FC<TabProps> = ({
                             <div>
                                 <div className="text-sm font-bold text-gray-900 dark:text-gray-200">{t('Library Database Location')}</div>
                                 <div className="text-xs text-gray-500 mt-1">
-                                    {t('Ambit stores the library catalog in Local AppData. This is separate from the folder where the app itself is installed.')}</div>
+                                    {t('Dvoyna Vault stores the library catalog in Local AppData. This is separate from the folder where the app itself is installed.')}</div>
                             </div>
 
                             {dbDiagnostics ? (
                                 <div className="space-y-2 text-xs">
                                     {dbDiagnostics.isUsingRoamingFallback && (
                                         <div className="rounded-lg border border-ember-200 bg-ember-50 p-3 font-medium text-ember-600 dark:border-ember-400/20 dark:bg-ember-500/10 dark:text-ember-300">
-                                            {t('Ambit is using the legacy Roaming AppData database because no Local AppData database is available.')}</div>
+                                            {t('Dvoyna Vault is using the legacy Roaming AppData database because no Local AppData database is available.')}</div>
                                     )}
                                     <div className="rounded-lg bg-gray-50 p-3 dark:bg-black/20">
                                         <div className="font-bold uppercase tracking-wider text-gray-400">{t('Active catalog')}</div>
@@ -381,7 +381,7 @@ export const AdvancedTab: React.FC<TabProps> = ({
                                 <div>
                                     <div className="text-sm font-bold text-gray-900 dark:text-gray-200">{t('App Logs')}</div>
                                     <div className="text-xs text-gray-500 mt-1">
-                                        {t('Runtime logs are written to Ambit\'s app log folder for support investigations.')}</div>
+                                        {t('Runtime logs are written to Dvoyna Vault\'s app log folder for support investigations.')}</div>
                                 </div>
                                 <div className="flex flex-col gap-2 sm:flex-row">
                                     <button

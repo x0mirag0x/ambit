@@ -335,7 +335,7 @@ describe('useAppHandlers', () => {
 
             expect(dispatchedImages).toEqual([]);
             expect(mockAddToast).toHaveBeenCalledWith(
-                'Moved 1 file to OS trash and removed it from Ambit',
+                'Moved 1 file to OS trash and removed it from Dvoyna Vault',
                 'success'
             );
             expect(mockAddToast).toHaveBeenCalledWith(
@@ -654,7 +654,7 @@ describe('useAppHandlers', () => {
         const { result } = renderHandlers();
         mockDeleteRemovedImagesFromDisk.mockResolvedValueOnce({ clearedIds: ['a', 'b'], trashedIds: ['a', 'b'], alreadyMissingIds: [], failedIds: [], cleanupPendingIds: [], thumbnailWarningIds: [], notFoundIds: [] });
         await act(async () => result.current.handleDeleteFile(['a', 'b']));
-        expect(mockAddToast).toHaveBeenCalledWith('Moved 2 files to OS trash and removed them from Ambit', 'success');
+        expect(mockAddToast).toHaveBeenCalledWith('Moved 2 files to OS trash and removed them from Dvoyna Vault', 'success');
 
         mockDeleteRemovedImagesFromDisk.mockResolvedValueOnce({ clearedIds: ['a'], trashedIds: ['a'], alreadyMissingIds: [], failedIds: [], cleanupPendingIds: [], thumbnailWarningIds: ['a'], notFoundIds: [] });
         await act(async () => result.current.handleDeleteFile(['a']));
@@ -680,7 +680,7 @@ describe('useAppHandlers', () => {
         await act(async () => result.current.handleDeleteFile(['stale-entry']));
 
         expect(mockAddToast).toHaveBeenCalledWith(
-            'Removed 0 entries from Ambit; 1 selected entry was already unavailable.',
+            'Removed 0 entries from Dvoyna Vault; 1 selected entry was already unavailable.',
             'warning'
         );
     });
@@ -728,6 +728,6 @@ describe('useAppHandlers', () => {
         });
         const { result } = renderHandlers();
         await act(async () => result.current.handleDeleteFile(['a', 'b', 'c']));
-        expect(mockAddToast).toHaveBeenCalledWith(expect.stringContaining('Removed 2 entries from Ambit'), 'warning');
+        expect(mockAddToast).toHaveBeenCalledWith(expect.stringContaining('Removed 2 entries from Dvoyna Vault'), 'warning');
     });
 });

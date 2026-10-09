@@ -18,7 +18,7 @@ interface CheckForUpdatesOptions {
 }
 
 const RELEASE_FEED_UNAVAILABLE_MESSAGE =
-  'Update checks require Ambit release assets to be publicly reachable. The current GitHub Releases feed is unavailable, which is expected while the repository or release is private.';
+  'Update checks require Dvoyna Vault release assets to be publicly reachable. The current GitHub Releases feed is unavailable, which is expected while the repository or release is private.';
 
 const isLikelyReleaseFeedAccessError = (message: string) => {
   const normalized = message.toLowerCase();
@@ -48,7 +48,7 @@ const getCheckForUpdatesErrorMessage = (error: unknown) => {
   const rawMessage = getRawUpdaterErrorMessage(error);
 
   if (isLikelyReleaseFeedAccessError(rawMessage)) {
-    return `${RELEASE_FEED_UNAVAILABLE_MESSAGE} Once releases are public, this check will report either an available update or that Ambit is already up to date.`;
+    return `${RELEASE_FEED_UNAVAILABLE_MESSAGE} Once releases are public, this check will report either an available update or that Dvoyna Vault is already up to date.`;
   }
 
   return rawMessage;
@@ -91,7 +91,7 @@ export const useAppUpdater = ({
           setStatus('idle');
 
           if (manual) {
-            addToast(t('Ambit is already up to date.'), 'success');
+            addToast(t('Dvoyna Vault is already up to date.'), 'success');
           }
 
           return null;

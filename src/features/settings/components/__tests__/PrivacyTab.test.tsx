@@ -86,7 +86,7 @@ describe('PrivacyTab', () => {
     it('explains startup-default privacy masking and session-only changes', () => {
         render(<PrivacyTab settings={createSettings()} setSettings={vi.fn()} />);
 
-        expect(screen.getByText(/Privacy Mode starts on whenever Ambit launches/)).not.toBeNull();
+        expect(screen.getByText(/Privacy Mode starts on whenever Dvoyna Vault launches/)).not.toBeNull();
         expect(screen.getByText('Masking Sources')).not.toBeNull();
         expect(screen.getByText('Manual image masks')).not.toBeNull();
         expect(screen.getByText('Follows Privacy Mode')).not.toBeNull();

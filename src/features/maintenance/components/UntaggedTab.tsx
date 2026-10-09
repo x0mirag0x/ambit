@@ -104,7 +104,7 @@ export const UntaggedTab: React.FC<UntaggedTabProps> = ({
                 </button>
             ) : (
                 <div className="px-4 py-2 text-gray-400 text-xs font-medium italic">
-                    {t('Select images to remove from Ambit while keeping the source files')}</div>
+                    {t('Select images to remove from Dvoyna Vault while keeping the source files')}</div>
             )}
         </div>
     );

@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="en" class="dark" style="background-color: #09090b;">
+<html lang="en" class="dark" style="background-color: #0c0a09;">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ambit | Local AI Workspace</title>
-  <link rel="icon" type="image/svg+xml" href="/branding/ambit-mark.svg" />
-  <link rel="preload" href="/branding/ambit-glyph.svg" as="image" type="image/svg+xml" />
+  <title>DV | Local AI Workspace</title>
+  <link rel="icon" type="image/png" href="/branding/dv-favicon.png" />
+  <link rel="preload" href="/branding/dv-glyph.png" as="image" type="image/png" />
   <style>
     /* Critical: Set background immediately to prevent white flash */
     html,
     body {
-      background-color: #09090b !important;
+      background-color: #0c0a09 !important;
       margin: 0;
       padding: 0;
       overflow: hidden !important;
@@ -24,8 +24,8 @@
       background:
         linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px),
-        radial-gradient(circle at 50% 38%, rgba(92, 108, 70, 0.18), transparent 30%),
-        linear-gradient(180deg, #10130f 0%, #09090b 100%);
+        radial-gradient(circle at 50% 38%, rgba(198, 164, 90, 0.18), transparent 30%),
+        linear-gradient(180deg, #14110c 0%, #0c0a09 100%);
       background-size: 48px 48px, 48px 48px, 100% 100%, 100% 100%;
       display: flex;
       flex-direction: column;
@@ -58,7 +58,7 @@
     .static-loading__glow {
       position: absolute;
       inset: 0.55rem;
-      background: radial-gradient(circle, rgba(214, 193, 116, 0.16) 0%, rgba(122, 143, 90, 0.13) 45%, transparent 72%);
+      background: radial-gradient(circle, rgba(227, 201, 120, 0.22) 0%, rgba(168, 135, 62, 0.12) 45%, transparent 72%);
       filter: blur(24px);
       border-radius: 9999px;
       animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -117,7 +117,7 @@
 
     .static-loading__subtitle {
       font-size: 0.875rem;
-      color: rgba(204, 211, 199, 0.68);
+      color: rgba(228, 214, 186, 0.72);
       font-weight: 500;
       margin: 0;
     }
@@ -166,21 +166,21 @@
   </style>
 </head>
 
-<body style="background-color: #09090b; margin: 0; overflow: hidden;">
+<body style="background-color: #0c0a09; margin: 0; overflow: hidden;">
   <div id="root"></div>
   <!-- Static loading screen - persists until removed by App.tsx -->
   <div id="static-loading" class="static-loading">
     <div class="static-loading__brand">
       <div class="static-loading__mark-container">
         <div class="static-loading__glow"></div>
-        <img class="static-loading__mark" src="/branding/ambit-glyph.svg" alt="Ambit logo" fetchpriority="high" decoding="sync" />
+        <img class="static-loading__mark" src="/branding/dv-glyph.png" alt="DV logo" fetchpriority="high" decoding="sync" />
         <svg class="static-loading__loader-ring" viewBox="0 0 108 108" aria-hidden="true">
           <circle class="static-loading__loader-track" cx="54" cy="54" r="49" />
           <circle class="static-loading__loader-arc" cx="54" cy="54" r="49" />
         </svg>
       </div>
       <div class="static-loading__text">
-        <h1 class="static-loading__title">AMBIT</h1>
+        <h1 class="static-loading__title">DV</h1>
       </div>
     </div>
     <div class="static-loading__status" aria-live="polite">
@@ -194,7 +194,7 @@
       var systemRussian = ((navigator.language || '') + ' ' + (navigator.languages || []).join(' ')).toLowerCase().indexOf('ru') !== -1;
       var russian = cached === 'ru' || (cached !== 'en' && systemRussian);
       document.documentElement.lang = russian ? 'ru' : 'en';
-      document.title = russian ? 'Ambit | Локальная рабочая среда для ИИ' : 'Ambit | Local AI Workspace';
+      document.title = russian ? 'DV | Локальная рабочая среда для ИИ' : 'DV | Local AI Workspace';
       var subtitle = document.querySelector('.static-loading__subtitle');
       if (subtitle && russian) subtitle.textContent = 'Подготовка библиотеки...';
     })();

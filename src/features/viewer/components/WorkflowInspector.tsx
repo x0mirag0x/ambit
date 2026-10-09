@@ -138,7 +138,7 @@ const WorkflowOutputAnchors: React.FC<{
             {outputAmbiguous ? (
                 <div className="flex items-start gap-1.5 text-[10px] text-ember-600 dark:text-ember-300">
                     <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" />
-                    {t('Multiple root samplers were found. Ambit does not treat any candidate as authoritative.')}</div>
+                    {t('Multiple root samplers were found. Dvoyna Vault does not treat any candidate as authoritative.')}</div>
             ) : rootSamplerNodeIds.length === 0 ? (
                 <div className="text-[10px] text-gray-500 dark:text-gray-400">
                     {t('No sampler root was found for the selected output.')}</div>
@@ -531,7 +531,7 @@ const ComfyDiagnosticsPanel: React.FC<{
         <ConfirmDialog
             isOpen={isExportConfirmOpen}
             title={t('Export ComfyUI support bundle?')}
-            message={t('This local JSON file includes the image\'s raw metadata chunks. It may contain prompts, model names, workflow settings, and local filenames. Ambit will not upload it.')}
+            message={t('This local JSON file includes the image\'s raw metadata chunks. It may contain prompts, model names, workflow settings, and local filenames. Dvoyna Vault will not upload it.')}
             confirmLabel={t('Export Bundle')}
             isLoading={isExporting}
             onConfirm={handleExportDiagnostics}

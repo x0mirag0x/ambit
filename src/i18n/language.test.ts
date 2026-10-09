@@ -59,7 +59,7 @@ describe('ui language resolution', () => {
         expect(i18n.t('import.photos', { count: 0 })).toBe('0 фото');
         expect(i18n.t('import.photos', { count: 1 })).toBe('1 фото');
         expect(i18n.t('toast.favoriteItems', { count: 1, context: 'on' })).toBe('1 элемент добавлен в избранное');
-        expect(i18n.t('toast.movedToOsTrash', { count: 2, context: 'plural' })).toBe('2 файла перемещены в корзину и убраны из Ambit');
+        expect(i18n.t('toast.movedToOsTrash', { count: 2, context: 'plural' })).toBe('2 файла перемещены в корзину и убраны из Dvoyna Vault');
 
         await i18n.changeLanguage('en');
         expect(i18n.t('count.files', { count: 1 })).toBe('1 file');
@@ -69,11 +69,11 @@ describe('ui language resolution', () => {
         expect(i18n.t('toast.movedDuplicates', { count: 2 })).toBe('Moved 2 duplicates to Removed');
         expect(i18n.t('import.imported', { count: 1, kinds: '1 Generated, 0 Photos, 0 Other' })).toBe('Imported 1 item (1 Generated, 0 Photos, 0 Other).');
         expect(i18n.t('import.skippedDuplicates', { total: 1 })).toBe('(Skipped 1 duplicates)');
-        expect(i18n.t('toast.movedToOsTrash', { count: 1, context: 'singular' })).toBe('Moved 1 file to OS trash and removed it from Ambit');
-        expect(i18n.t('toast.movedToOsTrash', { count: 2, context: 'plural' })).toBe('Moved 2 files to OS trash and removed them from Ambit');
+        expect(i18n.t('toast.movedToOsTrash', { count: 1, context: 'singular' })).toBe('Moved 1 file to OS trash and removed it from Dvoyna Vault');
+        expect(i18n.t('toast.movedToOsTrash', { count: 2, context: 'plural' })).toBe('Moved 2 files to OS trash and removed them from Dvoyna Vault');
         expect(i18n.t('toast.removedEntriesDetails', {
             entries: i18n.t('count.entries', { count: 0 }),
             details: i18n.t('toast.entriesUnavailable', { count: 1 }),
-        })).toBe('Removed 0 entries from Ambit; 1 selected entry was already unavailable.');
+        })).toBe('Removed 0 entries from Dvoyna Vault; 1 selected entry was already unavailable.');
     });
 });

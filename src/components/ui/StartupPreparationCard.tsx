@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { LoaderCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface StartupPreparationProgress {
     current: number;
@@ -18,13 +19,14 @@ interface StartupPreparationCardProps {
 
 export const StartupPreparationCard: React.FC<StartupPreparationCardProps> = ({
     phaseLabel,
-    title = 'Preparing Ambit',
+    title = 'Preparing DV',
     icon,
     description,
     statusMessage,
     reassurance,
     progress,
 }) => {
+    const { t } = useTranslation();
     const isDeterminate = (progress?.total ?? 0) > 0;
     const current = Math.min(progress?.current ?? 0, progress?.total ?? 0);
     const percentage = isDeterminate
@@ -45,7 +47,7 @@ export const StartupPreparationCard: React.FC<StartupPreparationCardProps> = ({
                         {phaseLabel}
                     </p>
                     <h1 className="mt-1 text-xl font-black tracking-tight text-gray-900 dark:text-white">
-                        {title}
+                        {t(title)}
                     </h1>
                 </div>
             </div>

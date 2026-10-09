@@ -39,14 +39,14 @@ const manifest = {
 };
 
 const nsisAsset = {
-  name: 'Ambit_9.9.9_x64-setup.exe',
+  name: 'Dvoyna Vault_9.9.9_x64-setup.exe',
   state: 'uploaded',
   size: NSIS_INSTALLER.length,
   digest: `sha256:${NSIS_SHA256}`,
 };
 
 const msiAsset = {
-  name: 'Ambit_9.9.9_x64_en-US.msi',
+  name: 'Dvoyna Vault_9.9.9_x64_en-US.msi',
   state: 'uploaded',
   size: MSI_INSTALLER.length,
   digest: `sha256:${MSI_SHA256}`,
@@ -108,13 +108,13 @@ test('verifies a publicly downloadable signed Windows updater artifact', async (
     version: '9.9.9',
     artifacts: [
       {
-        name: 'Ambit_9.9.9_x64-setup.exe',
+        name: 'Dvoyna Vault_9.9.9_x64-setup.exe',
         platforms: ['windows-x86_64', 'windows-x86_64-nsis'],
         bytes: NSIS_INSTALLER.length,
         sha256: NSIS_SHA256,
       },
       {
-        name: 'Ambit_9.9.9_x64_en-US.msi',
+        name: 'Dvoyna Vault_9.9.9_x64_en-US.msi',
         platforms: ['windows-x86_64-msi'],
         bytes: MSI_INSTALLER.length,
         sha256: MSI_SHA256,
@@ -350,7 +350,7 @@ test('rejects an MSI platform that reuses the signed NSIS artifact', async () =>
       publicKey: PUBLIC_KEY,
       fetchImpl,
     }),
-    /windows-x86_64-msi must reference Ambit_9\.9\.9_x64_en-US\.msi/,
+    /windows-x86_64-msi must reference Dvoyna Vault_9\.9\.9_x64_en-US\.msi/,
   );
 });
 
@@ -358,7 +358,7 @@ test('rejects a signed installer from a different release version', async () => 
   const { fetchImpl } = createFetch({
     assetValue: {
       ...nsisAsset,
-      name: 'Ambit_9.9.8_x64-setup.exe',
+      name: 'Dvoyna Vault_9.9.8_x64-setup.exe',
     },
   });
 
@@ -369,7 +369,7 @@ test('rejects a signed installer from a different release version', async () => 
       publicKey: PUBLIC_KEY,
       fetchImpl,
     }),
-    /windows-x86_64 must reference Ambit_9\.9\.9_x64-setup\.exe/,
+    /windows-x86_64 must reference Dvoyna Vault_9\.9\.9_x64-setup\.exe/,
   );
 });
 

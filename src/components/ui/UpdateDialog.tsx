@@ -105,10 +105,10 @@ export const UpdateDialog: React.FC<UpdateDialogProps> = ({
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.22em] text-sage-600 dark:text-sage-300">{t('Update Available')}</p>
                     <h3 id="update-dialog-title" className="mt-2 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-                      {t('Ambit')} {availableVersion}
+                      {t('Dvoyna Vault')} {availableVersion}
                     </h3>
                     <p id="update-dialog-description" className="mt-2 max-w-md text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                      {t('A newer build is ready to install. After you confirm, Ambit will download the update and then restart or close to finish the installation.')}</p>
+                      {t('A newer build is ready to install. After you confirm, Dvoyna Vault will download the update and then restart or close to finish the installation.')}</p>
                   </div>
                 </div>
 

@@ -57,7 +57,7 @@ export class StartupBoundary extends React.Component<StartupBoundaryProps, Start
                 >
                     <div className="max-w-md space-y-3">
                         <h1 className="text-xl font-semibold">{i18n.t('Something went wrong')}</h1>
-                        <p className="text-sm text-zinc-300">{i18n.t('Ambit was already open, but this view stopped rendering.')}</p>
+                        <p className="text-sm text-zinc-300">{i18n.t('Dvoyna Vault was already open, but this view stopped rendering.')}</p>
                         <button
                             type="button"
                             className="rounded-lg bg-sage-600 px-4 py-2 text-sm font-medium text-white hover:bg-sage-500"
@@ -76,8 +76,8 @@ export class StartupBoundary extends React.Component<StartupBoundaryProps, Start
                 style={{ position: 'fixed', inset: 0, zIndex: 2147483647 }}
             >
                 <div className="max-w-md space-y-3">
-                    <h1 className="text-xl font-semibold">{i18n.t('Ambit couldn’t start')}</h1>
-                    <p className="text-sm text-zinc-300">{i18n.t('Restart Ambit. If the problem continues, share this launch ID with support.')}</p>
+                    <h1 className="text-xl font-semibold">{i18n.t('DV couldn’t start')}</h1>
+                    <p className="text-sm text-zinc-300">{i18n.t('Restart DV. If the problem continues, share this launch ID with support.')}</p>
                     <p className="font-mono text-xs text-zinc-400">{i18n.t('Launch ID:')} {this.state.launchId ?? 'unavailable'}</p>
                 </div>
             </main>

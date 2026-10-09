@@ -245,10 +245,10 @@ describe('AdvancedTab', () => {
     it.each([
         ['available', null, null, 'A new version is ready to install.'],
         ['downloading', null, null, 'Downloading the selected update package.'],
-        ['installing', null, null, 'Installing update. Ambit may restart or close to finish.'],
+        ['installing', null, null, 'Installing update. Dvoyna Vault may restart or close to finish.'],
         ['checking', null, null, 'Checking GitHub Releases for a newer build.'],
         ['error', null, 'release server unavailable', 'release server unavailable'],
-        ['error', null, null, 'Automatically checks GitHub Releases once each time Ambit starts.'],
+        ['error', null, null, 'Automatically checks GitHub Releases once each time Dvoyna Vault starts.'],
     ] as const)('renders the %s updater status', (updateStatus, pendingUpdateVersion, updateErrorMessage, label) => {
         renderAdvanced(createSettings(), { updateStatus, pendingUpdateVersion, updateErrorMessage });
         fireEvent.click(screen.getByRole('button', { name: /interface/i }));

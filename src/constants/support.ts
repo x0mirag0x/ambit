@@ -1,6 +1,8 @@
-export const REPOSITORY_URL = 'https://github.com/AsuraAce/ambit';
+export const REPOSITORY_URL = 'https://github.com/x0mirag0x/ambit';
 export const ISSUES_URL = `${REPOSITORY_URL}/issues`;
 export const RELEASES_URL = `${REPOSITORY_URL}/releases`;
+/** Upstream project. Required for the GPL-3.0 attribution link. */
+export const UPSTREAM_REPOSITORY_URL = 'https://github.com/AsuraAce/ambit';
 export const GITHUB_SPONSORS_URL = 'https://github.com/sponsors/AsuraAce';
 export const KO_FI_URL = 'https://ko-fi.com/astraoriondev';
 

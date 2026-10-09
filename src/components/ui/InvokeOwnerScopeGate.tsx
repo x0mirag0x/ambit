@@ -53,7 +53,7 @@ const BusyGate: React.FC<{ state: InvokeOwnerScopeState }> = ({ state }) => {
                 ? t('Switching to {{ownerLabel}}', { ownerLabel: ownerLabel })
                 : t('Preparing your InvokeAI view')}
             icon={<ShieldCheck className="h-7 w-7" />}
-            description={t('Ambit is loading the images, boards, and filters available in this view.')}
+            description={t('Dvoyna Vault is loading the images, boards, and filters available in this view.')}
             statusMessage={statusMessage}
             reassurance="Your library remains unchanged while this view loads."
             progress={progress}
@@ -117,8 +117,8 @@ export const InvokeOwnerScopeGate: React.FC<InvokeOwnerScopeGateProps> = ({
         ? 'InvokeAI needs attention'
         : 'InvokeAI library preparation failed';
     const description = isSourceUnavailable
-        ? "Ambit couldn't open the configured InvokeAI database, so InvokeAI content is staying hidden."
-        : "Ambit couldn't finish verifying owner visibility. InvokeAI content is staying hidden to avoid showing the wrong library.";
+        ? "Dvoyna Vault couldn't open the configured InvokeAI database, so InvokeAI content is staying hidden."
+        : "Dvoyna Vault couldn't finish verifying owner visibility. InvokeAI content is staying hidden to avoid showing the wrong library.";
 
     return (
         <main

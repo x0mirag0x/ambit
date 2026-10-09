@@ -2,19 +2,19 @@
 
 [Back to manual index](index.md)
 
-Ambit is a local-first desktop app for organizing large AI-generated image libraries. The public beta is currently distributed as Windows builds through GitHub Releases.
+Dvoyna Vault is a local-first desktop app for organizing large AI-generated image libraries. The public beta is currently distributed as Windows builds through GitHub Releases.
 
 ## Install The Public Beta
 
-1. Open the Ambit [GitHub Releases](https://github.com/AsuraAce/ambit/releases) page.
+1. Open the Dvoyna Vault [GitHub Releases](https://github.com/x0mirag0x/ambit/releases) page.
 2. Download the Windows setup installer ending in `-setup.exe`.
-3. Run the installer and launch Ambit.
+3. Run the installer and launch Dvoyna Vault.
 
-You do not need Node.js, pnpm, Rust, Tauri, or VS Code unless you want to build Ambit from source.
+You do not need Node.js, pnpm, Rust, Tauri, or VS Code unless you want to build Dvoyna Vault from source.
 
 ## First Launch
 
-On first launch, Ambit shows an onboarding wizard. The wizard introduces:
+On first launch, Dvoyna Vault shows an onboarding wizard. The wizard introduces:
 
 - integrations for InvokeAI, ComfyUI, and SD WebUI style output folders
 - optional Gemini-powered intelligence features
@@ -23,11 +23,11 @@ On first launch, Ambit shows an onboarding wizard. The wizard introduces:
 
 You can skip optional integrations and Gemini setup during onboarding and configure them later from Settings. If you enable Gemini during onboarding, verify the API key before continuing. After setup, you can reopen the guide from **Help & Guide > Setup Guide** without resetting your existing preferences. Close or press Escape to discard unsaved guide changes; verified API keys and changes made directly in linked Settings pages are saved when you make them.
 
-After setup, Ambit opens the library. Existing images appear immediately. If an import is still running, the empty library shows its current progress until the first images arrive. If the library is empty and idle, use **Import Images** to connect a generator, add a folder, or select individual files.
+After setup, Dvoyna Vault opens the library. Existing images appear immediately. If an import is still running, the empty library shows its current progress until the first images arrive. If the library is empty and idle, use **Import Images** to connect a generator, add a folder, or select individual files.
 
 ```mermaid
 flowchart TD
-    A["Install Ambit"] --> B["Launch app"]
+    A["Install Dvoyna Vault"] --> B["Launch app"]
     B --> C["Complete onboarding"]
     C --> D["Open library"]
     D --> E{"Library state"}
@@ -41,7 +41,7 @@ flowchart TD
 
 ## Main Areas
 
-The main Ambit workspace has a left sidebar, a library area, and an optional filter panel.
+The main Dvoyna Vault workspace has a left sidebar, a library area, and an optional filter panel.
 
 - Grid View shows image thumbnails for everyday browsing.
 - Timeline View groups browsing around image time.
@@ -51,13 +51,13 @@ The main Ambit workspace has a left sidebar, a library area, and an optional fil
 - Settings opens preferences and integrations.
 - Help opens keyboard shortcuts, search syntax, and the reusable setup guide.
 
-## What Ambit Stores
+## What Dvoyna Vault Stores
 
-Ambit keeps source image files where they already are. It stores a local catalog, metadata, thumbnails, settings, and optional integration configuration so the app can search and maintain the library quickly.
+Dvoyna Vault keeps source image files where they already are. It stores a local catalog, metadata, thumbnails, settings, and optional integration configuration so the app can search and maintain the library quickly.
 
 On Windows, the installer folder is only where the Ambit application is installed. The library catalog database is application data and lives under Local AppData, normally `%LOCALAPPDATA%\io.github.asuraace.ambit\images.db`. Installing Ambit to another folder or drive does not move the library database.
 
-Gemini API keys entered through Ambit are stored locally through the OS keyring. Credentials supplied through the environment are read but not saved by Ambit, and no key needs to be committed to the repository or source code.
+Gemini API keys entered through Dvoyna Vault are stored locally through the OS keyring. Credentials supplied through the environment are read but not saved by Dvoyna Vault, and no key needs to be committed to the repository or source code.
 
 You can create or view a key in [Google AI Studio](https://aistudio.google.com/apikey). A free tier is available for eligible accounts and regions, with model and usage limits. Gemini requests are handled by Google under the terms of your AI Studio plan.
 

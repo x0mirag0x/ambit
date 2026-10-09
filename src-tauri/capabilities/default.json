@@ -130,13 +130,16 @@
       "identifier": "shell:allow-open",
       "allow": [
         {
+          "href": "https://github.com/x0mirag0x/ambit"
+        },
+        {
+          "href": "https://github.com/x0mirag0x/ambit/issues"
+        },
+        {
+          "href": "https://github.com/x0mirag0x/ambit/releases"
+        },
+        {
           "href": "https://github.com/AsuraAce/ambit"
-        },
-        {
-          "href": "https://github.com/AsuraAce/ambit/issues"
-        },
-        {
-          "href": "https://github.com/AsuraAce/ambit/releases"
         },
         {
           "href": "https://github.com/sponsors/AsuraAce"

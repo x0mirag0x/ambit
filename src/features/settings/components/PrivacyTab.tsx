@@ -190,7 +190,7 @@ export const PrivacyTab: React.FC<TabProps> = React.memo(({ settings, setSetting
                 >
                     <div>
                         <div id="privacy-mode-label" className="text-base font-medium text-gray-900 dark:text-gray-200 group-hover:text-sage-500 transition-colors">{t('Privacy Mode')}</div>
-                        <div id="privacy-mode-description" className="text-sm text-gray-500">{t('Applies your saved masking rules for this session. Privacy Mode starts on whenever Ambit launches; turning it off temporarily reveals both manually masked and keyword-matched images.')}</div>
+                        <div id="privacy-mode-description" className="text-sm text-gray-500">{t('Applies your saved masking rules for this session. Privacy Mode starts on whenever Dvoyna Vault launches; turning it off temporarily reveals both manually masked and keyword-matched images.')}</div>
                         <div className={`mt-2 text-xs font-medium ${privacyEnabled ? 'text-sage-600 dark:text-sage-300' : 'text-gray-500'}`}>{privacySummary}</div>
                     </div>
                     <span

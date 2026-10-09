@@ -14,6 +14,8 @@ import {
 import { AppSettings } from '../../../types';
 import { unwrap } from '../../../utils/spectaUtils';
 import { nativeLanguageName, resolveUiLanguage, UI_LANGUAGES, type UiLanguage } from '../../../i18n/language';
+import { UPSTREAM_REPOSITORY_URL } from '../../../constants/support';
+import { openExternalUrl } from '../../../utils/externalLinks';
 import { useTranslation } from 'react-i18next';
 
 interface TabProps {
@@ -200,7 +202,7 @@ export const GeneralTab: React.FC<TabProps> = React.memo(({ settings, setSetting
                 <div className="mt-6 flex items-center justify-between gap-4">
                     <div className="min-w-0">
                         <div className="text-base font-medium text-gray-900 dark:text-gray-200">{t('Language')}</div>
-                        <div className="text-sm text-gray-500">{t('Choose the language used throughout Ambit')}</div>
+                        <div className="text-sm text-gray-500">{t('Choose the language used throughout Dvoyna Vault')}</div>
                     </div>
                     <div role="radiogroup" aria-label={t('Language')} className="flex shrink-0 flex-wrap justify-end gap-2">
                         {UI_LANGUAGES.map((language) => {
@@ -222,6 +224,19 @@ export const GeneralTab: React.FC<TabProps> = React.memo(({ settings, setSetting
                             );
                         })}
                     </div>
+                </div>
+                <div className="mt-6 border-t border-gray-200 pt-5 dark:border-white/10">
+                    <div className="text-base font-medium text-gray-900 dark:text-gray-200">{t('About')}</div>
+                    <p className="mt-1 text-sm leading-relaxed text-gray-500">
+                        {t('Dvoyna Vault is based on Ambit by AsuraAce, licensed under GPL-3.0, with modifications.')}
+                    </p>
+                    <button
+                        type="button"
+                        onClick={() => void openExternalUrl(UPSTREAM_REPOSITORY_URL)}
+                        className="mt-2 text-sm font-medium text-sage-700 underline-offset-2 hover:underline dark:text-sage-300"
+                    >
+                        {t('Ambit on GitHub')}
+                    </button>
                 </div>
             </section>
 
@@ -287,7 +302,7 @@ export const GeneralTab: React.FC<TabProps> = React.memo(({ settings, setSetting
                                             content={t('Quiet minimizes CPU use. Balanced uses moderate parallelism. Fast prioritizes completion speed and may reduce responsiveness while it runs.')}
                                         />
                                     </div>
-                                    <div className="text-xs text-gray-400 mt-0.5">{t('Controls CPU use while Ambit is idle')}</div>
+                                    <div className="text-xs text-gray-400 mt-0.5">{t('Controls CPU use while Dvoyna Vault is idle')}</div>
                                 </div>
                                 <div className="inline-flex rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-black/20 p-0.5">
                                     {THUMBNAIL_PROFILE_OPTIONS.map(option => {
@@ -407,7 +422,7 @@ export const GeneralTab: React.FC<TabProps> = React.memo(({ settings, setSetting
                     >
                         <div>
                             <div className="text-base font-medium text-gray-900 dark:text-gray-200 group-hover:text-sage-500 transition-colors">{t('Confirm Deletions')}</div>
-                            <div className="text-sm text-gray-500">{t('Show a warning before removing files from Ambit while keeping them on disk')}</div>
+                            <div className="text-sm text-gray-500">{t('Show a warning before removing files from Dvoyna Vault while keeping them on disk')}</div>
                         </div>
                         <button
                             type="button"

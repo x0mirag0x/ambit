@@ -339,7 +339,7 @@ describe('SearchBar query readiness and trigger behavior', () => {
         const harness = renderSearchBar(createDefaultFilters(), {
             searchProps: { isAiSearchEnabled: true, isSearchingAi: true, isFocused: false },
         });
-        const input = screen.getByRole('combobox', { name: 'Ask Ambit with AI' });
+        const input = screen.getByRole('combobox', { name: 'Ask DV with AI' });
         fireEvent.focus(input);
         fireEvent.blur(input);
         const aiButton = screen.getByRole('button', { name: 'Disable AI Search' });
@@ -408,7 +408,7 @@ describe('SearchBar query readiness and trigger behavior', () => {
         const harness = renderSearchBar(createDefaultFilters({ searchQuery: 'existing' }), {
             searchProps: { isAiSearchEnabled: true },
         });
-        const input = screen.getByRole('combobox', { name: 'Ask Ambit with AI' });
+        const input = screen.getByRole('combobox', { name: 'Ask DV with AI' });
 
         fireEvent.change(input, { target: { value: 'warm portraits from last month' } });
         act(() => vi.advanceTimersByTime(600));

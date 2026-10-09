@@ -1,16 +1,18 @@
-# Ambit User Manual
+# Dvoyna Vault User Manual
 
-This manual is for people using Ambit public beta builds. It explains how to install Ambit, add image folders, browse and search a library, inspect metadata, organize images, and recover from common library problems.
+This manual is for people using Dvoyna Vault public beta builds. It explains how to install Dvoyna Vault, add image folders, browse and search a library, inspect metadata, organize images, and recover from common library problems.
 
-Ambit is currently a public beta. Official public beta builds are Windows-only while macOS and Linux support is being validated.
+Dvoyna Vault is based on [Ambit](https://github.com/AsuraAce/ambit) by AsuraAce, licensed under GPL-3.0, with modifications.
 
-## How Ambit Works
+Dvoyna Vault is currently a public beta. Official public beta builds are Windows-only while macOS and Linux support is being validated.
 
-Ambit catalogs local folders containing images and supported videos. It does not need to move your original image files into a managed library folder.
+## How Dvoyna Vault Works
+
+Dvoyna Vault catalogs local folders containing images and supported videos. It does not need to move your original image files into a managed library folder.
 
 ```mermaid
 flowchart LR
-    A["Your image folders"] --> B["Ambit scan"]
+    A["Your image folders"] --> B["Dvoyna Vault scan"]
     B --> C["Local SQLite catalog"]
     B --> D["Generated thumbnails"]
     C --> E["Browse, search, filter"]
@@ -22,7 +24,7 @@ The core app is local-first. Image records, metadata, thumbnails, and settings a
 
 ## Manual Pages
 
-- [Getting Started](getting-started.md): install the public beta, launch Ambit, and complete the first-run wizard.
+- [Getting Started](getting-started.md): install the public beta, launch Dvoyna Vault, and complete the first-run wizard.
 - [Adding Folders](adding-folders.md): add monitored media folders and run one-time image or video imports.
 - [Generator Integrations](generator-integrations.md): connect InvokeAI, ComfyUI, SD WebUI, A1111, Forge, SD.Next, and Anapnoe output locations.
 - [Browsing The Library](browsing-library.md): use grid, timeline, statistics, selection, favorites, pins, and the viewer.
@@ -35,4 +37,4 @@ The core app is local-first. Image records, metadata, thumbnails, and settings a
 
 ## Related Project Docs
 
-This manual is user-facing. For development setup and pull request expectations, see [Contributing To Ambit](../../CONTRIBUTING.md). For security-sensitive reports, follow [Security Policy](../../SECURITY.md) instead of opening a public issue.
+This manual is user-facing. For development setup and pull request expectations, see [Contributing To Dvoyna Vault](../../CONTRIBUTING.md). For security-sensitive reports, follow [Security Policy](../../SECURITY.md) instead of opening a public issue.

@@ -585,7 +585,7 @@ describe('WorkflowInspector ComfyUI parser diagnostics', () => {
 
         fireEvent.click(await screen.findByTitle('Export parser support bundle'));
         expect(screen.getByText('Export ComfyUI support bundle?')).toBeTruthy();
-        expect(screen.getByText(/Ambit will not upload it/i)).toBeTruthy();
+        expect(screen.getByText(/Dvoyna Vault will not upload it/i)).toBeTruthy();
 
         fireEvent.click(screen.getAllByRole('button', { name: 'Export Bundle' })[1]);
 

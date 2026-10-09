@@ -314,7 +314,7 @@ export const SearchBar = React.memo(({
             onFocusCapture={handleFocusCapture}
             onBlurCapture={handleBlurCapture}
         >
-            <div className={`relative flex-1 rounded-xl transition-shadow duration-200 ${isStandardSearchPending ? 'shadow-[0_0_18px_rgba(139,174,124,0.24)] dark:shadow-[0_0_20px_rgba(139,174,124,0.18)]' : ''}`}>
+            <div className={`relative flex-1 rounded-xl transition-shadow duration-200 ${isStandardSearchPending ? 'shadow-[0_0_18px_rgba(198,164,90,0.24)] dark:shadow-[0_0_20px_rgba(198,164,90,0.18)]' : ''}`}>
                 {showLoadingIndicator ? (
                     <LoaderCircle
                         aria-hidden="true"

@@ -11,8 +11,8 @@ import {
 import { isTauriRuntime } from '../services/runtime';
 
 const DOCUMENT_TITLES: Record<UiLanguage, string> = {
-    en: 'Ambit | Local AI Workspace',
-    ru: 'Ambit | Локальная рабочая среда для ИИ',
+    en: 'DV | Local AI Workspace',
+    ru: 'DV | Локальная рабочая среда для ИИ',
 };
 
 export const useUiLanguage = (savedLanguage: unknown, isSettingsLoaded: boolean): void => {

@@ -127,7 +127,7 @@ describe('geminiService: thinking configuration', () => {
         expect(getGeminiThinkingConfig('gemini-2.5-pro', 'off')).toBeUndefined();
     });
 
-    it('applies Gemini 3 thinking effort to every Ambit AI workflow', async () => {
+    it('applies Gemini 3 thinking effort to every Dvoyna Vault AI workflow', async () => {
         mockGenerateContent
             .mockResolvedValueOnce({ text: 'analysis' })
             .mockResolvedValueOnce({ text: '["variation"]' })

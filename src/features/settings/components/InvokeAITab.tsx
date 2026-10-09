@@ -289,8 +289,8 @@ export const InvokeAITab: React.FC<TabProps> = React.memo(({ settings, setSettin
                             </p>
                             <p className="mt-1 text-[10px] leading-4">
                                 {invokeOwnerScopeState.failure?.kind === 'source_unavailable'
-                                    ? t('Ambit could not verify this InvokeAI database, so its content remains hidden.')
-                                    : t('Ambit could not finish verifying owner visibility, so its content remains hidden.')}
+                                    ? t('Dvoyna Vault could not verify this InvokeAI database, so its content remains hidden.')
+                                    : t('Dvoyna Vault could not finish verifying owner visibility, so its content remains hidden.')}
                             </p>
                             {invokeOwnerScopeState.error && (
                                 <details className="mt-3 text-[10px]">
@@ -340,7 +340,7 @@ export const InvokeAITab: React.FC<TabProps> = React.memo(({ settings, setSettin
                         && invokeOwnerScopeState.status !== 'offline_ready'
                         && ownerDiscovery?.schemaMode === 'legacy' && (
                         <div className="p-4 rounded-xl bg-sage-500/10 border border-sage-500/20 text-xs text-gray-600 dark:text-gray-300">
-                            {t('This InvokeAI database predates per-user ownership. Ambit keeps the existing unscoped behavior.')}</div>
+                            {t('This InvokeAI database predates per-user ownership. Dvoyna Vault keeps the existing unscoped behavior.')}</div>
                     )}
 
                     {!ownerScopeBusy
@@ -361,7 +361,7 @@ export const InvokeAITab: React.FC<TabProps> = React.memo(({ settings, setSettin
                                 </p>
                             )}
                             <p className="mt-3 text-xs leading-5 text-gray-600 dark:text-gray-300">
-                                {t('Ambit found one InvokeAI owner and selected it automatically. All users would show the same library, so no scope switch is needed.')}</p>
+                                {t('Dvoyna Vault found one InvokeAI owner and selected it automatically. All users would show the same library, so no scope switch is needed.')}</p>
                         </div>
                     )}
 
@@ -386,7 +386,7 @@ export const InvokeAITab: React.FC<TabProps> = React.memo(({ settings, setSettin
                     <h4 className="mb-2 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-sage-600 dark:text-sage-300">
                         <RotateCcw className="h-4 w-4" /> {t('Hidden InvokeAI collections')}</h4>
                     <p className="mb-4 text-xs text-gray-500 dark:text-gray-400">
-                        {t('Restore collections hidden from Ambit. Source ownership and local organization are retained.')}</p>
+                        {t('Restore collections hidden from Dvoyna Vault. Source ownership and local organization are retained.')}</p>
                     <div className="space-y-2">
                         {hiddenCollections.map(collection => (
                             <div key={collection.id} className="flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-gray-50 p-3 dark:border-white/5 dark:bg-black/20">

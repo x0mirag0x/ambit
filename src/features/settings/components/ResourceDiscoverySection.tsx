@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { AlertTriangle, Folder, FolderSearch, RefreshCw, Trash2, Plus } from 'lucide-react';
-import { APP_NAME } from '../../../constants/app';
+import { APP_FULL_NAME } from '../../../constants/app';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import { useTranslation } from 'react-i18next';
 import { translateRuntimeMessage } from '../../../i18n/statusMessages';
@@ -49,7 +49,7 @@ export const ResourceDiscoverySection: React.FC<ResourceDiscoverySectionProps> =
                     <FolderSearch className="w-5 h-5 flex-shrink-0 mt-0.5" />
                     <div>
                         <strong className="block mb-1">{t('Resource Discovery')}</strong>
-                        {t('Add your model and resource folders here. {{appName}} will scan local assets and sidecar previews (.jpg, .png, .webp).', { appName: APP_NAME })}
+                        {t('Add your model and resource folders here. {{appName}} will scan local assets and sidecar previews (.jpg, .png, .webp).', { appName: APP_FULL_NAME })}
                     </div>
                 </div>
                 <div className="flex gap-2">

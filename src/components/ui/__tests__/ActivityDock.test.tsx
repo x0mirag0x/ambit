@@ -67,7 +67,7 @@ describe('ActivityDock', () => {
         render(<ActivityDock />);
 
         expect(screen.getByText('InvokeAI Sync')).toBeTruthy();
-        expect(screen.getByText('You can keep using the library while Ambit synchronizes InvokeAI.')).toBeTruthy();
+        expect(screen.getByText('You can keep using the library while Dvoyna Vault synchronizes InvokeAI.')).toBeTruthy();
         expect(screen.getByText('Cancel')).toBeTruthy();
         expect(screen.queryByText('Live Watch')).toBeNull();
     });
@@ -82,7 +82,7 @@ describe('ActivityDock', () => {
         render(<ActivityDock />);
 
         expect(screen.getByText('InvokeAI Catch-up')).toBeTruthy();
-        expect(screen.getByText('You can keep using the library while Ambit catches up.')).toBeTruthy();
+        expect(screen.getByText('You can keep using the library while Dvoyna Vault catches up.')).toBeTruthy();
     });
 
     it('renders duplicate scan progress with cancel controls', () => {

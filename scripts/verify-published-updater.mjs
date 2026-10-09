@@ -267,8 +267,8 @@ const assertArtifactRepository = (artifactUrl, repository) => {
 
 const expectedWindowsAssetName = (platform, version) =>
   platform === 'windows-x86_64-msi'
-    ? `Ambit_${version}_x64_en-US.msi`
-    : `Ambit_${version}_x64-setup.exe`;
+    ? `Dvoyna Vault_${version}_x64_en-US.msi`
+    : `Dvoyna Vault_${version}_x64-setup.exe`;
 
 const verifyArtifact = async ({ artifact, expectedVersion, fetchImpl, publicKey }) => {
   const metadataResponse = await fetchOk(fetchImpl, artifact.url, undefined, 'Updater asset metadata');

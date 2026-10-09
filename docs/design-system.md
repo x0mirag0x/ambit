@@ -1,12 +1,12 @@
-# Ambit UI Color Contract
+# Dvoyna Vault UI Color Contract
 
 Status: Canonical
 
-Ambit uses a restrained semantic palette. The executable color values in `tailwind.config.js` are authoritative; this document defines their roles.
+Dvoyna Vault uses a restrained semantic palette. The executable color values in `tailwind.config.js` are authoritative; this document defines their roles.
 
 ## Semantic roles
 
-- **Sage** is the brand tone for primary actions, navigation and selection, ordinary progress, and positive states.
+- **Sage** is the champagne-gold brand tone for primary actions, navigation and selection, ordinary progress, and positive states. On dark surfaces it reads as warm gold against black.
 - **Amethyst** identifies AI-assisted features. Do not use it for stacks, versions, collection thumbnails, or non-AI background work.
 - **Harbor** is informational. Use it for discovery, online lookup context, and non-AI background activity, never as a competing primary-action color.
 - **Ember** marks warnings, missing information, modified metadata, and attention states. It replaces semantic amber, orange, and yellow.

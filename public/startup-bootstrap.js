@@ -44,21 +44,21 @@
   function startupCopy() {
     if (!isRussianUi()) {
       return {
-        title: 'Ambit couldn’t start',
-        body: 'Restart Ambit. If the problem continues, share this launch ID with support.',
+        title: 'DV couldn’t start',
+        body: 'Restart DV. If the problem continues, share this launch ID with support.',
         launch: 'Launch ID: ',
         unavailable: 'unavailable',
         slow: 'Startup is taking longer than expected',
-        diagnostics: 'Startup diagnostics unavailable. Ambit will continue starting.'
+        diagnostics: 'Startup diagnostics unavailable. DV will continue starting.'
       };
     }
     return {
-      title: 'Ambit не удалось запустить',
-      body: 'Перезапустите Ambit. Если проблема повторится, передайте этот идентификатор запуска в поддержку.',
+      title: 'DV не удалось запустить',
+      body: 'Перезапустите DV. Если проблема повторится, передайте этот идентификатор запуска в поддержку.',
       launch: 'Идентификатор запуска: ',
       unavailable: 'недоступен',
       slow: 'Запуск занимает больше времени, чем ожидалось',
-      diagnostics: 'Диагностика запуска недоступна. Ambit продолжит запуск.'
+      diagnostics: 'Диагностика запуска недоступна. DV продолжит запуск.'
     };
   }
 

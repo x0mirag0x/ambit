@@ -2,7 +2,6 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { Database, Zap, Loader2, BrainCircuit, Undo2, Save, Wrench, RefreshCw, History } from 'lucide-react';
-import { APP_NAME } from '../../../constants/app';
 import { generateStressTestData } from '../../../utils/dev/dataGenerator';
 import { useLibraryContext } from '../../../hooks/useLibraryContext';
 import { useSettingsStore } from '../../../stores/settingsStore';

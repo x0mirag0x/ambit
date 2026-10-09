@@ -57,7 +57,7 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({
     onOpenSettings,
 }) => {
     const { t } = useTranslation();
-    const brandGlyphSrc = '/branding/ambit-glyph.svg';
+    const brandGlyphSrc = '/branding/dv-glyph.png';
     const settings = useSettingsStore(state => state.settings);
     const geminiApiKey = useSettingsStore(state => state.geminiApiKey);
     const setGeminiApiKey = useSettingsStore(state => state.setGeminiApiKey);
@@ -359,7 +359,7 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({
 
                                         <div className="rounded-2xl border border-sage-500/10 bg-sage-500/5 p-4 backdrop-blur-sm dark:border-white/10 dark:bg-white/5">
                                             <p className="text-xs leading-relaxed text-gray-500 dark:text-gray-400">
-                                                {t('Ambit watches connected folders for new images. InvokeAI can also sync supported favorites and boards.')}</p>
+                                                {t('Dvoyna Vault watches connected folders for new images. InvokeAI can also sync supported favorites and boards.')}</p>
                                             <button
                                                 type="button"
                                                 onClick={() => onOpenSettings?.('folders')}
@@ -434,7 +434,7 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({
                                                 />
                                                 <p className="text-xs leading-relaxed text-gray-500 dark:text-gray-400">
                                                     {isEnvKey
-                                                        ? t('Ambit reads this API key from your environment and does not save it. Gemini requests are handled by Google under your AI Studio plan. A free tier is available for eligible accounts and regions; limits apply.')
+                                                        ? t('Dvoyna Vault reads this API key from your environment and does not save it. Gemini requests are handled by Google under your AI Studio plan. A free tier is available for eligible accounts and regions; limits apply.')
                                                         : t('Stored in your OS keyring. Gemini requests are handled by Google under your AI Studio plan. A free tier is available for eligible accounts and regions; limits apply.')}
                                                 </p>
                                                 {needsAiSetup ? (
@@ -457,9 +457,9 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({
                                             >
                                                 {t('Privacy & control')}</h2>
                                             <div className="space-y-2">
-                                                <PrivacyRow icon={<ServerOff className="h-6 w-6" />} title={t('Stored locally')} description={t('Your image catalog, metadata, and settings stay on this machine. Ambit does not send telemetry.')} />
+                                                <PrivacyRow icon={<ServerOff className="h-6 w-6" />} title={t('Stored locally')} description={t('Your image catalog, metadata, and settings stay on this machine. Dvoyna Vault does not send telemetry.')} />
                                                 <PrivacyRow icon={<FileJson className="h-6 w-6" />} title={t('Gemini requests')} description={t('Images or prompts are sent to Google only when you verify the key or run an AI action.')} />
-                                                <PrivacyRow icon={<Link2 className="h-6 w-6" />} title={t('Optional network access')} description={t('Ambit can check GitHub Releases at startup when updates are enabled. CivitAI lookups run only after you confirm Resolve Online.')} />
+                                                <PrivacyRow icon={<Link2 className="h-6 w-6" />} title={t('Optional network access')} description={t('Dvoyna Vault can check GitHub Releases at startup when updates are enabled. CivitAI lookups run only after you confirm Resolve Online.')} />
                                             </div>
                                         </div>
 

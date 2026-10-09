@@ -65,7 +65,7 @@ describe('InvokeReferenceLinks', () => {
         expect(await screen.findByRole('heading', { name: 'Source Images' })).toBeTruthy();
         expect(screen.getByRole('heading', { name: 'Used By' })).toBeTruthy();
         expect(screen.getByText('IP-Adapter input')).toBeTruthy();
-        expect((screen.getByText('Unavailable in Ambit').closest('button') as HTMLButtonElement).disabled).toBe(true);
+        expect((screen.getByText('Unavailable in Dvoyna Vault').closest('button') as HTMLButtonElement).disabled).toBe(true);
         expect((screen.getByText('Removed from library').closest('button') as HTMLButtonElement).disabled).toBe(true);
         expect((screen.getByText('Current image').closest('button') as HTMLButtonElement).disabled).toBe(true);
         expect((screen.getByRole('button', { name: 'Open source.png' }) as HTMLButtonElement).disabled).toBe(false);

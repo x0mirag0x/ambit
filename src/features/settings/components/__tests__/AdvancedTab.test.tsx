@@ -188,7 +188,7 @@ describe('AdvancedTab', () => {
         });
 
         const payload = clipboardWriteTextMock.mock.calls[0][0] as string;
-        expect(payload).toContain('Ambit Support Diagnostics');
+        expect(payload).toContain('Dvoyna Vault Support Diagnostics');
         expect(payload).toContain('Console log level: warn');
         expect(payload).toContain('App log file: C:\\Users\\AmbitTester\\AppData\\Roaming\\io.github.asuraace.ambit\\logs\\Ambit.log');
         expect(payload).toContain('Images: 12');

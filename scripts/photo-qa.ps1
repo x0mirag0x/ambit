@@ -9,8 +9,8 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $CorpusRoot = [IO.Path]::GetFullPath((Join-Path ([IO.Path]::GetTempPath()) 'ambit-photo-qa'))
-$RoamingProfile = [IO.Path]::GetFullPath((Join-Path $env:APPDATA 'com.ambit.qa'))
-$LocalProfile = [IO.Path]::GetFullPath((Join-Path $env:LOCALAPPDATA 'com.ambit.qa'))
+$RoamingProfile = [IO.Path]::GetFullPath((Join-Path $env:APPDATA 'com.dvoyna.vault.qa'))
+$LocalProfile = [IO.Path]::GetFullPath((Join-Path $env:LOCALAPPDATA 'com.dvoyna.vault.qa'))
 $DatabasePath = Join-Path $RoamingProfile 'images.db'
 
 function Assert-ExactLeaf([string]$Path, [string]$ExpectedLeaf) {
@@ -38,8 +38,8 @@ function Invoke-Harness([string[]]$HarnessArgs) {
 switch ($Action) {
     'Prepare' {
         Remove-GuardedDirectory $CorpusRoot 'ambit-photo-qa'
-        Remove-GuardedDirectory $RoamingProfile 'com.ambit.qa'
-        Remove-GuardedDirectory $LocalProfile 'com.ambit.qa'
+        Remove-GuardedDirectory $RoamingProfile 'com.dvoyna.vault.qa'
+        Remove-GuardedDirectory $LocalProfile 'com.dvoyna.vault.qa'
         Invoke-Harness @('generate', $CorpusRoot)
         $modifiedAt = [DateTimeOffset]::Parse('2026-07-30T12:00:00+02:00').LocalDateTime
         Get-ChildItem -LiteralPath $CorpusRoot -File | Where-Object Name -ne 'manifest.json' | ForEach-Object {
@@ -56,8 +56,8 @@ switch ($Action) {
     }
     'Cleanup' {
         Remove-GuardedDirectory $CorpusRoot 'ambit-photo-qa'
-        Remove-GuardedDirectory $RoamingProfile 'com.ambit.qa'
-        Remove-GuardedDirectory $LocalProfile 'com.ambit.qa'
-        Write-Output 'Removed the isolated photography QA corpus and com.ambit.qa profiles.'
+        Remove-GuardedDirectory $RoamingProfile 'com.dvoyna.vault.qa'
+        Remove-GuardedDirectory $LocalProfile 'com.dvoyna.vault.qa'
+        Write-Output 'Removed the isolated photography QA corpus and com.dvoyna.vault.qa profiles.'
     }
 }

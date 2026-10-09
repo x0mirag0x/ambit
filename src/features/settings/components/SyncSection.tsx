@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { RefreshCw, Zap, ZapOff, XCircle } from 'lucide-react';
-import { APP_NAME } from '../../../constants/app';
+import { APP_FULL_NAME } from '../../../constants/app';
 import { AppSettings } from '../../../types';
 import { useLibrary } from '../../../contexts/LibraryContext';
 import { useToast } from '../../../hooks/useToast';
@@ -130,7 +130,7 @@ export const SyncSection: React.FC<SyncSectionProps> = React.memo(({ settings, s
 
             <div className="mb-8 space-y-6 relative z-10">
                 <p className="text-sm text-gray-500 font-medium">
-                    {t('Automate the bridge between InvokeAI and your')} {APP_NAME} library.
+                    {t('Automate the bridge between InvokeAI and your')} {APP_FULL_NAME} library.
                 </p>
 
                 {ownerSyncBlocked && (
@@ -280,7 +280,7 @@ export const SyncSection: React.FC<SyncSectionProps> = React.memo(({ settings, s
         <ConfirmDialog
             isOpen={isFullResyncConfirmOpen}
             title={t('Force Full InvokeAI Resync?')}
-            message={t('This clears the InvokeAI sync cursor. The next sync will scan the full InvokeAI database. Existing Ambit records, files, and InvokeAI snapshots stay untouched.')}
+            message={t('This clears the InvokeAI sync cursor. The next sync will scan the full InvokeAI database. Existing Dvoyna Vault records, files, and InvokeAI snapshots stay untouched.')}
             confirmLabel={t('Force Full Resync')}
             onConfirm={handleForceFullResync}
             onCancel={() => setIsFullResyncConfirmOpen(false)}

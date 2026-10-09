@@ -70,7 +70,7 @@ export const FoldersTab: React.FC<TabProps> = React.memo(({
                     <Monitor className="w-5 h-5 flex-shrink-0 mt-0.5" />
                     <div>
                         <strong className="block mb-1">{t('Image Folders')}</strong>
-                        {t('Add folders containing generated images, camera photos, or other local images. Ambit scans')} <span className="font-semibold">{t('PNG, JPEG, and WebP')}</span> {t('files without uploading them.')}</div>
+                        {t('Add folders containing generated images, camera photos, or other local images. Dvoyna Vault scans')} <span className="font-semibold">{t('PNG, JPEG, and WebP')}</span> {t('files without uploading them.')}</div>
                 </div>
 
                 <div className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-xl overflow-hidden shadow-sm">

@@ -233,8 +233,8 @@ export const ActivityDock: React.FC = () => {
         label = invokeSyncActivityKind === 'startup' ? "InvokeAI Catch-up" : "InvokeAI Sync";
         supportsCancel = true;
         footerMessage = invokeSyncActivityKind === 'startup'
-            ? "You can keep using the library while Ambit catches up."
-            : "You can keep using the library while Ambit synchronizes InvokeAI.";
+            ? "You can keep using the library while Dvoyna Vault catches up."
+            : "You can keep using the library while Dvoyna Vault synchronizes InvokeAI.";
     } else if (isRegeneratingThumbnails) {
         progress = thumbnailProgress;
         label = "Optimizing";
@@ -251,12 +251,12 @@ export const ActivityDock: React.FC = () => {
         progress = duplicateScanProgress;
         label = "Duplicate Scan";
         supportsCancel = true;
-        footerMessage = "You can keep using Ambit while this scans.";
+        footerMessage = "You can keep using Dvoyna Vault while this scans.";
     } else if (isScanningMissingFiles) {
         progress = missingScanProgress;
         label = "Missing File Audit";
         supportsCancel = true;
-        footerMessage = "You can keep using Ambit while this audit runs.";
+        footerMessage = "You can keep using Dvoyna Vault while this audit runs.";
     } else if (isPopulatingThumbnails) {
         progress = { current: 0, total: 0, message: "Matching images to models..." };
         label = "Smart Fill";
@@ -333,8 +333,8 @@ export const ActivityDock: React.FC = () => {
         ? {
             iconText: 'text-sage-600 dark:text-sage-300',
             iconBg: 'bg-sage-500/10 text-sage-600 dark:text-sage-300',
-            fill: 'bg-sage-500 shadow-[0_0_12px_rgba(139,174,124,0.32)]',
-            pillHover: 'hover:shadow-[0_0_15px_rgba(139,174,124,0.2)]',
+            fill: 'bg-sage-500 shadow-[0_0_12px_rgba(198,164,90,0.32)]',
+            pillHover: 'hover:shadow-[0_0_15px_rgba(198,164,90,0.2)]',
             percentText: 'text-sage-600 dark:text-sage-300'
         }
         : isLowPriority
@@ -348,8 +348,8 @@ export const ActivityDock: React.FC = () => {
         : {
             iconText: 'text-sage-600 dark:text-sage-300',
             iconBg: 'bg-sage-500/10 text-sage-600 dark:text-sage-300',
-            fill: 'bg-sage-500 shadow-[0_0_12px_rgba(139,174,124,0.5)]',
-            pillHover: 'hover:shadow-[0_0_15px_rgba(139,174,124,0.3)]',
+            fill: 'bg-sage-500 shadow-[0_0_12px_rgba(198,164,90,0.5)]',
+            pillHover: 'hover:shadow-[0_0_15px_rgba(198,164,90,0.3)]',
             percentText: 'text-sage-600 dark:text-sage-300'
         };
 

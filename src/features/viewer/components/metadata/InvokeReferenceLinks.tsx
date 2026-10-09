@@ -49,7 +49,7 @@ const ReferenceList = ({
                         : group.availability === 'removed'
                             ? 'Removed from library'
                             : group.availability === 'unresolved'
-                                ? 'Unavailable in Ambit'
+                                ? 'Unavailable in Dvoyna Vault'
                                 : null;
 
                     return (

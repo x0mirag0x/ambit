@@ -59,7 +59,7 @@ export const TrashTab: React.FC<TrashTabProps> = ({
                 </div>
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">{t('Removed List is Empty')}</h2>
                 <p className="max-w-md text-center text-gray-500 dark:text-gray-400">
-                    {t('No library-removed items found. Files you remove from Ambit while keeping them on disk will appear here.')}</p>
+                    {t('No library-removed items found. Files you remove from Dvoyna Vault while keeping them on disk will appear here.')}</p>
             </div>
         );
     }

@@ -22,7 +22,7 @@ const STARTUP_PHASE_LABELS: Record<StartupDbPhase, string> = {
 };
 
 const STARTUP_PHASE_COPY: Record<StartupDbPhase, string> = {
-    'Preparing library database': 'Checking the local library database before Ambit opens.',
+    'Preparing library database': 'Checking the local library database before Dvoyna Vault opens.',
     'Updating database schema': 'Preparing the local database. Startup may take longer than usual this time.',
     'Optimizing database': 'Optimizing the local database for large libraries.',
     'Loading library': 'Loading your library.'
@@ -87,7 +87,7 @@ export const StartupMaintenanceGate: React.FC<StartupMaintenanceGateProps> = ({ 
                         icon={<Database className="h-7 w-7" />}
                         description={t(STARTUP_PHASE_COPY[phase])}
                         statusMessage={STARTUP_PHASE_LABELS[phase]}
-                        reassurance="Please keep Ambit open."
+                        reassurance="Please keep Dvoyna Vault open."
                     />
                 </main>
             ) : null}
@@ -108,7 +108,7 @@ export const StartupMaintenanceGate: React.FC<StartupMaintenanceGateProps> = ({ 
                         </div>
 
                         <p className="mt-6 text-sm leading-6 text-gray-600 dark:text-gray-300">
-                            {t('Ambit could not prepare the local library database. Restart the app and contact support if this repeats.')}</p>
+                            {t('Dvoyna Vault could not prepare the local library database. Restart the app and contact support if this repeats.')}</p>
 
                         <pre className="mt-4 max-h-32 overflow-auto rounded-xl bg-black/30 p-3 text-xs text-red-200">
                             {error}

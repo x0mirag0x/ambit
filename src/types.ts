@@ -304,7 +304,7 @@ export interface Collection {
   filters?: FilterState; // Added for Smart/Hybrid logic
   manualExclusions?: string[]; // Added for Hybrid override logic
   source?: 'ambit' | 'invoke'; // Added to track InvokeAI boards
-  invokeOwnerId?: string; // Owner-specific visibility for InvokeAI boards and Ambit collections
+  invokeOwnerId?: string; // Owner-specific visibility for InvokeAI boards and Dvoyna Vault collections
   invokeSourceId?: string; // InvokeAI database whose owner namespace scopes this collection
   invokeSourceName?: string; // Last authoritative InvokeAI board name
   invokeSourcePresent?: boolean; // False when the source board was absent from the latest snapshot
@@ -417,7 +417,7 @@ export interface InvokeOwnerDiscovery {
 export interface AppSettings {
   hasCompletedOnboarding: boolean;
   theme: 'dark' | 'light';
-  /** Persisted UI language. When omitted, Ambit follows the system language if it is Russian and English otherwise. */
+  /** Persisted UI language. When omitted, Dvoyna Vault follows the system language if it is Russian and English otherwise. */
   uiLanguage?: 'en' | 'ru';
   thumbnailSize: number;
   autoCheckForUpdates?: boolean;

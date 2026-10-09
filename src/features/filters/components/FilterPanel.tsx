@@ -528,8 +528,8 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                 </div>
                 <div className="flex items-center gap-3">
                     <TooltipButton
-                        label={t('Open Ambit on GitHub')}
-                        content={t('Open Ambit on GitHub')}
+                        label={t('Open Dvoyna Vault on GitHub')}
+                        content={t('Open Dvoyna Vault on GitHub')}
                         onClick={() => openExternalUrl(REPOSITORY_URL)}
                         className="hover:text-gray-900 dark:hover:text-zinc-200 transition-colors opacity-80 hover:opacity-100"
                     >

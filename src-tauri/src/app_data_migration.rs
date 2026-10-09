@@ -1,20 +1,22 @@
-const PRODUCTION_IDENTIFIER: &str = "io.github.asuraace.ambit";
-const LEGACY_PRODUCTION_IDENTIFIER: &str = "com.ambit.app";
+const PRODUCTION_IDENTIFIER: &str = "com.dvoyna.vault";
+// A fork-only id that does not exist on disk. Migration must not move an
+// installed Ambit profile (com.ambit.app or io.github.asuraace.ambit).
+const LEGACY_PRODUCTION_IDENTIFIER: &str = "com.dvoyna.vault.legacy";
 const MAIN_DATABASE_FILES: [&str; 3] = ["images.db", "images.db-wal", "images.db-shm"];
 const PURGE_DATABASE_FILES: [&str; 3] = ["images.db-wal", "images.db-shm", "images.db"];
 const PURGE_MARKER_FILE: &str = ".purge_on_restart";
 pub(crate) const PURGE_JOURNAL_FILE: &str = "library.purge.json";
 pub(crate) const PURGE_COMPLETION_FILE: &str = "library.purge.completed";
 #[cfg(test)]
-const DEVELOPMENT_IDENTIFIER: &str = "com.ambit.dev";
+const DEVELOPMENT_IDENTIFIER: &str = "com.dvoyna.vault.dev";
 const PRODUCTION_IDENTIFIER_PATHS: [&str; 2] =
     [PRODUCTION_IDENTIFIER, LEGACY_PRODUCTION_IDENTIFIER];
 const APP_IDENTIFIER_PATHS: [&str; 5] = [
     PRODUCTION_IDENTIFIER,
     LEGACY_PRODUCTION_IDENTIFIER,
-    "com.ambit.dev",
-    "com.ambit.alpha",
-    "com.tauri.dev",
+    "com.dvoyna.vault.dev",
+    "com.dvoyna.vault.qa",
+    "com.dvoyna.vault.video-smoke",
 ];
 #[cfg(not(test))]
 const THUMBNAIL_PATH_REPAIR_MARKER: &str = ".thumbnail-path-repair-v1";
@@ -1509,7 +1511,7 @@ mod identifier_migration_tests {
         let local_root = root.join("Local");
         let local_profile = local_root.join(PRODUCTION_IDENTIFIER);
         let roaming_profile = roaming_root.join(PRODUCTION_IDENTIFIER);
-        let dev_profile = local_root.join("com.ambit.dev");
+        let dev_profile = local_root.join("com.dvoyna.vault.dev");
         write_purge_marker(&local_profile);
         write_purge_marker(&roaming_profile);
         write_db_triplet(&local_profile, "local");
@@ -1586,7 +1588,7 @@ mod identifier_migration_tests {
         let root = unique_temp_root("purge-dev-only");
         let roaming_root = root.join("Roaming");
         let local_root = root.join("Local");
-        let dev_profile = local_root.join("com.ambit.dev");
+        let dev_profile = local_root.join("com.dvoyna.vault.dev");
         let local_profile = local_root.join(PRODUCTION_IDENTIFIER);
         let roaming_profile = roaming_root.join(PRODUCTION_IDENTIFIER);
         write_purge_marker(&dev_profile);
@@ -1607,7 +1609,7 @@ mod identifier_migration_tests {
 
     #[test]
     fn deferred_custom_smoke_purge_never_touches_shared_development_profile() {
-        const SMOKE_IDENTIFIER: &str = "com.ambit.dev.video-smoke";
+        const SMOKE_IDENTIFIER: &str = "com.dvoyna.vault.video-smoke";
         let root = unique_temp_root("purge-video-smoke-only");
         let local_root = root.join("Local");
         let smoke_profile = local_root.join(SMOKE_IDENTIFIER);
@@ -1680,7 +1682,7 @@ mod identifier_migration_tests {
         let root = unique_temp_root("purge-dev-failure-keeps-marker");
         let roaming_root = root.join("Roaming");
         let local_root = root.join("Local");
-        let dev_profile = local_root.join("com.ambit.dev");
+        let dev_profile = local_root.join("com.dvoyna.vault.dev");
         let local_profile = local_root.join(PRODUCTION_IDENTIFIER);
         write_purge_marker(&dev_profile);
         fs::create_dir_all(dev_profile.join("images.db"))

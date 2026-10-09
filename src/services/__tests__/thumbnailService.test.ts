@@ -119,7 +119,7 @@ describe('thumbnailService', () => {
         vi.resetAllMocks();
 
         mocks.convertFileSrc.mockImplementation((path: string) => `asset://${path}`);
-        mocks.appLocalDataDir.mockResolvedValue('C:/AppData/Ambit');
+        mocks.appLocalDataDir.mockResolvedValue('C:/AppData/Dvoyna Vault');
         mocks.join.mockImplementation(async (...parts: string[]) => parts.join('/'));
         mocks.scanImageNative.mockResolvedValue({});
         mocks.scanImagesBulk.mockResolvedValue([]);
@@ -147,11 +147,11 @@ describe('thumbnailService', () => {
     it('caches the app thumbnail directory because every healing flow uses the same target', async () => {
         const { getThumbnailDir } = await import('../thumbnailService');
 
-        await expect(getThumbnailDir()).resolves.toBe('C:/AppData/Ambit/.thumbnails');
-        await expect(getThumbnailDir()).resolves.toBe('C:/AppData/Ambit/.thumbnails');
+        await expect(getThumbnailDir()).resolves.toBe('C:/AppData/Dvoyna Vault/.thumbnails');
+        await expect(getThumbnailDir()).resolves.toBe('C:/AppData/Dvoyna Vault/.thumbnails');
 
         expect(mocks.appLocalDataDir).toHaveBeenCalledTimes(1);
-        expect(mocks.join).toHaveBeenCalledWith('C:/AppData/Ambit', '.thumbnails');
+        expect(mocks.join).toHaveBeenCalledWith('C:/AppData/Dvoyna Vault', '.thumbnails');
     });
 
     it('returns null for duplicate single-thumbnail work so scroll retries do not pile up', async () => {
@@ -165,13 +165,13 @@ describe('thumbnailService', () => {
         const first = generateSingleThumbnail('C:/library/a.png');
         await expect(generateSingleThumbnail('C:/library/a.png')).resolves.toBeNull();
 
-        resolveScan({ thumbnail: 'C:/AppData/Ambit/.thumbnails/a.webp' });
-        await expect(first).resolves.toBe('C:/AppData/Ambit/.thumbnails/a.webp');
+        resolveScan({ thumbnail: 'C:/AppData/Dvoyna Vault/.thumbnails/a.webp' });
+        await expect(first).resolves.toBe('C:/AppData/Dvoyna Vault/.thumbnails/a.webp');
 
         expect(mocks.scanImageNative).toHaveBeenCalledTimes(1);
         expect(mocks.scanImageNative).toHaveBeenCalledWith(
             'C:/library/a.png',
-            'C:/AppData/Ambit/.thumbnails',
+            'C:/AppData/Dvoyna Vault/.thumbnails',
             false,
             false
         );
@@ -198,7 +198,7 @@ describe('thumbnailService', () => {
         expect(mocks.repairThumbnailBatch).toHaveBeenCalledWith({
             operationId: 7,
             ids: ['C:/library/a.png', 'C:/library/b.png', 'C:/library/c.png'],
-            thumbnailDir: 'C:/AppData/Ambit/.thumbnails',
+            thumbnailDir: 'C:/AppData/Dvoyna Vault/.thumbnails',
             sourceRoots: ['C:/library'],
             force: true,
             respectBackoff: false,
@@ -239,7 +239,7 @@ describe('thumbnailService', () => {
         expect(mocks.repairThumbnailBatch).toHaveBeenCalledWith({
             operationId: 7,
             ids: ['id-a', 'id-b', 'id-c'],
-            thumbnailDir: 'C:/AppData/Ambit/.thumbnails',
+            thumbnailDir: 'C:/AppData/Dvoyna Vault/.thumbnails',
             sourceRoots: ['C:/library'],
             force: false,
             respectBackoff: false,
@@ -308,7 +308,7 @@ describe('thumbnailService', () => {
         await expect(cleanupOrphanThumbnails()).resolves.toBe(1);
         expect(select).toHaveBeenCalledWith(expect.stringContaining('FROM images'));
         expect(select).not.toHaveBeenCalledWith(expect.stringContaining('FROM scoped_images'));
-        expect(mocks.remove).toHaveBeenCalledWith('C:/AppData/Ambit/.thumbnails/orphan.webp');
+        expect(mocks.remove).toHaveBeenCalledWith('C:/AppData/Dvoyna Vault/.thumbnails/orphan.webp');
         expect(mocks.remove).toHaveBeenCalledTimes(1);
         expect(mocks.beginThumbnailRepairOperation).toHaveBeenCalledOnce();
         expect(mocks.finishThumbnailRepairOperation).toHaveBeenCalledWith(7);
@@ -363,13 +363,13 @@ describe('thumbnailService', () => {
             select,
             execute,
         });
-        mocks.exists.mockImplementation(async (path: string) => path !== 'C:/AppData/Ambit/.thumbnails/legacy.webp');
+        mocks.exists.mockImplementation(async (path: string) => path !== 'C:/AppData/Dvoyna Vault/.thumbnails/legacy.webp');
 
         const { pruneBrokenThumbnails } = await import('../thumbnailService');
 
         await expect(pruneBrokenThumbnails()).resolves.toBe(1);
         expect(select).toHaveBeenCalledWith(expect.stringContaining('invoke_scope_hidden = 0'));
-        expect(mocks.exists).toHaveBeenCalledWith('C:/AppData/Ambit/.thumbnails/legacy.webp');
+        expect(mocks.exists).toHaveBeenCalledWith('C:/AppData/Dvoyna Vault/.thumbnails/legacy.webp');
         expect(mocks.exists).toHaveBeenCalledWith('C:/thumbs/absolute.webp');
         expect(execute).toHaveBeenCalledWith(
             'UPDATE images SET thumbnail_path = NULL, micro_thumbnail = NULL, thumbnail_source = NULL WHERE id IN (?) AND id IN (SELECT id FROM scoped_images WHERE invoke_scope_hidden = 0)',
@@ -384,7 +384,7 @@ describe('thumbnailService', () => {
         await expect(service.generateSingleThumbnail('C:/library/no-dir.png')).resolves.toBeNull();
 
         vi.resetModules();
-        mocks.appLocalDataDir.mockResolvedValue('C:/AppData/Ambit');
+        mocks.appLocalDataDir.mockResolvedValue('C:/AppData/Dvoyna Vault');
         mocks.scanImageNative.mockRejectedValueOnce(new Error('scan failed')).mockResolvedValueOnce({});
         service = await import('../thumbnailService');
         await expect(service.generateSingleThumbnail('C:/library/error.png')).resolves.toBeNull();

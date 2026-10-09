@@ -2,11 +2,11 @@
 
 [Back to manual index](index.md)
 
-Ambit builds its library by scanning local image folders and selected files. It catalogs supported images and videos through file selection and folder scans, parses generation or camera metadata when available, and keeps the original files on disk.
+Dvoyna Vault builds its library by scanning local image folders and selected files. It catalogs supported images and videos through file selection and folder scans, parses generation or camera metadata when available, and keeps the original files on disk.
 
 ## Import Choices
 
-When Ambit asks you to add media, you can choose between integration setup and one-time import.
+When Dvoyna Vault asks you to add media, you can choose between integration setup and one-time import.
 
 ```mermaid
 flowchart TD
@@ -20,9 +20,9 @@ flowchart TD
     C --> H["Add Folder"]
 ```
 
-Use integrations when you want Ambit to understand an existing generator workspace. Use one-time import for camera folders, downloaded packs, screenshots, archives, or individual files. Import completion reports how many images Ambit detected as Generated, Photo, and Other.
+Use integrations when you want Dvoyna Vault to understand an existing generator workspace. Use one-time import for camera folders, downloaded packs, screenshots, archives, or individual files. Import completion reports how many images Dvoyna Vault detected as Generated, Photo, and Other.
 
-Manual video import accepts MP4, WebM, MOV, M4V, and MKV candidates. Ambit probes the file before adding it, shows a static poster in the library, and uses actual playback events to decide whether the built-in viewer can play it. If the current Windows media runtime cannot decode it, the video stays manageable and can be opened in the default app. Folder scans and Live Watch also discover supported videos, including create, modify, rename, and removal changes. A video whose poster cannot be generated remains cataloged with a generic placeholder.
+Manual video import accepts MP4, WebM, MOV, M4V, and MKV candidates. Dvoyna Vault probes the file before adding it, shows a static poster in the library, and uses actual playback events to decide whether the built-in viewer can play it. If the current Windows media runtime cannot decode it, the video stays manageable and can be opened in the default app. Folder scans and Live Watch also discover supported videos, including create, modify, rename, and removal changes. A video whose poster cannot be generated remains cataloged with a generic placeholder.
 
 ## Monitored Folders
 
@@ -31,22 +31,22 @@ Open Settings > Connections > Folders to manage monitored media folders.
 In the Folders section you can:
 
 - add folders containing generated images, camera photos, other local images, and supported videos
-- review folders Ambit is monitoring
+- review folders Dvoyna Vault is monitoring
 - rescan a single folder
 - refresh metadata across all folders
-- remove a folder from Ambit's monitored list
+- remove a folder from Dvoyna Vault's monitored list
 
 Adding a folder catalogs the files. It does not move or delete your source files.
 
 ## Generator Integrations
 
-Ambit has connection pages for common local generator tools:
+Dvoyna Vault has connection pages for common local generator tools:
 
 - InvokeAI: select the root folder containing `databases/invokeai.db`, then test the connection.
 - ComfyUI: select the output folder where ComfyUI saves generated images, then link it.
 - SD WebUI: select an installation or archive path, scan for output folders, choose folders, then link and import them.
 
-For SD WebUI style folders, Ambit can auto-detect variants such as A1111, Forge, SD.Next, and Anapnoe. If auto-detection is uncertain, select the installation type manually before scanning.
+For SD WebUI style folders, Dvoyna Vault can auto-detect variants such as A1111, Forge, SD.Next, and Anapnoe. If auto-detection is uncertain, select the installation type manually before scanning.
 
 For step-by-step setup and sync behavior, see [Generator Integrations](generator-integrations.md).
 
@@ -58,7 +58,7 @@ For details, see [Assets And Resource Discovery](assets-resource-discovery.md).
 
 ## During Scans
 
-Scans can take time on large folders. Ambit reports progress while it scans sources, imports images, and finalizes metadata. If an import is cancelled, imported images are kept and unfinished folders can be rescanned later. Refresh All Metadata also adopts camera metadata for older library records in restart-safe batches; manual Image Kind choices remain unchanged.
+Scans can take time on large folders. Dvoyna Vault reports progress while it scans sources, imports images, and finalizes metadata. If an import is cancelled, imported images are kept and unfinished folders can be rescanned later. Refresh All Metadata also adopts camera metadata for older library records in restart-safe batches; manual Image Kind choices remain unchanged.
 
 ## Next Step
 

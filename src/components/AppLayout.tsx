@@ -376,7 +376,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 aria-label={t('Library workspace')}
                 className="flex-1 flex flex-col min-w-0 bg-white dark:bg-zinc-900/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-black/20 border border-zinc-200 dark:border-white/10 overflow-hidden relative outline-none"
             >
-                <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_0%,rgba(139,174,124,0.08),transparent_70%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(139,174,124,0.15),transparent_60%)] z-10" />
+                <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_0%,rgba(198,164,90,0.08),transparent_70%)] dark:bg-[radial-gradient(circle_at_50%_0%,rgba(198,164,90,0.15),transparent_60%)] z-10" />
 
                 {isSearchFocused && searchProps.isAiSearchEnabled && (
                     <div

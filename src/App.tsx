@@ -699,7 +699,7 @@ export default function App() {
             const image = await getImageWithFullMetadata(imageId);
             if (referenceNavigationRequestRef.current !== requestId) return false;
             if (!image) {
-                addToast(t('The referenced image is no longer available in Ambit.'), 'error');
+                addToast(t('The referenced image is no longer available in Dvoyna Vault.'), 'error');
                 await queryClient.invalidateQueries({ queryKey: INVOKE_REFERENCE_QUERY_KEY });
                 return false;
             }

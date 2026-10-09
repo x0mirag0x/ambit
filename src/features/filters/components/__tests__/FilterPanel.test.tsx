@@ -410,7 +410,7 @@ describe('FilterPanel interactions', () => {
         });
 
         fireEvent.click(screen.getByRole('button', { name: 'Clear filters' }));
-        fireEvent.click(screen.getByRole('button', { name: 'Open Ambit on GitHub' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Open Dvoyna Vault on GitHub' }));
         expect(clearAllFilters).toHaveBeenCalledOnce();
         expect(openExternalUrl).toHaveBeenCalledOnce();
         expect(screen.getByText('v0.0.0-test')).toBeTruthy();

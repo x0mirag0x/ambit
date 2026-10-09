@@ -758,7 +758,7 @@ export const SyncProvider: React.FC<{
                         rootPath,
                         allowed: false,
                         scope: offlineScope,
-                        reason: 'InvokeAI is unavailable while Ambit is using the last verified local view.',
+                        reason: 'InvokeAI is unavailable while Dvoyna Vault is using the last verified local view.',
                         offline: true,
                     };
                     ownerScopeAdmissionRef.current = admission;
@@ -1147,8 +1147,8 @@ export const SyncProvider: React.FC<{
             const catchesUpBoards = options.syncBoards !== false;
             const message = outcome === 'catchup'
                 ? catchesUpBoards
-                    ? 'Your InvokeAI view is ready. Ambit is catching up images and boards in the background. You can use your library now.'
-                    : 'Your InvokeAI view is ready. Ambit is catching up images in the background. You can use your library now.'
+                    ? 'Your InvokeAI view is ready. Dvoyna Vault is catching up images and boards in the background. You can use your library now.'
+                    : 'Your InvokeAI view is ready. Dvoyna Vault is catching up images in the background. You can use your library now.'
                 : outcome === 'current'
                     ? 'Your InvokeAI view is ready. You can use your library now.'
                     : 'Your saved InvokeAI view is available, but catch-up could not start because the InvokeAI database file is unavailable.';

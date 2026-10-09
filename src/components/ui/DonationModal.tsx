@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Coffee, Heart, X } from 'lucide-react';
-import { APP_NAME } from '../../constants/app';
+import { APP_FULL_NAME } from '../../constants/app';
 import { ENABLED_DONATION_PROVIDERS } from '../../constants/support';
 import { openExternalUrl } from '../../utils/externalLinks';
 import { useTranslation } from 'react-i18next';
@@ -72,9 +72,9 @@ export const DonationModal: React.FC<DonationModalProps> = ({ isOpen, onClose })
                                 <Heart className="w-8 h-8 text-red-500 fill-current animate-pulse" />
                             </div>
 
-                            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('Support')} {APP_NAME}</h2>
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('Support')} {APP_FULL_NAME}</h2>
                             <p className="text-gray-600 dark:text-gray-400 text-sm mb-8 leading-relaxed max-w-xs">
-                                {t('If Ambit helps you manage your image library, optional support helps fund development, testing, packaging, and maintenance.')}</p>
+                                {t('If Dvoyna Vault helps you manage your image library, optional support helps fund development, testing, packaging, and maintenance.')}</p>
 
                             {ENABLED_DONATION_PROVIDERS.length > 0 ? (
                                 <div className="flex flex-col gap-3 w-full">

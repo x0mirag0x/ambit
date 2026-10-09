@@ -2,17 +2,17 @@
 
 [Back to manual index](index.md)
 
-Maintenance helps keep Ambit's catalog aligned with your local files and metadata. Open Maintenance from the left sidebar.
+Maintenance helps keep Dvoyna Vault's catalog aligned with your local files and metadata. Open Maintenance from the left sidebar.
 
 ## Library Record vs Source File
 
-Most Maintenance actions change Ambit's local catalog, not your original image files. Use this distinction before choosing a cleanup action:
+Most Maintenance actions change Dvoyna Vault's local catalog, not your original image files. Use this distinction before choosing a cleanup action:
 
 | Action | What it changes | Source files |
 | --- | --- | --- |
-| File Link Audit, Re-Scan Files, Repair Broken Thumbnails | Checks or repairs Ambit's local records and thumbnail references | Not touched |
-| Mark All as Missing | Marks audited missing paths as missing in Ambit's catalog | Not touched and not recovered |
-| Remove from Library, Remove all from Library, duplicate resolution | Removes records from the active library; removed records can appear in Removed when Ambit has enough record data | Kept on disk |
+| File Link Audit, Re-Scan Files, Repair Broken Thumbnails | Checks or repairs Dvoyna Vault's local records and thumbnail references | Not touched |
+| Mark All as Missing | Marks audited missing paths as missing in Dvoyna Vault's catalog | Not touched and not recovered |
+| Remove from Library, Remove all from Library, duplicate resolution | Removes records from the active library; removed records can appear in Removed when Dvoyna Vault has enough record data | Kept on disk |
 | Restore to Library | Moves selected Removed records back into the active library | Not touched |
 | Delete File in Removed | Destructive path for selected Removed records; clears generation data only after OS-trash success or when the source is already missing | Moved to OS trash when the action succeeds |
 
@@ -20,7 +20,7 @@ If you are unsure, prefer scans, repairs, rescans, and restore actions before ac
 
 ## Maintenance Areas
 
-Ambit currently exposes these maintenance tabs:
+Dvoyna Vault currently exposes these maintenance tabs:
 
 - Missing: audit file links, mark missing paths, and remove records whose source files are gone.
 - Thumbnails: regenerate unoptimized thumbnails, repair broken thumbnail references, and clean up unused thumbnails.
@@ -45,13 +45,13 @@ flowchart TD
 
 ## Missing
 
-The Missing tab helps when files were moved, renamed, deleted outside Ambit, or live on a disconnected drive.
+The Missing tab helps when files were moved, renamed, deleted outside Dvoyna Vault, or live on a disconnected drive.
 
 Use File Link Audit to check whether active library records still point to files on disk. After an audit has run, Re-Scan Files runs the check again. If missing paths appear, review the sample paths first; a disconnected drive or renamed folder can make many healthy records look missing.
 
-Use Mark All as Missing when you want Ambit to accept the audited paths as missing. This updates Ambit's catalog state without deleting database records or source files. It does not restore files or search other folders for replacements.
+Use Mark All as Missing when you want Dvoyna Vault to accept the audited paths as missing. This updates Dvoyna Vault's catalog state without deleting database records or source files. It does not restore files or search other folders for replacements.
 
-After records appear in Missing, select records and use Remove from Library, or use Remove all from Library when every listed record should leave the active library. These actions clean Ambit's active catalog for files that are already unavailable; they do not recover files.
+After records appear in Missing, select records and use Remove from Library, or use Remove all from Library when every listed record should leave the active library. These actions clean Dvoyna Vault's active catalog for files that are already unavailable; they do not recover files.
 
 ## Thumbnails
 
@@ -65,7 +65,7 @@ Use the thumbnail controls this way:
 - Repair Broken Thumbnails: check thumbnail files on disk and reset missing thumbnail references.
 - Clean up unused thumbnails: remove unused thumbnail files when the selected scope is already optimized.
 
-Ambit can also heal thumbnails in the background during normal use. Smart and Maintenance use the same repair and filesystem-safety rules, but Smart works incrementally at lower priority, waits before retrying recent failures, and throttles while you browse. Only one thumbnail repair job runs at a time, so manual controls may be disabled until background work finishes.
+Dvoyna Vault can also heal thumbnails in the background during normal use. Smart and Maintenance use the same repair and filesystem-safety rules, but Smart works incrementally at lower priority, waits before retrying recent failures, and throttles while you browse. Only one thumbnail repair job runs at a time, so manual controls may be disabled until background work finishes.
 
 Video records open in the video viewer from Maintenance. The Thumbnails repair engine is image-only; it does not regenerate video posters. Other applicable catalog operations, including missing-file audit, exact duplicates, Removed, and restore, also handle videos.
 
@@ -88,11 +88,11 @@ Untagged helps find images without descriptive metadata or positive prompts. Use
 
 Known InvokeAI user, control, mask, and other image assets are excluded from Untagged because missing generation prompts are normal for those source images. They remain available to missing-file, duplicate, thumbnail, and Removed workflows, and can be inspected from the library after enabling `Show InvokeAI Image Assets` in the View menu.
 
-Use View Image to inspect a record before cleanup. Use Remove from Library only when the selected records should leave Ambit's active library while keeping their source files on disk.
+Use View Image to inspect a record before cleanup. Use Remove from Library only when the selected records should leave Dvoyna Vault's active library while keeping their source files on disk.
 
 ## Intermediates
 
-The Intermediates tab appears only when Ambit has images flagged as intermediate outputs, such as images without the expected InvokeAI metadata. Use Global or Filtered scope to control which intermediate records you review.
+The Intermediates tab appears only when Dvoyna Vault has images flagged as intermediate outputs, such as images without the expected InvokeAI metadata. Use Global or Filtered scope to control which intermediate records you review.
 
 Use View Image to inspect a record before cleanup. Use Move to Gallery when an image is a keeper and should stop being treated as an intermediate. Delete Selected asks for confirmation, then removes the records from the active library and moves their source files to OS trash. If a file move fails, its recoverable record remains in Removed so you can inspect or retry it.
 
@@ -101,13 +101,13 @@ Use View Image to inspect a record before cleanup. Use Move to Gallery when an i
 Removed contains images that were removed from the active library while kept on disk. Select records to choose between:
 
 - Restore to Library: restore selected records to the active library.
-- Delete File: move selected source files to OS trash, then remove those records from Ambit. If a source is already missing, the remaining Removed record can still be cleared safely.
+- Delete File: move selected source files to OS trash, then remove those records from Dvoyna Vault. If a source is already missing, the remaining Removed record can still be cleared safely.
 
-Treat Delete File carefully. If moving a file to OS trash fails, Ambit reports the failure and keeps that Removed record selected for a retry instead of silently discarding its generation data.
+Treat Delete File carefully. If moving a file to OS trash fails, Dvoyna Vault reports the failure and keeps that Removed record selected for a retry instead of silently discarding its generation data.
 
 ## Thumbnail Problems
 
-Ambit performs thumbnail handling in the background. If thumbnails are stale or broken, start with Maintenance > Thumbnails:
+Dvoyna Vault performs thumbnail handling in the background. If thumbnails are stale or broken, start with Maintenance > Thumbnails:
 
 - Repair Broken Thumbnails checks thumbnail files on disk and resets missing thumbnail references.
 - Regenerate Selected rebuilds thumbnails for selected records.
@@ -121,7 +121,7 @@ From Settings > Connections > Folders, use Refresh All Metadata or a folder-leve
 
 ## Start Over
 
-Maintenance is for repairing and cleaning selected library records. To reset Ambit's catalog and linked folders, use Settings > Advanced > Database > Purge Database. Purge Database resets imported metadata and app state, but source image files are not touched.
+Maintenance is for repairing and cleaning selected library records. To reset Dvoyna Vault's catalog and linked folders, use Settings > Advanced > Database > Purge Database. Purge Database resets imported metadata and app state, but source image files are not touched.
 
 ## Next Step
 

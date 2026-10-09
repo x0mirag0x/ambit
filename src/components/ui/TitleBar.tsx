@@ -8,8 +8,8 @@ import { areDeveloperFeaturesEnabled } from "../../utils/settingsUtils";
 import { isCaptureMode } from "../../utils/buildFlags";
 import { useTranslation } from 'react-i18next';
 
-const BRAND_GLYPH_SRC = "/branding/ambit-glyph.svg";
-const BRAND_WINDOW_ICON_SRC = "/branding/ambit-window-icon.png";
+const BRAND_GLYPH_SRC = "/branding/dv-glyph.png";
+const BRAND_WINDOW_ICON_SRC = "/branding/dv-window-icon.png";
 
 export const TitleBar = () => {
     const { t } = useTranslation();

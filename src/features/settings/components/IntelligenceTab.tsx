@@ -128,7 +128,7 @@ export const IntelligenceTab: React.FC<TabProps> = React.memo(({ settings, setSe
         <div className="space-y-6 max-w-2xl">
             <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-xl p-6 shadow-sm">
                 <h4 className="mb-6 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amethyst-600 dark:text-amethyst-300">
-                    <FlaskConical className="w-4 h-4" /> {t('Ambit Intelligence')}</h4>
+                    <FlaskConical className="w-4 h-4" /> {t('Dvoyna Vault Intelligence')}</h4>
 
                 <div className="space-y-6">
                     <div
@@ -225,14 +225,14 @@ export const IntelligenceTab: React.FC<TabProps> = React.memo(({ settings, setSe
                                             ))}
                                         </select>
                                         <p className="text-[10px] text-gray-500 mt-2 ml-1">
-                                            {t('Changes the reasoning effort used by Ambit AI requests so response quality and speed can be compared.')}</p>
+                                            {t('Changes the reasoning effort used by Dvoyna Vault AI requests so response quality and speed can be compared.')}</p>
                                     </div>
                                 </div>
                             )}
 
                             <p className="text-xs text-gray-500 mt-2">
                                 {isEnvKey
-                                    ? t('Ambit reads this API key from your environment and does not save it. Requests are sent only when you test the key or run an AI feature.')
+                                    ? t('Dvoyna Vault reads this API key from your environment and does not save it. Requests are sent only when you test the key or run an AI feature.')
                                     : t('Use your own Gemini API key. Your key is stored locally in the OS keyring, and requests are sent only when you verify the key or run an AI feature.')}
                             </p>
                         </div>

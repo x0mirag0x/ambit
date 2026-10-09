@@ -31,13 +31,13 @@ export const InvokeOwnerScopeSelector: React.FC<InvokeOwnerScopeSelectorProps> =
             : null,
     ].filter((value): value is string => value !== null).join(' and ');
     const allUsersMessage = unassignedDetails
-        ? `Ambit will show every owner's InvokeAI content, including ${unassignedDetails}, across the gallery, collections, maintenance views, and references. You can return to a single owner at any time.`
-        : "Ambit will show every owner's InvokeAI images and boards from this local database. You can return to a single owner at any time.";
+        ? `Dvoyna Vault will show every owner's InvokeAI content, including ${unassignedDetails}, across the gallery, collections, maintenance views, and references. You can return to a single owner at any time.`
+        : "Dvoyna Vault will show every owner's InvokeAI images and boards from this local database. You can return to a single owner at any time.";
 
     return (
         <div className="space-y-3">
             <p className="text-xs leading-5 text-gray-500 dark:text-gray-400">
-                {t('Choose whose InvokeAI images Ambit may show. Display names and stable IDs are shown; email addresses are never read.')}</p>
+                {t('Choose whose InvokeAI images Dvoyna Vault may show. Display names and stable IDs are shown; email addresses are never read.')}</p>
             {discovery.owners.map(owner => {
                 const selected = selection?.mode === 'owner' && selection.ownerId === owner.ownerId;
                 const intermediateImageCount = owner.intermediateImageCount ?? 0;

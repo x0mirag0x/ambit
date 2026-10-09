@@ -70,7 +70,7 @@ describe('CollectionEditorModal', () => {
         useInvokeOwnerScopeStore.getState().resetOwnerScopeState();
     });
 
-    it('offers All Users and discovered owners for Ambit collection visibility', async () => {
+    it('offers All Users and discovered owners for Dvoyna Vault collection visibility', async () => {
         const onUpdateScope = vi.fn().mockResolvedValue(true);
         useInvokeOwnerScopeStore.getState().setOwnerScopeState({
             status: 'ready',

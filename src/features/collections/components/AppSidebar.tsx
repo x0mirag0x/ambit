@@ -31,7 +31,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   showSupportPulse
 }) => {
   const { t } = useTranslation();
-  const brandGlyphSrc = '/branding/ambit-glyph.svg';
+  const brandGlyphSrc = '/branding/dv-glyph.png';
 
   return (
     <aside className="hidden md:flex w-20 flex-col items-center py-6 h-full rounded-3xl bg-white/90 dark:bg-zinc-900/95 backdrop-blur-xl border border-gray-200 dark:border-white/10 z-20 shadow-2xl transition-all duration-500 ease-spring">
@@ -63,7 +63,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       </nav>
 
       <div className="mt-auto flex flex-col items-center gap-4">
-        <TooltipButton label={t('Support Ambit')} content={t('Support Ambit')} onClick={onOpenDonation} className={`w-10 h-10 rounded-xl flex items-center justify-center hover:text-red-500 dark:hover:text-red-400 transition-all mb-2 ${showSupportPulse ? 'animate-pulse hover:animate-none text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10' : 'text-gray-400 dark:text-zinc-500'}`}>
+        <TooltipButton label={t('Support Dvoyna Vault')} content={t('Support Dvoyna Vault')} onClick={onOpenDonation} className={`w-10 h-10 rounded-xl flex items-center justify-center hover:text-red-500 dark:hover:text-red-400 transition-all mb-2 ${showSupportPulse ? 'animate-pulse hover:animate-none text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10' : 'text-gray-400 dark:text-zinc-500'}`}>
           <Gift className="w-5 h-5" />
         </TooltipButton>
         <TooltipButton label={t('Open Help & Guide')} content={t('Open Help & Guide')} onClick={onOpenShortcuts} className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 dark:text-zinc-500 hover:text-gray-900 dark:hover:text-white mb-2">

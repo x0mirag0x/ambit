@@ -1,5 +1,5 @@
 import { Import, Loader2 } from 'lucide-react';
-import { APP_NAME } from '../../../constants/app';
+import { APP_FULL_NAME } from '../../../constants/app';
 import { useTranslation } from 'react-i18next';
 
 interface LibraryEmptyStateProps {
@@ -31,7 +31,7 @@ export default function LibraryEmptyState({ isImporting, importMessage, onImport
             </div>
             <h3 className="text-2xl font-bold mb-3 text-gray-800 dark:text-gray-100">{t('Your Library is Empty')}</h3>
             <p className="text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
-                {t('Import your images to start organizing, searching, and exploring your AI creations with')} {APP_NAME}.
+                {t('Import your images to start organizing, searching, and exploring your AI creations with')} {APP_FULL_NAME}.
             </p>
             <button
                 onClick={onImport}

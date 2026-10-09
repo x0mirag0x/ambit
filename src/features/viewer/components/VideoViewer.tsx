@@ -327,7 +327,7 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
                 {video.isMissing ? (
                     <div className="flex max-w-md flex-col items-center rounded-2xl border border-red-500/30 bg-zinc-900 p-8 text-center shadow-2xl">
                         <h2 className="text-xl font-bold">{t('Source file missing')}</h2>
-                        <p className="mt-2 text-sm text-zinc-400">{t('Ambit still keeps this library record. Restore the file at its original location or remove the record.')}</p>
+                        <p className="mt-2 text-sm text-zinc-400">{t('Dvoyna Vault still keeps this library record. Restore the file at its original location or remove the record.')}</p>
                     </div>
                 ) : playbackStatus === 'external_required' ? (
                     <div className="flex max-w-md flex-col items-center rounded-2xl border border-white/10 bg-zinc-900 p-8 text-center">

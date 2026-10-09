@@ -28,7 +28,7 @@ describe('assetScope', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mocks.browserMockMode = false;
-        mocks.appLocalDataDir.mockResolvedValue('C:/Users/Test/AppData/Local/Ambit');
+        mocks.appLocalDataDir.mockResolvedValue('C:/Users/Test/AppData/Local/Dvoyna Vault');
         mocks.registerLibraryPath.mockResolvedValue({ status: 'ok', data: null });
     });
 
@@ -71,8 +71,8 @@ describe('assetScope', () => {
     it('skips files already inside AppLocalData and caches its resolved root', async () => {
         const { ensureAssetPathAccessible } = await loadService();
 
-        await ensureAssetPathAccessible('C:/Users/Test/AppData/Local/Ambit/images/a.png');
-        await ensureAssetPathAccessible('C:/Users/Test/AppData/Local/Ambit/thumbs/b.webp');
+        await ensureAssetPathAccessible('C:/Users/Test/AppData/Local/Dvoyna Vault/images/a.png');
+        await ensureAssetPathAccessible('C:/Users/Test/AppData/Local/Dvoyna Vault/thumbs/b.webp');
 
         expect(mocks.appLocalDataDir).toHaveBeenCalledTimes(1);
         expect(mocks.registerLibraryPath).not.toHaveBeenCalled();

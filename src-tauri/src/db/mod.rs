@@ -10,7 +10,7 @@ pub mod migrations;
 pub mod reparse;
 
 #[cfg(any(test, all(windows, not(debug_assertions))))]
-const PRODUCTION_IDENTIFIER: &str = "io.github.asuraace.ambit";
+const PRODUCTION_IDENTIFIER: &str = "com.dvoyna.vault";
 pub const MAIN_DB_FILE_NAME: &str = "images.db";
 pub const LEGACY_MAIN_DB_URL: &str = "sqlite:images.db";
 

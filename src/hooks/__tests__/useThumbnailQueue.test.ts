@@ -98,7 +98,7 @@ describe('useThumbnailQueue behavioral contract', () => {
         mocks.listenerHandlers.clear();
         mocks.browserMockMode = false;
         mocks.activeImageQueryCount = 0;
-        mocks.getThumbnailDir.mockResolvedValue('C:/AppData/Ambit/.thumbnails');
+        mocks.getThumbnailDir.mockResolvedValue('C:/AppData/Dvoyna Vault/.thumbnails');
         mocks.getThumbnailRepairOwnerId.mockReturnValue('renderer-a');
         mocks.rebuildThumbnailFacetCache.mockResolvedValue(undefined);
         mocks.refreshCollectionThumbnails.mockResolvedValue(undefined);
@@ -206,7 +206,7 @@ describe('useThumbnailQueue behavioral contract', () => {
         });
 
         expect(mocks.startThumbnailOptimizationJob).toHaveBeenCalledWith({
-            thumbnailDir: 'C:/AppData/Ambit/.thumbnails',
+            thumbnailDir: 'C:/AppData/Dvoyna Vault/.thumbnails',
             includeUpgradeable: false,
             profile: 'balanced',
             sourceRoots: ['D:/Library'],

@@ -23,7 +23,7 @@ describe('UpdateDialog', () => {
             />
         );
 
-        expect(screen.getByRole('dialog', { name: 'Ambit 0.8.0' })).toBeTruthy();
+        expect(screen.getByRole('dialog', { name: 'Dvoyna Vault 0.8.0' })).toBeTruthy();
         expect(screen.getByText("What's New")).toBeTruthy();
         expect(screen.getByText('Features')).toBeTruthy();
         expect(screen.getByText('Faster')).toBeTruthy();
@@ -37,7 +37,7 @@ describe('UpdateDialog', () => {
         fireEvent.click(screen.getByRole('button', { name: /view release on github/i }));
 
         await waitFor(() => {
-            expect(open).toHaveBeenCalledWith('https://github.com/AsuraAce/ambit/releases');
+            expect(open).toHaveBeenCalledWith('https://github.com/x0mirag0x/ambit/releases');
         });
     });
 

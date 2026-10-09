@@ -72,7 +72,7 @@ describe('TitleBar', () => {
         const { unmount } = render(<TitleBar />);
         await screen.findByText('AMBIT');
         expect(screen.getByText('DEV')).toBeTruthy();
-        expect(win.setIcon).toHaveBeenCalledWith('/branding/ambit-window-icon.png');
+        expect(win.setIcon).toHaveBeenCalledWith('/branding/dv-window-icon.png');
 
         const buttons = screen.getAllByRole('button');
         fireEvent.click(buttons[0]);

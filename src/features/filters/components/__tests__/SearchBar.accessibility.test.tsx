@@ -122,7 +122,7 @@ describe('SearchBar accessibility', () => {
 
         standard.unmount();
         renderSearchBar(createDefaultFilters(), { isAiSearchEnabled: true });
-        const aiInput = screen.getByRole('combobox', { name: 'Ask Ambit with AI' });
+        const aiInput = screen.getByRole('combobox', { name: 'Ask DV with AI' });
         const aiHelper = await screen.findByText('Press Enter to analyze with AI.');
         expect(aiInput.getAttribute('aria-describedby')).toContain(aiHelper.id);
     });
@@ -134,7 +134,7 @@ describe('SearchBar accessibility', () => {
         );
         const guidance = await screen.findAllByText('Press Enter to analyze with AI.');
         const helper = screen.getByText('Search syntax opens standard query operators.');
-        const input = screen.getByRole('combobox', { name: 'Ask Ambit with AI' });
+        const input = screen.getByRole('combobox', { name: 'Ask DV with AI' });
 
         expect(guidance).toHaveLength(1);
         expect(input.getAttribute('aria-describedby')).toContain(helper.id);
