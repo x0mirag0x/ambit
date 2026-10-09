@@ -126,8 +126,8 @@ export function SelectionBar({
                     <Pin className={`w-5 h-5 ${allPinned ? 'fill-current' : ''}`} />
                 </TooltipButton>
                 <TooltipButton
-                    label={nextLabel}
-                    content={nextLabel}
+                    label={t(nextLabel)}
+                    content={t(nextLabel)}
                     onClick={() => onToggleMask(undefined, nextState)}
                     className={buttonClass}
                 >

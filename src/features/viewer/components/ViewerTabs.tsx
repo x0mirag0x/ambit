@@ -44,7 +44,7 @@ export function ViewerTabs<T extends string>({
     return (
         <div
             role="tablist"
-            aria-label={ariaLabel}
+            aria-label={t(ariaLabel)}
             className={`flex gap-1 rounded-lg bg-gray-100 p-1 dark:bg-black ${className}`}
         >
             {tabs.map((tab, index) => {

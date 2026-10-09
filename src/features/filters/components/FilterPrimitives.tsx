@@ -203,7 +203,7 @@ interface SearchInputProps {
     className?: string;
 }
 
-export const SearchInput: React.FC<SearchInputProps> = ({ value, onChange, placeholder = "Search...", className }) => { const { t } = useTranslation(); return ((
+export const SearchInput: React.FC<SearchInputProps> = ({ value, onChange, placeholder = "Search...", className }) => { const { t } = useTranslation(); const resolvedPlaceholder = t(placeholder); return ((
     <div className={`${className}`}>
         <div className="relative group size-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 group-focus-within:text-sage-500 transition-colors pointer-events-none" />
@@ -211,13 +211,13 @@ export const SearchInput: React.FC<SearchInputProps> = ({ value, onChange, place
                 type="text"
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                placeholder={placeholder}
+                placeholder={resolvedPlaceholder}
                 className="w-full bg-gray-100/50 dark:bg-white/[0.03] border border-gray-200 dark:border-white/10 rounded-xl pl-10 pr-10 py-2 text-xs focus:border-sage-500/50 focus:ring-4 focus:ring-sage-500/10 outline-none text-gray-900 dark:text-white transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600"
             />
             {value && (
                 <button
                     type="button"
-                    aria-label={t('Clear {{placeholder}}', { placeholder: placeholder })}
+                    aria-label={t('Clear {{placeholder}}', { placeholder: resolvedPlaceholder })}
                     onClick={() => onChange('')}
                     className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1.5 hover:bg-gray-200 dark:hover:bg-white/10 rounded-lg transition-all"
                 >

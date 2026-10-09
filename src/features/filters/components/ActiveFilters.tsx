@@ -51,6 +51,11 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = () => {
     const hasUnavailableCollection = collectionsLoaded && !!filters.collectionId && !activeCollection;
     const showFavoritesFilter = filters.favoritesOnly && !activeSmartCol?.filters?.favoritesOnly;
     const showPinnedFilter = !!filters.pinnedOnly && !activeSmartCol?.filters?.pinnedOnly;
+    const localizeDateFilterLabel = (label: string) => {
+        if (label === 'Date: Today' || label === 'Date: Week' || label === 'Date: Month') return t(label);
+        if (label.startsWith('Date: ')) return t('Date: {{value}}', { value: label.slice(6) });
+        return t(label);
+    };
     const dateFilterLabel = getDateFilterLabel(filters);
     const smartDateFilterLabel = activeSmartCol?.filters ? getDateFilterLabel(activeSmartCol.filters) : null;
     const smartSourceKind = activeSmartCol?.filters ? getEffectiveImageKind(activeSmartCol.filters) : 'all';
@@ -134,7 +139,7 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = () => {
                     )}
                     {smartDateFilterLabel && (
                         <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 text-xs border border-gray-200 dark:border-zinc-700 opacity-80 cursor-not-allowed" title={t('Smart Collection Rule')}>
-                            <span>{smartDateFilterLabel}</span>
+                            <span>{localizeDateFilterLabel(smartDateFilterLabel)}</span>
                             <div className="w-3 h-3 flex items-center justify-center text-[10px]">🔒</div>
                         </div>
                     )}
@@ -215,7 +220,7 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = () => {
 
             {dateFilterLabel && (
                 <div className="flex items-center gap-1 rounded-full border border-gray-200 bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
-                    <span>{dateFilterLabel}</span>
+                    <span>{localizeDateFilterLabel(dateFilterLabel)}</span>
                     <button type="button" aria-label={t('Clear Date Filter')} onClick={() => setFilters(f => ({ ...f, dateRange: 'all', dateFrom: undefined, dateTo: undefined }))}><X className="w-3 h-3" /></button>
                 </div>
             )}

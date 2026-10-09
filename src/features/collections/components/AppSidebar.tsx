@@ -31,7 +31,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   showSupportPulse
 }) => {
   const { t } = useTranslation();
-  const brandGlyphSrc = '/branding/dv-glyph.png';
+  const brandGlyphSrc = '/branding/dv-monogram.png';
 
   return (
     <aside className="hidden md:flex w-20 flex-col items-center py-6 h-full rounded-3xl bg-white/90 dark:bg-zinc-900/95 backdrop-blur-xl border border-gray-200 dark:border-white/10 z-20 shadow-2xl transition-all duration-500 ease-spring">

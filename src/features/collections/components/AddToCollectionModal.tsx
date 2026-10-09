@@ -195,6 +195,7 @@ export const AddToCollectionModal: React.FC<AddToCollectionModalProps> = ({
                             {filtered.map(col => {
                                 const showThumbnailSkeleton = (!!thumbnailHydrationPendingIds[col.id] || !!smartSummaryPendingIds[col.id]) && !col.thumbnail;
                                 const count = getCollectionCount(col);
+                                const countLabel = getCollectionCountLabel(col);
 
                                 return (
                                     <button
@@ -253,8 +254,8 @@ export const AddToCollectionModal: React.FC<AddToCollectionModalProps> = ({
                                                 </div>
                                                 <div
                                                     className="text-[10px] text-gray-500 dark:text-gray-500 uppercase tracking-wider"
-                                                    aria-label={getCollectionCountLabel(col)}
-                                                    title={getCollectionCountLabel(col)}
+                                                    aria-label={countLabel ? t(countLabel) : undefined}
+                                                    title={countLabel ? t(countLabel) : undefined}
                                                 >
                                                     {count === undefined ? '\u2014' : t('{{count}} images', { count: count })}
                                                 </div>

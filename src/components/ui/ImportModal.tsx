@@ -149,9 +149,9 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                                             <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 font-medium">{t('Automatic imports from connected generator output folders.')}</p>
 
                                             <ul className="grid grid-cols-1 gap-2 mb-6">
-                                                <FeatureItem text="Auto-import new images" />
-                                                <FeatureItem text="Sync favorites & boards when supported" />
-                                                <FeatureItem text="Full metadata extraction" />
+                                                <FeatureItem text={t('Auto-import new images')} />
+                                                <FeatureItem text={t('Sync favorites & boards when supported')} />
+                                                <FeatureItem text={t('Full metadata extraction')} />
                                             </ul>
 
                                             <div className="flex flex-wrap gap-2">
@@ -169,7 +169,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                                 <div className="absolute inset-0 flex items-center">
                                     <div className="w-full border-t border-gray-100 dark:border-white/5" />
                                 </div>
-                                <span className="relative px-4 text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 bg-white dark:bg-[#0c0c0e]">or</span>
+                                <span className="relative px-4 text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 bg-white dark:bg-[#0c0c0e]">{t('or')}</span>
                             </div>
 
                             {/* MANUAL IMPORT SECTION */}

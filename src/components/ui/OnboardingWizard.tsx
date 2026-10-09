@@ -57,7 +57,7 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({
     onOpenSettings,
 }) => {
     const { t } = useTranslation();
-    const brandGlyphSrc = '/branding/dv-glyph.png';
+    const brandGlyphSrc = '/branding/dv-monogram.png';
     const settings = useSettingsStore(state => state.settings);
     const geminiApiKey = useSettingsStore(state => state.geminiApiKey);
     const setGeminiApiKey = useSettingsStore(state => state.setGeminiApiKey);
@@ -263,7 +263,7 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({
                                 key={label}
                                 current={step}
                                 step={index + 1}
-                                label={label}
+                                label={t(label)}
                             />
                         ))}
                     </ol>
@@ -284,7 +284,7 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({
                     ) : null}
 
                     <p className="relative z-10 mb-3 text-xs font-bold uppercase tracking-widest text-sage-500 md:hidden">
-                        {t('Step')} {step} of {TOTAL_STEPS} · {t(STEP_LABELS[step - 1])}
+                        {t('Step {{current}} of {{total}}', { current: step, total: TOTAL_STEPS })} · {t(STEP_LABELS[step - 1])}
                     </p>
 
                     <div
@@ -315,9 +315,9 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({
                                         </div>
 
                                         <div className="space-y-3">
-                                            <FeatureRow icon={<Search className="h-6 w-6 text-sage-400" />} title={t('One searchable library')} desc="Find images across prompts, models, tags, dates, and generation settings." />
-                                            <FeatureRow icon={<BrainCircuit className="h-6 w-6 text-sage-400" />} title={t('Native generation metadata')} desc="Inspect prompts, seeds, parameters, and supported workflow data." />
-                                            <FeatureRow icon={<Lock className="h-6 w-6 text-sage-400" />} title={t('Local-first by default')} desc="Your catalog stays on this machine, with optional network features under your control." />
+                                            <FeatureRow icon={<Search className="h-6 w-6 text-sage-400" />} title={t('One searchable library')} desc={t('Find images across prompts, models, tags, dates, and generation settings.')} />
+                                            <FeatureRow icon={<BrainCircuit className="h-6 w-6 text-sage-400" />} title={t('Native generation metadata')} desc={t('Inspect prompts, seeds, parameters, and supported workflow data.')} />
+                                            <FeatureRow icon={<Lock className="h-6 w-6 text-sage-400" />} title={t('Local-first by default')} desc={t('Your catalog stays on this machine, with optional network features under your control.')} />
                                         </div>
                                     </div>
                                 ) : null}
@@ -613,7 +613,7 @@ const IntegrationCard: React.FC<IntegrationCardProps> = ({ icon, title, features
                 {features.map(feature => (
                     <span key={feature} className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
                         <span aria-hidden="true" className="h-1 w-1 rounded-full bg-gray-400" />
-                        {feature}
+                        {t(feature)}
                     </span>
                 ))}
             </span>

@@ -336,7 +336,7 @@ export const SearchBar = React.memo(({
                     aria-invalid={queryIssue?.kind === 'invalid' ? true : undefined}
                     aria-busy={showLoadingIndicator}
                     readOnly={searchProps.isSearchingAi}
-                    placeholder={searchProps.isAiSearchEnabled ? t('Ask {{APP_NAME}}...', { APP_NAME: APP_NAME }) : t('Search in {{scopeName}}...', { scopeName: scopeName })}
+                    placeholder={searchProps.isAiSearchEnabled ? t('Ask {{APP_NAME}}...', { APP_NAME: APP_NAME }) : t('Search in {{scopeName}}...', { scopeName: localizeScopeName(scopeName, t) })}
                     className={`w-full bg-gray-100 dark:bg-zinc-800/50 border rounded-xl py-2 pl-10 pr-10 text-sm focus:outline-none transition-all text-gray-900 dark:text-gray-100 placeholder-gray-500 ${searchProps.isAiSearchEnabled ? 'border-amethyst-300 dark:border-amethyst-800 focus:border-amethyst-500/50 focus:ring-1 focus:ring-amethyst-500/30' : 'border-gray-200 dark:border-white/10 focus:border-sage-500/50 focus:ring-1 focus:ring-sage-500/30'}`}
                     value={localValue}
                     onChange={handleSearchChange}

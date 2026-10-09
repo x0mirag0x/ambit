@@ -106,8 +106,8 @@ export const MetadataTextAreaField: React.FC<MetadataTextAreaFieldProps> = ({
         <button
             ref={editButtonRef}
             type="button"
-            aria-label={'Edit ' + field.label}
-            title={'Edit ' + field.label}
+            aria-label={t('Edit {{field}}', { field: t(field.label) })}
+            title={t('Edit {{field}}', { field: t(field.label) })}
             onClick={handleStartEditing}
             className="rounded p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-sage-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500/50 dark:text-zinc-500 dark:hover:bg-white/5 dark:hover:text-sage-300"
         >

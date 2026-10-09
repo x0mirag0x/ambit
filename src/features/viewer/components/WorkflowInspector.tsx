@@ -327,7 +327,11 @@ const ComfyDiagnosticsPanel: React.FC<{
                         <div className="text-[10px] uppercase font-bold text-ember-600/60 dark:text-ember-300/60">{t('Output Selection')}</div>
                         <div className="mt-1 flex flex-wrap items-center gap-1.5 font-mono text-[10px]">
                             <span className="rounded-md border border-ember-300/70 dark:border-ember-400/20 bg-white/70 dark:bg-black/20 px-1.5 py-0.5">
-                                {diagnostics.selectedOutputCandidateCount} output{diagnostics.selectedOutputCandidateCount === 1 ? '' : 's'} / {diagnostics.uniqueOutputRootSamplerCount} root{diagnostics.uniqueOutputRootSamplerCount === 1 ? '' : 's'}
+                                {diagnostics.selectedOutputCandidateCount === 1
+                                    ? t('{{n}} output', { n: diagnostics.selectedOutputCandidateCount })
+                                    : t('{{n}} outputs', { n: diagnostics.selectedOutputCandidateCount })} / {diagnostics.uniqueOutputRootSamplerCount === 1
+                                    ? t('{{n}} root', { n: diagnostics.uniqueOutputRootSamplerCount })
+                                    : t('{{n}} roots', { n: diagnostics.uniqueOutputRootSamplerCount })}
                             </span>
                             {diagnostics.outputAmbiguous && (
                                 <span
@@ -342,15 +346,15 @@ const ComfyDiagnosticsPanel: React.FC<{
                     <div className="grid grid-cols-2 gap-2">
                         <div>
                             <div className="text-[10px] uppercase font-bold text-ember-600/60 dark:text-ember-300/60">{t('Model')}</div>
-                            <div className="font-mono break-all">{formatDiagnosticValue(diagnostics.metadata.model)}</div>
+                            <div className="font-mono break-all">{formatDiagnosticValue(diagnostics.metadata.model) === 'None' ? t('None') : formatDiagnosticValue(diagnostics.metadata.model)}</div>
                         </div>
                         <div>
                             <div className="text-[10px] uppercase font-bold text-ember-600/60 dark:text-ember-300/60">{t('Sampler')}</div>
-                            <div className="font-mono break-all">{formatDiagnosticValue(diagnostics.metadata.sampler)}</div>
+                            <div className="font-mono break-all">{formatDiagnosticValue(diagnostics.metadata.sampler) === 'None' ? t('None') : formatDiagnosticValue(diagnostics.metadata.sampler)}</div>
                         </div>
                         <div>
                             <div className="text-[10px] uppercase font-bold text-ember-600/60 dark:text-ember-300/60">{t('Seed')}</div>
-                            <div className="font-mono break-all">{formatDiagnosticValue(diagnostics.metadata.seed)}</div>
+                            <div className="font-mono break-all">{formatDiagnosticValue(diagnostics.metadata.seed) === 'None' ? t('None') : formatDiagnosticValue(diagnostics.metadata.seed)}</div>
                         </div>
                         <div>
                             <div className="text-[10px] uppercase font-bold text-ember-600/60 dark:text-ember-300/60">{t('Steps / CFG')}</div>
@@ -360,7 +364,7 @@ const ComfyDiagnosticsPanel: React.FC<{
 
                     <div>
                         <div className="text-[10px] uppercase font-bold text-ember-600/60 dark:text-ember-300/60">{t('Positive Prompt')}</div>
-                        <div className="font-mono line-clamp-3 break-words">{formatDiagnosticValue(diagnostics.metadata.positivePrompt)}</div>
+                        <div className="font-mono line-clamp-3 break-words">{formatDiagnosticValue(diagnostics.metadata.positivePrompt) === 'None' ? t('None') : formatDiagnosticValue(diagnostics.metadata.positivePrompt)}</div>
                     </div>
 
                     <div>
@@ -371,10 +375,10 @@ const ComfyDiagnosticsPanel: React.FC<{
                                 return (
                                     <div key={field} className="flex flex-wrap items-center gap-1">
                                         <span
-                                            title={getDiagnosticLayerTitle(layer)}
+                                            title={t(getDiagnosticLayerTitle(layer))}
                                             className={`rounded-md border px-1.5 py-0.5 font-mono text-[10px] ${getDiagnosticLayerBadgeClass(layer)}`}
                                         >
-                                            {formatDiagnosticLabel(field)}: {formatDiagnosticLabel(layer ?? '')}
+                                            {t(formatDiagnosticLabel(field))}: {t(formatDiagnosticLabel(layer ?? ''))}
                                         </span>
                                         {sourceNodeIds.map((nodeId) => {
                                             const node = nodeById.get(nodeId);
@@ -416,14 +420,14 @@ const ComfyDiagnosticsPanel: React.FC<{
                                         className="flex flex-wrap items-center gap-1.5 font-mono text-[10px]"
                                     >
                                         <span className="font-bold text-ember-600 dark:text-ember-300">
-                                            {formatResourceFieldLabel(source.field)}:
+                                            {t(formatResourceFieldLabel(source.field))}:
                                         </span>
                                         <span className="break-all text-ember-600 dark:text-ember-300">{source.value}</span>
                                         <span
-                                            title={getDiagnosticLayerTitle(source.layer)}
+                                            title={t(getDiagnosticLayerTitle(source.layer))}
                                             className={`rounded-md border px-1.5 py-0.5 ${getDiagnosticLayerBadgeClass(source.layer)}`}
                                         >
-                                            {formatDiagnosticLabel(source.layer ?? 'unknown')}
+                                            {t(formatDiagnosticLabel(source.layer ?? 'unknown'))}
                                         </span>
                                         {source.nodeIds.map((nodeId) => {
                                             const node = nodeById.get(nodeId);
@@ -432,7 +436,7 @@ const ComfyDiagnosticsPanel: React.FC<{
                                                     key={nodeId}
                                                     type="button"
                                                     onClick={() => onFocusNode(nodeId)}
-                                                    aria-label={t('Jump to {{v0}} resource source node {{title}} ({{nodeId}})', { v0: formatResourceFieldLabel(source.field), title: node.title, nodeId: nodeId })}
+                                                    aria-label={t('Jump to {{v0}} resource source node {{title}} ({{nodeId}})', { v0: t(formatResourceFieldLabel(source.field)), title: node.title, nodeId: nodeId })}
                                                     title={t('Jump to resource source node {{nodeId}}: {{title}}', { nodeId: nodeId, title: node.title })}
                                                     className="rounded-md border border-ember-300/70 bg-white/80 px-1.5 py-0.5 text-ember-600 transition-colors hover:border-sage-400 hover:bg-sage-50 hover:text-sage-600 dark:border-ember-400/20 dark:bg-black/20 dark:text-ember-300 dark:hover:border-sage-500/50 dark:hover:bg-sage-500/10 dark:hover:text-sage-300"
                                                 >
@@ -482,7 +486,7 @@ const ComfyDiagnosticsPanel: React.FC<{
                                     return (
                                         <div
                                             key={`${issue.field}-${issue.nodeId}-${issue.inputName ?? ''}-${issue.reason}-${index}`}
-                                            title={getTraversalIssueTitle(issue.reason)}
+                                            title={t(getTraversalIssueTitle(issue.reason))}
                                             className="rounded-md border border-ember-300/70 bg-ember-50/70 px-2 py-1 font-mono text-[10px] text-ember-600 dark:border-ember-400/30 dark:bg-ember-500/10 dark:text-ember-300"
                                         >
                                             <span className="font-bold">{formatDiagnosticLabel(issue.field)}</span>
@@ -1014,7 +1018,7 @@ export const WorkflowInspector: React.FC<WorkflowInspectorProps> = ({ image, onW
                         </div>
                         {graphSourceLabel && (
                             <div className="rounded-full border border-sage-200 bg-sage-50 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-sage-600 dark:border-sage-800 dark:bg-sage-900/20 dark:text-sage-300">
-                                {graphSourceLabel}
+                                {t(graphSourceLabel)}
                             </div>
                         )}
                         {workflowJsonForActions ? (
@@ -1064,7 +1068,7 @@ export const WorkflowInspector: React.FC<WorkflowInspectorProps> = ({ image, onW
                             type="button"
                             aria-pressed={nodeMode === 'selected'}
                             disabled={!selectedBranchAvailable}
-                            title={selectedBranchAvailable ? t('Show the parser-selected saved-output dependency branch.') : selectedBranchUnavailableTitle}
+                            title={selectedBranchAvailable ? t('Show the parser-selected saved-output dependency branch.') : t(selectedBranchUnavailableTitle)}
                             onClick={() => setNodeMode('selected')}
                             className={`min-h-8 rounded px-3 text-[10px] font-bold uppercase tracking-wide transition-colors ${nodeMode === 'selected'
                                 ? 'bg-sage-600 text-white shadow-sm dark:bg-sage-500 dark:text-zinc-950'

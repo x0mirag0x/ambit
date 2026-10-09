@@ -92,7 +92,7 @@ export const DonationModal: React.FC<DonationModalProps> = ({ isOpen, onClose })
                                                     : 'bg-gray-800 hover:bg-gray-700 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-gray-900'
                                                     }`}
                                             >
-                                                <ProviderIcon className="w-5 h-5" /> {provider.ctaLabel}
+                                                <ProviderIcon className="w-5 h-5" /> {t(provider.ctaLabel)}
                                             </button>
                                         );
                                     })}

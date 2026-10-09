@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { CircleHelp, FileCheck2, FileCode2, Pencil, Workflow } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { TooltipButton } from '../../../../components/ui/InfoTooltip';
 
 interface MetadataSourceBadgeProps {
@@ -15,6 +16,7 @@ const SOURCE_DETAILS = {
 } as const;
 
 export const MetadataSourceBadge: React.FC<MetadataSourceBadgeProps> = ({ source }) => {
+    const { t } = useTranslation();
     if (!source) return null;
 
     const details = SOURCE_DETAILS[source as keyof typeof SOURCE_DETAILS] ?? {
@@ -22,7 +24,7 @@ export const MetadataSourceBadge: React.FC<MetadataSourceBadgeProps> = ({ source
         icon: CircleHelp,
     };
     const Icon = details.icon;
-    const tooltip = `Source: ${details.label}`;
+    const tooltip = t('Source: {{label}}', { label: t(details.label) });
 
     return (
         <TooltipButton

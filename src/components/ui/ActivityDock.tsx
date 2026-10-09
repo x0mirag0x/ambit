@@ -15,6 +15,8 @@ import {
 } from '../../hooks/thumbnailQueueProgress';
 import { TooltipButton } from './InfoTooltip';
 import { useTranslation } from 'react-i18next';
+import i18n from '../../i18n';
+import { translateRuntimeMessage } from '../../i18n/statusMessages';
 
 const ELAPSED_VISIBLE_AFTER_MS = 5000;
 const LIVE_WATCH_DOCK_REVEAL_MS = 2500;
@@ -39,12 +41,14 @@ const formatElapsed = (elapsedMs: number): string | null => {
 
     const totalSeconds = Math.max(0, Math.floor(elapsedMs / 1000));
     if (totalSeconds < 60) {
-        return `${totalSeconds}s elapsed`;
+        return i18n.t('{{seconds}}s elapsed', { seconds: totalSeconds });
     }
 
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    return seconds > 0 ? `${minutes}m ${seconds}s elapsed` : `${minutes}m elapsed`;
+    return seconds > 0
+        ? i18n.t('{{minutes}}m {{seconds}}s elapsed', { minutes, seconds })
+        : i18n.t('{{minutes}}m elapsed', { minutes });
 };
 
 const splitDetailItems = (detail?: string): string[] => (
@@ -57,20 +61,23 @@ const formatProgressNumber = (value: number): string => value.toLocaleString();
 
 const formatMetadataRefreshMessage = (progress: SyncProgress | null, percent: number): string => {
     if (!progress || progress.total <= 0) {
-        return progress?.message || progress?.phase || 'Preparing metadata refresh...';
+        return translateRuntimeMessage(progress?.message || progress?.phase || 'Preparing metadata refresh...');
     }
 
     const pieces = [
-        `${formatProgressNumber(progress.current)} / ${formatProgressNumber(progress.total)} images`,
+        i18n.t('{{current}} / {{total}} images', {
+            current: formatProgressNumber(progress.current),
+            total: formatProgressNumber(progress.total),
+        }),
         `${percent}%`
     ];
 
     if (typeof progress.updated === 'number') {
-        pieces.push(`${formatProgressNumber(progress.updated)} updated`);
+        pieces.push(i18n.t('{{updated}} updated', { updated: formatProgressNumber(progress.updated) }));
     }
 
     if (typeof progress.errors === 'number' && progress.errors > 0) {
-        pieces.push(`${formatProgressNumber(progress.errors)} errors`);
+        pieces.push(i18n.t('{{errors}} errors', { errors: formatProgressNumber(progress.errors) }));
     }
 
     return pieces.join(' | ');
@@ -307,10 +314,10 @@ export const ActivityDock: React.FC = () => {
 
     const percent = isLiveWatchVisible ? 0 : isCompleteProgress ? 100 : total > 0 ? Math.round((current / total) * 100) : 0;
     const message = isLiveWatchVisible
-        ? liveWatchPresentation.message
+        ? translateRuntimeMessage(liveWatchPresentation.message)
         : isRefreshActive
             ? formatMetadataRefreshMessage(progress, percent)
-            : (progress?.message || progress?.phase || '');
+            : translateRuntimeMessage(progress?.message || progress?.phase || '');
     const showCounts = total > 0 && !isLiveWatchVisible && !isBackgroundActive && !isRefreshActive && !showIndeterminateProgress && !isCompleteProgress;
     const smartThumbnailHasFailures = isBackgroundActive && message.includes('need attention');
     const smartThumbnailIsComplete = isBackgroundActive && total > 0 && current >= total;
@@ -323,7 +330,7 @@ export const ActivityDock: React.FC = () => {
     const secondaryDetails = isLiveWatchVisible
         ? []
         : [
-            ...splitDetailItems(progress?.detail),
+            ...splitDetailItems(progress?.detail).map(detail => translateRuntimeMessage(detail)),
             elapsedLabel
         ].filter((item): item is string => Boolean(item));
     const hasMultipleSecondaryDetails = secondaryDetails.length > 1;
@@ -410,12 +417,12 @@ export const ActivityDock: React.FC = () => {
                                             {isLiveWatchVisible ? (
                                                 liveWatchPresentation.sourceLabel && (
                                                     <span className={LIVE_WATCH_SOURCE_CHIP_CLASS}>
-                                                        {liveWatchPresentation.sourceLabel}
+                                                        {t(liveWatchPresentation.sourceLabel)}
                                                     </span>
                                                 )
                                             ) : (
                                                 <>
-                                                    {label}
+                                                    {t(label)}
                                                     {showCounts && <span className="text-xs font-medium text-gray-400 font-mono tracking-tight">{current.toLocaleString()} / {total.toLocaleString()}</span>}
                                                 </>
                                             )}
@@ -498,7 +505,7 @@ export const ActivityDock: React.FC = () => {
                             <motion.div layout="position" className="pt-2 border-t border-black/5 dark:border-white/5 flex items-center justify-between gap-2">
                                 <div className="flex items-center gap-2">
                                     <Info className="w-3 h-3 text-gray-400" />
-                                    <span className="text-[9px] text-gray-500 font-medium">{visibleFooterMessage}</span>
+                                    <span className="text-[9px] text-gray-500 font-medium">{t(visibleFooterMessage)}</span>
                                 </div>
 
                                 {supportsCancel && (

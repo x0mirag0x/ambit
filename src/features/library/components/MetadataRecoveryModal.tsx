@@ -158,7 +158,7 @@ export const MetadataRecoveryModal: React.FC<MetadataRecoveryModalProps> = ({
                                                     )}>
                                                         {t(opt.label)}
                                                     </div>
-                                                    <div className="text-xs text-gray-500 dark:text-gray-500 mt-0.5">{opt.desc}</div>
+                                                    <div className="text-xs text-gray-500 dark:text-gray-500 mt-0.5">{t(opt.desc)}</div>
                                                 </div>
                                             </button>
                                         ))}

@@ -15,7 +15,7 @@ export const AssetTechnicalDetails: React.FC<{ rows: readonly TechnicalDetail[] 
             {rows.map(row => (
                 <React.Fragment key={row.label}>
                     <dt className="text-gray-500 dark:text-zinc-500">{t(row.label)}</dt>
-                    <dd className="min-w-0 break-words">{row.value}</dd>
+                    <dd className="min-w-0 break-words">{row.value === 'Unknown' || row.value === 'None' || row.value === 'Present' ? t(row.value) : row.value}</dd>
                 </React.Fragment>
             ))}
         </dl>

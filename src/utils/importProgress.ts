@@ -1,3 +1,4 @@
+import i18n from '../i18n';
 import type { SyncProgress } from '../stores/libraryStore';
 
 type ImportProgressPhase = 'scanning' | 'importing' | 'finalizing';
@@ -12,11 +13,8 @@ interface StableImportProgressOptions {
     sourcePath?: string;
 }
 
-const folderLabel = (count: number): string =>
-    `${count} folders`;
-
 const withPrefix = (message: string, prefix?: string): string =>
-    prefix ? `${prefix}: ${message}` : message;
+    prefix ? i18n.t('{{prefix}}: {{message}}', { prefix: i18n.t(prefix), message }) : message;
 
 export const formatStableImportProgress = ({
     current,
@@ -29,10 +27,10 @@ export const formatStableImportProgress = ({
 }: StableImportProgressOptions): SyncProgress => {
     const isSingleFolder = sourceCount === 1;
     const message = phase === 'finalizing'
-        ? withPrefix('Finalizing import...', prefix)
+        ? withPrefix(i18n.t('Finalizing import...'), prefix)
         : phase === 'scanning'
-            ? withPrefix(isSingleFolder ? 'Scanning folder...' : `Scanning ${folderLabel(sourceCount)}...`, prefix)
-            : withPrefix(isSingleFolder ? 'Importing images from folder...' : `Importing images from ${folderLabel(sourceCount)}...`, prefix);
+            ? withPrefix(isSingleFolder ? i18n.t('Scanning folder...') : i18n.t('Scanning {{n}} folders...', { n: sourceCount }), prefix)
+            : withPrefix(isSingleFolder ? i18n.t('Importing images from folder...') : i18n.t('Importing images from {{n}} folders...', { n: sourceCount }), prefix);
 
     const progress: SyncProgress = {
         current,
@@ -43,7 +41,7 @@ export const formatStableImportProgress = ({
     if (sourceCount === 1 && sourcePath) {
         progress.detail = sourcePath;
     } else if (sourceIndex && sourceCount > 1) {
-        progress.detail = `Folder ${sourceIndex} of ${sourceCount}`;
+        progress.detail = i18n.t('Folder {{current}} of {{total}}', { current: sourceIndex, total: sourceCount });
     }
 
     return progress;

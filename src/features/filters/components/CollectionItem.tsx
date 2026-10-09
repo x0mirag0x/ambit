@@ -6,6 +6,7 @@ import { CollectionThumbnailSkeleton } from '../../../components/ui/CollectionTh
 import { formatCountCompact } from '../../../utils/formatUtils';
 import { createCollectionSelectionFilters } from '../../../utils/filterState';
 import { getCollectionCount, getCollectionCountLabel } from '../../../utils/collectionCount';
+import { useTranslation } from 'react-i18next';
 
 interface CollectionItemProps {
     col: Collection;
@@ -64,12 +65,14 @@ export const CollectionItem: React.FC<CollectionItemProps> = ({
     viewMode = 'list',
     isThumbnailPending = false
 }) => {
+    const { t } = useTranslation();
     const isSelected = filters.collectionId === col.id;
     const thumbUrl = col.thumbnail || '';
     const showThumbnailSkeleton = isThumbnailPending && !thumbUrl;
     const count = getCollectionCount(col);
     const countText = count === undefined ? '\u2014' : formatCountCompact(count);
-    const unknownCountLabel = getCollectionCountLabel(col);
+    const rawCountLabel = getCollectionCountLabel(col);
+    const unknownCountLabel = rawCountLabel ? t(rawCountLabel) : undefined;
     return (
         <div
             key={col.id}

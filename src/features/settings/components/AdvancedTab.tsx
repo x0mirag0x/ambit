@@ -192,16 +192,20 @@ export const AdvancedTab: React.FC<TabProps> = ({
 
             {/* Sub Tabs Navigation */}
             <div className="flex p-1 bg-gray-100 dark:bg-white/5 rounded-xl">
-                {(['database', 'interface', 'support'] as const).map((tab) => (
+                {([
+                    ['database', 'Database'],
+                    ['interface', 'Interface'],
+                    ['support', 'Support'],
+                ] as const).map(([tab, label]) => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
-                        className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors capitalize ${activeTab === tab
+                        className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${activeTab === tab
                             ? 'bg-white dark:bg-white/10 text-gray-900 dark:text-white shadow-sm'
                             : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
                             }`}
                     >
-                        {tab}
+                        {t(label)}
                     </button>
                 ))}
             </div>
