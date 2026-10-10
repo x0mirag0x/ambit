@@ -1,5 +1,5 @@
 <div align="center">
-<img width="120" height="120" alt="Dvoyna Vault app icon" src="public/branding/dv-glyph.png" />
+<img width="120" height="120" alt="Dvoyna Vault app icon" src="public/branding/d-mark.png" />
 
 # Dvoyna Vault
 ### High-Performance Local AI Image Manager

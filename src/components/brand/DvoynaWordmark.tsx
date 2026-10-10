@@ -5,5 +5,5 @@ interface DvoynaWordmarkProps {
 }
 
 export const DvoynaWordmark: React.FC<DvoynaWordmarkProps> = ({ className = '' }) => (
-    <span className={`font-wordmark text-[#E8C46E] ${className}`}>Dvoyna</span>
+    <img src="/branding/dvoyna-wordmark.png" alt="Dvoyna" className={`block h-[1em] w-auto select-none ${className}`} />
 );
