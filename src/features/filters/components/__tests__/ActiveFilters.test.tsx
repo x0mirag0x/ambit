@@ -105,7 +105,7 @@ describe('ActiveFilters', () => {
             { filters: { embeddings: ['embedding'] }, label: 'embedding' },
             { filters: { hypernetworks: ['hyper'] }, label: 'hyper' },
             { filters: { samplers: ['Euler'] }, label: 'Euler' },
-            { filters: { generationTypes: ['txt2img'] }, label: 'txt2img' },
+            { filters: { generationTypes: ['txt2img'] }, label: 'Text to Image' },
             { filters: { minSteps: 1 }, label: /Steps: 1-/ },
             { filters: { maxSteps: 20 }, label: 'Steps: 0-20' },
             { filters: { minCfg: 1 }, label: /CFG: 1-/ },

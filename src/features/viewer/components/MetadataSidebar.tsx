@@ -45,6 +45,7 @@ interface MetadataSidebarProps {
     isLoading?: boolean;
     searchHighlights?: PromptHighlightSpec;
     onOpenReferencedImage?: (imageId: string) => Promise<boolean>;
+    onFindSimilarColor?: (color: string) => void;
 }
 
 export const MetadataSidebar: React.FC<MetadataSidebarProps> = ({
@@ -81,6 +82,7 @@ export const MetadataSidebar: React.FC<MetadataSidebarProps> = ({
     isLoading,
     searchHighlights,
     onOpenReferencedImage,
+    onFindSimilarColor,
 }) => {
     const isGenerated = getEffectiveSourceKind(image) === 'generated';
     const tabs = getImageViewerTabs(image);
@@ -107,6 +109,7 @@ export const MetadataSidebar: React.FC<MetadataSidebarProps> = ({
                 onSetCollectionMembership={onSetCollectionMembership}
                 palette={palette}
                 isPaletteLoading={isPaletteLoading}
+                onFindSimilarColor={onFindSimilarColor}
             />
         ) : null}
 

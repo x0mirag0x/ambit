@@ -57,7 +57,7 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({
     onOpenSettings,
 }) => {
     const { t } = useTranslation();
-    const brandGlyphSrc = '/branding/dv-monogram.png';
+    const brandGlyphSrc = '/branding/d-mark.svg';
     const settings = useSettingsStore(state => state.settings);
     const geminiApiKey = useSettingsStore(state => state.geminiApiKey);
     const setGeminiApiKey = useSettingsStore(state => state.setGeminiApiKey);
@@ -174,7 +174,7 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({
 
             setVerificationStatus('success');
             addToast(
-                overrideKey ? 'Environment API key verified' : 'API key verified and saved securely',
+                overrideKey ? t('Environment API key verified') : t('API key verified and saved securely'),
                 'success'
             );
         } catch (error) {

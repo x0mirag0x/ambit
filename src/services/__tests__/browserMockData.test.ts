@@ -80,6 +80,45 @@ describe('browserMockData filtering', () => {
         expect(excludedResult.totalCount).toBe(0);
     });
 
+    it('lists and searches manual model overrides for images and videos', () => {
+        const generated = getBrowserMockImages().find(image => (
+            image.mediaType !== 'video'
+            && image.metadata.model
+            && image.metadata.model !== 'Unknown'
+            && !image.isIntermediate
+            && !image.metadata.isIntermediate
+            && !image.metadata.isGrid
+        ))!;
+        const video = getBrowserMockImages().find(image => image.mediaType === 'video' && !image.isDeleted)!;
+        const originalGenerated = generated.metadata;
+        const originalVideo = video.metadata;
+
+        try {
+            updateBrowserMockImage(generated.id, {
+                metadata: { ...originalGenerated, model: 'parsed-only', overrideModel: 'Nano' },
+            });
+            updateBrowserMockImage(video.id, {
+                metadata: { ...originalVideo, model: 'parsed-video', overrideModel: 'Seedance 2.5' },
+            });
+
+            const names = getBrowserMockFacets().checkpoints.map(item => item.name);
+            expect(names).toContain('Nano');
+            expect(names).toContain('Seedance 2.5');
+            expect(names).not.toContain('parsed-only');
+
+            const byFilter = searchBrowserMockImages(createDefaultFilters({ models: ['Nano', 'Seedance 2.5'] }), 'date_desc', 1000);
+            expect(byFilter.images.map(image => image.id).sort()).toEqual([generated.id, video.id].sort());
+
+            const bySearch = searchBrowserMockImages(createDefaultFilters({ searchQuery: 'model:nano' }), 'date_desc', 1000);
+            expect(bySearch.images.some(image => image.id === generated.id)).toBe(true);
+            const byParsed = searchBrowserMockImages(createDefaultFilters({ searchQuery: 'model:parsed-only' }), 'date_desc', 1000);
+            expect(byParsed.images.some(image => image.id === generated.id)).toBe(true);
+        } finally {
+            updateBrowserMockImage(generated.id, { metadata: originalGenerated });
+            updateBrowserMockImage(video.id, { metadata: originalVideo });
+        }
+    });
+
     it('supports scoped search tokens used by the main search box', () => {
         const searchableTerms = [
             'steps:>18',

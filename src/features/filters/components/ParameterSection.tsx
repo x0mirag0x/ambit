@@ -2,8 +2,8 @@ import * as React from 'react';
 import { normalizeSampler } from '../../../utils/samplerUtils';
 import { FilterState } from '../../../types';
 import { SectionHeader, FilterSlider, MultiSelectDropdown, ChipSelect } from './FilterPrimitives';
+import { generationTypeLabel } from '../filterLabels';
 import { useParameterRangesQuery } from '../../../hooks/useParameterRangesQuery';
-import { Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface ParameterSectionProps {
@@ -12,22 +12,6 @@ interface ParameterSectionProps {
     isOpen: boolean;
     onToggle: () => void;
 }
-
-
-/** Format generation type for display */
-const formatGenType = (type: string): string => {
-    const labels: Record<string, string> = {
-        'txt2img': 'Text to Image',
-        'img2img': 'Image to Image',
-        'extras': 'Extras/Upscale',
-        'grid': 'Grid',
-        'saved': 'Saved',
-        'unknown': 'Unknown'
-    };
-    return labels[type] || type;
-};
-
-// ... (ChipSelect and formatGenType omitted as they are before)
 
 const groupSamplers = (samplers: string[]) => {
     const groups: Record<string, string[]> = {
@@ -147,7 +131,7 @@ export const ParameterSection: React.FC<ParameterSectionProps> = ({
                         options={ranges.generationTypes}
                         selected={filters.generationTypes || []}
                         onChange={(generationTypes) => setFilters(prev => ({ ...prev, generationTypes }))}
-                        formatLabel={(type) => t(formatGenType(type))}
+                        formatLabel={(type) => t(generationTypeLabel(type))}
                     />
                 )}
             </div>

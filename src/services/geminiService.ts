@@ -23,6 +23,7 @@ import {
     normalizeAiThinkingMode
 } from "../constants/aiModels";
 import { formatDateInputValue } from "../utils/dateFilters";
+import i18n from "../i18n";
 
 const getAIClient = (apiKey: string) => {
     const key = apiKey || process.env.API_KEY;
@@ -114,7 +115,10 @@ export const analyzePromptAndSuggest = async (
 ): Promise<string> => {
     try {
         const ai = getAIClient(apiKey);
-        const template = resolvePrompt('ANALYSIS', prompts);
+        const language = i18n.resolvedLanguage || i18n.language;
+        const template = language.startsWith('ru')
+            ? (prompts?.ANALYSIS_RU || AI_PROMPTS.ANALYSIS_RU)
+            : resolvePrompt('ANALYSIS', prompts);
         const prompt = template.replace('{{prompt}}', currentPrompt);
         const thinkingConfig = getGeminiThinkingConfig(modelId, thinkingMode);
 

@@ -33,6 +33,7 @@ interface GlobalModalsProps {
     onCloseExport: () => void;
     exportIds: Set<string>;
     pendingViewerDeleteId: string | null;
+    onDeleteCancel?: () => void;
     collectionToDeleteId: string | null;
     addToCollectionMode: 'add' | 'move';
     sourceCollectionId: string | null;
@@ -88,6 +89,7 @@ export const GlobalModals: React.FC<GlobalModalsProps> = ({
     onCloseExport,
     exportIds,
     pendingViewerDeleteId,
+    onDeleteCancel,
     collectionToDeleteId,
     addToCollectionMode,
     sourceCollectionId,
@@ -193,12 +195,16 @@ export const GlobalModals: React.FC<GlobalModalsProps> = ({
 
             <ConfirmDialog
                 isOpen={modals.deleteConfirm}
-                onCancel={() => closeModal('deleteConfirm')}
+                onCancel={() => {
+                    closeModal('deleteConfirm');
+                    onDeleteCancel?.();
+                }}
                 onConfirm={handleDeleteConfirm}
                 title={t('Remove from Library?')}
                 message={t('dialog.removeFromLibrary', { count: deleteTargetCount })}
                 isDangerous={true}
                 isLoading={isDeletePending}
+                zIndex={220}
             />
 
             <ConfirmDialog

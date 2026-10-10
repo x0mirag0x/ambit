@@ -600,7 +600,7 @@ describe('ImageViewer full metadata loading', () => {
         const { container } = renderViewer({ onToggleFavorite, onTogglePin, onDelete });
         await waitFor(() => expect(captures.toolbar).toBeTruthy());
         const toolbar = captures.toolbar as {
-            onCopy: () => Promise<void>; onOpenExternal: () => Promise<void>; onShare: () => void;
+            onCopy: () => Promise<void>; onOpenExternal: () => Promise<void>;
             onToggleTheater: () => void; onToggleFavorite: () => void; onTogglePin: () => void;
             onDelete: () => void;
         };
@@ -618,8 +618,7 @@ describe('ImageViewer full metadata loading', () => {
         await toolbar.onOpenExternal();
         expect(toastMock).toHaveBeenNthCalledWith(1, 'open unavailable', 'info');
         expect(toastMock).toHaveBeenNthCalledWith(2, 'permission denied', 'error');
-        toolbar.onShare();
-        expect(share).toHaveBeenCalledWith({ title: lightImage.filename, url: lightImage.url });
+        expect(share).not.toHaveBeenCalled();
         act(() => {
             toolbar.onToggleFavorite();
             toolbar.onTogglePin();
@@ -644,9 +643,8 @@ describe('ImageViewer full metadata loading', () => {
         Object.defineProperty(navigator, 'share', { configurable: true, value: undefined });
         renderViewer();
         const toolbar = captures.toolbar as {
-            onShare: () => void; onTogglePin?: () => void; onDelete?: () => void;
+            onTogglePin?: () => void; onDelete?: () => void;
         };
-        toolbar.onShare();
         expect(toolbar.onTogglePin).toBeUndefined();
         expect(toolbar.onDelete).toBeUndefined();
     });

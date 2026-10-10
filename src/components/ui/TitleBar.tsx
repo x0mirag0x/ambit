@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
 import type { Window as TauriWindow } from "@tauri-apps/api/window";
 import { Minus, Square, X } from "lucide-react";
-import { APP_NAME } from "../../constants/app";
+import { DvoynaWordmark } from "../brand/DvoynaWordmark";
 import { useSettingsStore } from "../../stores/settingsStore";
 import { isTauriRuntime } from "../../services/runtime";
 import { areDeveloperFeaturesEnabled } from "../../utils/settingsUtils";
 import { isCaptureMode } from "../../utils/buildFlags";
 import { useTranslation } from 'react-i18next';
 
-const BRAND_GLYPH_SRC = "/branding/dv-monogram.png";
 const BRAND_WINDOW_ICON_SRC = "/branding/dv-window-icon.png";
 
 export const TitleBar = () => {
@@ -34,7 +33,11 @@ export const TitleBar = () => {
                 setAppWindow(win);
 
                 try {
-                    await win.setIcon(BRAND_WINDOW_ICON_SRC);
+                    const iconResponse = await fetch(BRAND_WINDOW_ICON_SRC);
+                    if (!iconResponse.ok) {
+                        throw new Error(`Window icon request failed: ${iconResponse.status}`);
+                    }
+                    await win.setIcon(new Uint8Array(await iconResponse.arrayBuffer()));
                 } catch (iconError) {
                     console.warn("TitleBar: Failed to set window icon", iconError);
                 }
@@ -116,14 +119,7 @@ export const TitleBar = () => {
                 className={`${containerClasses} flex items-center justify-between px-4 bg-white/90 dark:bg-zinc-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-white/10 select-none transition-all duration-300 shadow-xl`}
             >
                 <div className="flex items-center gap-3 pointer-events-none">
-                    <img
-                        src={BRAND_GLYPH_SRC}
-                        alt=""
-                        className="h-7 w-7 shrink-0 drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]"
-                    />
-                    <span className="text-[13px] font-semibold tracking-[0.18em] text-zinc-700 dark:text-zinc-300">
-                        {APP_NAME.toUpperCase()}
-                    </span>
+                    <DvoynaWordmark className="text-[26px] leading-none" />
                     {profileBadge && !isCaptureMode() && (
                         <span className="ml-2 px-1.5 py-0.5 bg-ember-500/20 text-ember-600 dark:text-ember-300 text-[9px] font-bold rounded animate-pulse">
                             {profileBadge}

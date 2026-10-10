@@ -60,9 +60,7 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
             metadata: {
                 ...img.metadata,
                 positivePrompt: prompt,
-                fieldSources: img.mediaType === 'video'
-                    ? { ...img.metadata.fieldSources, positivePrompt: 'user_override' as const }
-                    : img.metadata.fieldSources
+                fieldSources: { ...img.metadata.fieldSources, positivePrompt: 'user_override' as const }
             }
         };
 
@@ -83,9 +81,7 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
             metadata: {
                 ...img.metadata,
                 negativePrompt,
-                fieldSources: img.mediaType === 'video'
-                    ? { ...img.metadata.fieldSources, negativePrompt: 'user_override' as const }
-                    : img.metadata.fieldSources
+                fieldSources: { ...img.metadata.fieldSources, negativePrompt: 'user_override' as const }
             }
         };
 
@@ -107,9 +103,8 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
             metadata: {
                 ...img.metadata,
                 overrideModel: normalizedModel,
-                fieldSources: img.mediaType === 'video'
-                    ? { ...img.metadata.fieldSources, model: 'user_override' as const, overrideModel: 'user_override' as const }
-                    : img.metadata.fieldSources
+                model: normalizedModel,
+                fieldSources: { ...img.metadata.fieldSources, model: 'user_override' as const, overrideModel: 'user_override' as const }
             }
         };
 
@@ -118,6 +113,7 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
 
         // Ensure filter panel is updated
         rebuildFacetCacheIncremental('checkpoints').then(() => incrementFacetCacheVersion());
+        void queryClient.invalidateQueries({ queryKey: ['parameterRanges'] });
 
         addToast(t('Updated'), 'success');
     };
@@ -134,9 +130,7 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
             metadata: {
                 ...img.metadata,
                 tool,
-                fieldSources: img.mediaType === 'video'
-                    ? { ...img.metadata.fieldSources, tool: 'user_override' as const }
-                    : img.metadata.fieldSources
+                fieldSources: { ...img.metadata.fieldSources, tool: 'user_override' as const }
             }
         };
 
@@ -145,6 +139,7 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
 
         // Ensure filter panel is updated
         rebuildFacetCacheIncremental('tools').then(() => incrementFacetCacheVersion());
+        void queryClient.invalidateQueries({ queryKey: ['parameterRanges'] });
 
         addToast(t('Updated'), 'success');
     };
@@ -168,6 +163,7 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
         } as AIImage;
         updateImage(id, () => updatedImg);
         await updateImageMetadataFields(id, { generationMode, generationType: generationMode });
+        void queryClient.invalidateQueries({ queryKey: ['parameterRanges'] });
         addToast(t('Updated'), 'success');
     };
 

@@ -84,6 +84,7 @@ export const hasNonCollectionResultFilters = (filters: FilterState): boolean => 
     filters.ipAdapters.length > 0 ||
     filters.samplers.length > 0 ||
     filters.generationTypes.length > 0 ||
+    !!filters.similarColor ||
     filters.dateRange !== 'all' ||
     !!filters.dateFrom ||
     !!filters.dateTo ||

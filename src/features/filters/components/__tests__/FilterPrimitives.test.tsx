@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '../../../../test/testUtils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import i18n from '../../../../i18n';
 import { Zap } from 'lucide-react';
 import {
     ChipSelect,
@@ -13,8 +14,9 @@ import {
 } from '../FilterPrimitives';
 
 describe('FilterPrimitives', () => {
-    afterEach(() => {
+    afterEach(async () => {
         vi.restoreAllMocks();
+        await i18n.changeLanguage('en');
     });
 
     it('toggles section headers and keeps optional action controls visible', () => {
@@ -49,6 +51,23 @@ describe('FilterPrimitives', () => {
         rerender(<SelectableRow label="Flux" isSelected onClick={onClick} />);
         fireEvent.click(screen.getByText('Flux'));
         expect(onClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('right-aligns counts in a fixed column before the radio', () => {
+        render(
+            <>
+                <SelectableRow label="Nano" detail="1" isSelected={false} onClick={vi.fn()} />
+                <SelectableRow label="Seedance 2.5" detail="51" isSelected onClick={vi.fn()} />
+            </>
+        );
+
+        for (const count of ['1', '51']) {
+            const countNode = screen.getByText(count);
+            expect(countNode.className).toContain('w-16');
+            expect(countNode.className).toContain('text-right');
+            expect(countNode.className).toContain('tabular-nums');
+            expect(countNode.nextElementSibling?.className).toContain('rounded-full');
+        }
     });
 
     it('search input reports typing and exposes clear when populated', () => {
@@ -389,5 +408,22 @@ describe('FilterPrimitives', () => {
         fireEvent.click(screen.getByText('Select...'));
         fireEvent.mouseDown(screen.getByText('One'));
         expect(screen.getByText('One')).toBeTruthy();
+    });
+
+    it('translates Other and Unknown sampler options without renaming product values', async () => {
+        await i18n.changeLanguage('ru');
+        render(
+            <MultiSelectDropdown
+                label="Sampler"
+                selected={['Unknown']}
+                onChange={vi.fn()}
+                groups={[{ label: 'Other', items: ['Unknown', 'Euler'] }]}
+            />
+        );
+
+        expect(screen.getByText('Неизвестно')).toBeTruthy();
+        fireEvent.click(screen.getByRole('button', { name: 'Неизвестно' }));
+        expect(screen.getByText('Другое')).toBeTruthy();
+        expect(screen.getByText('Euler')).toBeTruthy();
     });
 });

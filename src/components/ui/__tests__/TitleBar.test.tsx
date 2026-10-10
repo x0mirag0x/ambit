@@ -44,6 +44,10 @@ describe('TitleBar', () => {
         settingsState.developer = true;
         settingsState.captureMode = false;
         vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+        vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+            ok: true,
+            arrayBuffer: async () => Uint8Array.from([137, 80, 78, 71]).buffer,
+        }));
     });
 
     it('labels the isolated QA profile independently of developer features', async () => {
@@ -54,7 +58,7 @@ describe('TitleBar', () => {
 
         render(<TitleBar />);
 
-        await screen.findByText('DV');
+        await screen.findByRole('img', { name: 'Dvoyna' });
         expect(screen.getByText('QA')).toBeTruthy();
         expect(screen.queryByText('DEV')).toBeNull();
     });
@@ -70,9 +74,12 @@ describe('TitleBar', () => {
         const { win, unlisten } = createWindow();
         mockedGetCurrentWindow.mockReturnValue(win as unknown as ReturnType<typeof getCurrentWindow>);
         const { unmount } = render(<TitleBar />);
-        await screen.findByText('DV');
+        await screen.findByRole('img', { name: 'Dvoyna' });
+        expect(screen.getAllByRole('img')).toHaveLength(1);
         expect(screen.getByText('DEV')).toBeTruthy();
-        expect(win.setIcon).toHaveBeenCalledWith('/branding/dv-window-icon.png');
+        await waitFor(() => expect(win.setIcon).toHaveBeenCalledOnce());
+        expect(win.setIcon.mock.calls[0]?.[0]).toBeInstanceOf(Uint8Array);
+        expect(fetch).toHaveBeenCalledWith('/branding/dv-window-icon.png');
 
         const buttons = screen.getAllByRole('button');
         fireEvent.click(buttons[0]);
@@ -93,7 +100,7 @@ describe('TitleBar', () => {
 
         render(<TitleBar />);
 
-        await screen.findByText('DV');
+        await screen.findByRole('img', { name: 'Dvoyna' });
         expect(settingsState.developer).toBe(true);
         expect(screen.queryByText('DEV')).toBeNull();
     });
@@ -104,7 +111,7 @@ describe('TitleBar', () => {
         win.isFullscreen.mockResolvedValueOnce(false).mockResolvedValueOnce(true).mockResolvedValueOnce(false);
         mockedGetCurrentWindow.mockReturnValue(win as unknown as ReturnType<typeof getCurrentWindow>);
         const { container } = render(<TitleBar />);
-        await screen.findByText('DV');
+        await screen.findByRole('img', { name: 'Dvoyna' });
 
         fireEvent.click(screen.getAllByRole('button')[1]);
         await waitFor(() => expect(win.unmaximize).toHaveBeenCalledOnce());
@@ -127,7 +134,7 @@ describe('TitleBar', () => {
         first.win.setIcon.mockRejectedValueOnce(new Error('unsupported'));
         mockedGetCurrentWindow.mockReturnValueOnce(first.win as unknown as ReturnType<typeof getCurrentWindow>);
         const view = render(<TitleBar />);
-        await screen.findByText('DV');
+        await screen.findByRole('img', { name: 'Dvoyna' });
         expect(console.warn).toHaveBeenCalledWith('TitleBar: Failed to set window icon', expect.any(Error));
         view.unmount();
 
@@ -143,7 +150,7 @@ describe('TitleBar', () => {
         win.listen.mockReturnValueOnce(new Promise(resolve => { resolveListen = resolve; }));
         mockedGetCurrentWindow.mockReturnValue(win as unknown as ReturnType<typeof getCurrentWindow>);
         const view = render(<TitleBar />);
-        await screen.findByText('DV');
+        await screen.findByRole('img', { name: 'Dvoyna' });
         view.unmount();
         await act(async () => resolveListen(unlisten));
         expect(unlisten).toHaveBeenCalledOnce();

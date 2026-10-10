@@ -49,7 +49,9 @@ export const AIResultModal: React.FC<AIResultModalProps> = ({
     const analysisContent = type === 'analysis' ? (content as string) : '';
     const analysisParts = analysisContent.split('### Applied Example');
     const analysisText = analysisParts[0]?.trim() || '';
-    const masteredPrompt = analysisParts[1]?.trim() || '';
+    const appliedParts = (analysisParts[1] ?? '').split(/### Russian translation/i);
+    const masteredPrompt = appliedParts[0]?.trim() || '';
+    const masteredTranslation = appliedParts[1]?.trim() || '';
 
     const variations = type === 'variations' ? (content as string[]) : [];
 
@@ -166,7 +168,7 @@ export const AIResultModal: React.FC<AIResultModalProps> = ({
                                             </div>
                                         ) : (
                                             <div>
-                                                <MasteredPromptCard prompt={masteredPrompt} onCopy={onCopy} />
+                                                <MasteredPromptCard prompt={masteredPrompt} translation={masteredTranslation} onCopy={onCopy} />
                                             </div>
                                         )}
                                     </div>
@@ -227,7 +229,7 @@ export const AIResultModal: React.FC<AIResultModalProps> = ({
 };
 
 /* Mastered Prompt Card Component */
-const MasteredPromptCard: React.FC<{ prompt: string; onCopy: (text: string) => void }> = ({ prompt, onCopy }) => {
+const MasteredPromptCard: React.FC<{ prompt: string; translation?: string; onCopy: (text: string) => void }> = ({ prompt, translation, onCopy }) => {
     const { t } = useTranslation();
     const [copied, setCopied] = React.useState(false);
 
@@ -256,6 +258,12 @@ const MasteredPromptCard: React.FC<{ prompt: string; onCopy: (text: string) => v
             <p className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed font-mono pr-20 selection:bg-amethyst-500/30">
                 {prompt}
             </p>
+            {translation ? (
+                <div className="mt-4 border-t border-amethyst-500/20 pt-3">
+                    <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-amethyst-600 dark:text-amethyst-300">{t('Russian translation')}</p>
+                    <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">{translation}</p>
+                </div>
+            ) : null}
         </div>
     );
 };

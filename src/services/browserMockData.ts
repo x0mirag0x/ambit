@@ -8,6 +8,7 @@ import { isKnownInvokeImageAsset } from '../utils/invokeImageSource';
 import { createDefaultFilters, getEffectiveImageKind, normalizeMediaTypeFilter } from '../utils/filterState';
 import { addLibraryScopeCount, createEmptyLibraryScopeCounts } from '../utils/libraryScopeCounts';
 import { getEffectiveMaskedKeywords, isImageMasked } from '../utils/maskingUtils';
+import { colorsAreSimilar } from '../utils/colorDistance';
 
 const STORAGE_KEY = 'ambit_browser_mock_state_v1';
 const MOCK_COUNT = 180;
@@ -45,6 +46,17 @@ const PROMPTS = [
     'isometric workshop, tiny tools, clean product render',
 ];
 const INVOKE_IMAGE_CATEGORIES = ['general', 'user', 'control', 'mask', 'other', 'future-category', undefined] as const;
+
+export const mockImageDominantColor = (id: string): string => {
+    const index = Number(id.replace(/\D/g, '')) - 1;
+    return colorForIndex(Number.isFinite(index) && index >= 0 ? index : 0);
+};
+
+export const mockImagePalette = (id: string): string[] => {
+    const index = Number(id.replace(/\D/g, '')) - 1;
+    const safe = Number.isFinite(index) && index >= 0 ? index : 0;
+    return [colorForIndex(safe), colorForIndex(safe + 2)];
+};
 
 const colorForIndex = (index: number): string => {
     const colors = ['#3b6f6a', '#8b5e34', '#5e6f9f', '#7b4f72', '#637047', '#9a5b54'];
@@ -430,6 +442,13 @@ const includesText = (value: string | number | undefined, term: string): boolean
     value !== undefined && String(value).toLowerCase().includes(term)
 );
 
+const effectiveModelName = (metadata: AIImage['metadata']): string | undefined => {
+    const override = metadata.overrideModel?.trim();
+    if (override) return override;
+    const parsed = metadata.model?.trim();
+    return parsed || undefined;
+};
+
 const matchesNumberExpression = (value: number | undefined, expression: string): boolean => {
     if (value === undefined) return false;
     if (expression.startsWith('>')) return value > Number(expression.slice(1));
@@ -448,6 +467,7 @@ const matchesScopedSearchToken = (image: AIImage, token: BrowserSearchToken): bo
     const haystack = [
         image.filename,
         image.notes,
+        image.metadata.overrideModel,
         image.metadata.model,
         image.metadata.tool,
         image.metadata.positivePrompt,
@@ -462,7 +482,7 @@ const matchesScopedSearchToken = (image: AIImage, token: BrowserSearchToken): bo
     else if (key === 'cfg') matched = matchesNumberExpression(image.metadata.cfg, val);
     else if (key === 'w' || key === 'width') matched = matchesNumberExpression(image.width, val);
     else if (key === 'h' || key === 'height') matched = matchesNumberExpression(image.height, val);
-    else if (key === 'model') matched = includesText(image.metadata.model, val);
+    else if (key === 'model') matched = includesText(image.metadata.overrideModel, val) || includesText(image.metadata.model, val);
     else if (key === 'seed') matched = includesText(image.metadata.seed, val);
     else if (key === 'neg' || key === 'negative') matched = includesText(image.metadata.negativePrompt, val);
     else if (key === 'file' || key === 'filename' || key === 'path') matched = includesText(image.filename, val);
@@ -575,7 +595,8 @@ const filterImages = (
         if (collectionIds && !collectionIds.has(image.id)) return false;
         if (smartMatches && !smartMatches.has(image.id)) return false;
         if (smartExclusions?.has(image.id)) return false;
-        if (!matchesSelectedValues([image.metadata.model], filters.models)) return false;
+        const modelName = effectiveModelName(image.metadata);
+        if (!matchesSelectedValues(modelName ? [modelName] : [], filters.models)) return false;
         if (!matchesSelectedValues([image.metadata.tool], filters.tools)) return false;
         if (!matchesSelectedValues(image.metadata.loras, filters.loras, filters.matchModes?.loras)) return false;
         if (!matchesSelectedValues(image.metadata.embeddings, filters.embeddings, filters.matchModes?.embeddings)) return false;
@@ -584,6 +605,7 @@ const filterImages = (
         if (!matchesSelectedValues(image.metadata.ipAdapters, filters.ipAdapters, filters.matchModes?.ipAdapters)) return false;
         if (!matchesSelectedValues([image.metadata.sampler], filters.samplers)) return false;
         if (!matchesSelectedValues([image.metadata.generationType ?? 'unknown'], filters.generationTypes)) return false;
+        if (filters.similarColor && !colorsAreSimilar(filters.similarColor, mockImageDominantColor(image.id))) return false;
         if (filters.minSteps !== undefined && image.metadata.steps < filters.minSteps) return false;
         if (filters.maxSteps !== undefined && image.metadata.steps > filters.maxSteps) return false;
         if (filters.minCfg !== undefined && image.metadata.cfg < filters.minCfg) return false;
@@ -678,7 +700,7 @@ const buildFacetItems = (images: AIImage[], type: FacetType) => {
     };
 
     images.forEach((image) => {
-        if (type === 'checkpoints') add(image.metadata.model);
+        if (type === 'checkpoints') add(effectiveModelName(image.metadata));
         if (type === 'tools') add(image.metadata.tool);
         if (type === 'loras') image.metadata.loras?.forEach(add);
         if (type === 'embeddings') image.metadata.embeddings?.forEach(add);
@@ -746,7 +768,9 @@ export const getBrowserMockStatsSummary = (filters: FilterState): LibraryStatsSu
     const modelCounts = new Map<string, number>();
 
     images.forEach((image) => {
-        modelCounts.set(image.metadata.model, (modelCounts.get(image.metadata.model) ?? 0) + 1);
+        const name = effectiveModelName(image.metadata);
+        if (!name) return;
+        modelCounts.set(name, (modelCounts.get(name) ?? 0) + 1);
     });
 
     return {

@@ -12,7 +12,7 @@ interface ToastContainerProps {
 
 export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, removeToast }) => {
   return (
-    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[9999] flex flex-col items-center gap-3 pointer-events-none">
+    <div className="fixed top-8 left-1/2 -translate-x-1/2 z-[9999] flex flex-col items-center gap-3 pointer-events-none">
       {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} onRemove={() => removeToast(toast.id)} />
       ))}
@@ -50,7 +50,7 @@ const ToastItem: React.FC<{ toast: ToastMessage; onRemove: () => void }> = ({ to
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="pointer-events-auto flex items-center gap-3 pl-4 pr-3 py-2.5 rounded-full border border-white/10 bg-zinc-900/80 backdrop-blur-md shadow-2xl text-white animate-in slide-in-from-bottom-4 zoom-in-95 duration-300 ease-spring transform transition-all hover:scale-[1.02]"
+      className="pointer-events-auto flex items-center gap-3 pl-4 pr-3 py-2.5 rounded-full border border-white/10 bg-zinc-900/80 backdrop-blur-md shadow-2xl text-white animate-in slide-in-from-top-4 zoom-in-95 duration-300 ease-spring transform transition-all hover:scale-[1.02]"
     >
       <div className="shrink-0">
         {icons[toast.type]}

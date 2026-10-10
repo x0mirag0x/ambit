@@ -508,16 +508,25 @@ export const updateImageMetadataFields = async (id: string, updates: Record<stri
     if (isBrowserMockMode()) {
         const image = getBrowserMockImages().find(item => item.id === id);
         if (image) {
-            const fieldSources = image.mediaType === 'video'
-                ? Object.keys(updates).reduce((sources, key) => {
-                    if (['tool', 'positivePrompt', 'negativePrompt', 'model', 'overrideModel', 'generationType', 'generationMode'].includes(key)) {
-                        sources[key as VideoMetadataField] = 'user_override';
-                        if (key === 'overrideModel') sources.model = 'user_override';
-                    }
-                    return sources;
-                }, { ...image.metadata.fieldSources })
-                : image.metadata.fieldSources;
-            updateBrowserMockImage(id, { metadata: { ...image.metadata, ...updates, fieldSources } });
+            const fieldSources = Object.keys(updates).reduce((sources, key) => {
+                if (['tool', 'positivePrompt', 'negativePrompt', 'model', 'overrideModel', 'generationType', 'generationMode'].includes(key)) {
+                    sources[key as VideoMetadataField] = 'user_override';
+                    if (key === 'overrideModel') sources.model = 'user_override';
+                    if (key === 'generationMode') sources.generationType = 'user_override';
+                }
+                return sources;
+            }, { ...image.metadata.fieldSources });
+            const overrideModel = typeof updates.overrideModel === 'string' ? updates.overrideModel : undefined;
+            const generationMode = typeof updates.generationMode === 'string' ? updates.generationMode : undefined;
+            updateBrowserMockImage(id, {
+                metadata: {
+                    ...image.metadata,
+                    ...updates,
+                    fieldSources,
+                    ...(overrideModel ? { model: overrideModel, overrideModel } : {}),
+                    ...(generationMode ? { generationType: generationMode, generationMode: generationMode as ImageMetadata['generationMode'] } : {}),
+                }
+            });
         }
         return;
     }
@@ -542,11 +551,10 @@ export const updateImageMetadataFields = async (id: string, updates: Record<stri
                 params.push(value);
             }
             if (['tool', 'positivePrompt', 'negativePrompt', 'model', 'overrideModel', 'generationType', 'generationMode'].includes(key)) {
-                let videoExpr = `json_set(${jsonSetExpr}, '$.fieldSources.${key}', 'user_override')`;
+                jsonSetExpr = `json_set(${jsonSetExpr}, '$.fieldSources.${key}', 'user_override')`;
                 if (key === 'overrideModel') {
-                    videoExpr = `json_set(${videoExpr}, '$.fieldSources.model', 'user_override')`;
+                    jsonSetExpr = `json_set(${jsonSetExpr}, '$.fieldSources.model', 'user_override')`;
                 }
-                jsonSetExpr = `CASE WHEN media_type = 'video' THEN ${videoExpr} ELSE ${jsonSetExpr} END`;
             }
         });
 

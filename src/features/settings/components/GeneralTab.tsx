@@ -227,7 +227,7 @@ export const GeneralTab: React.FC<TabProps> = React.memo(({ settings, setSetting
                 </div>
                 <div className="mt-6 border-t border-gray-200 pt-5 dark:border-white/10">
                     <div className="flex items-center gap-3">
-                        <img src="/branding/dv-monogram.png" alt="" className="h-10 w-10 shrink-0" />
+                        <img src="/branding/d-mark.svg" alt="" className="h-10 w-10 shrink-0" />
                         <div className="text-base font-medium text-gray-900 dark:text-gray-200">{t('About')}</div>
                     </div>
                     <p className="mt-1 text-sm leading-relaxed text-gray-500">

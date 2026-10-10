@@ -42,7 +42,6 @@ describe('ViewerToolbar tooltips', () => {
                 onCopy={vi.fn()}
                 onOpenExternal={vi.fn()}
                 onToggleTheater={vi.fn()}
-                onShare={vi.fn()}
                 onToggleFavorite={onToggleFavorite}
                 onTogglePin={vi.fn()}
                 onDelete={vi.fn()}

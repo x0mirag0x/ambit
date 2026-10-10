@@ -135,6 +135,8 @@ interface AppLayoutProps {
     handleOpenCollectionModal: (mode: 'add' | 'move') => void;
     onSetCollectionMembership: (imageId: string, collectionId: string, shouldBelong: boolean) => Promise<boolean>;
     onEditCollection: (colId: string) => void;
+    visualSearchActive?: boolean;
+    onResetVisualSearch?: () => void;
 }
 
 export const AppLayout: React.FC<AppLayoutProps> = ({
@@ -145,6 +147,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     viewMode, changeViewMode, searchProps, layoutMode, setLayoutMode,
     sortOption, setSortOption, displayedCount, scopeTotal, scopeName,
     fileOps, onOpenImportModal, workspaceRef, scrollContainerRef,
+    images: presentationImages,
     handlers, setViewingImageId, onMaintenanceViewerOpenChange, onOpenReferencedImage, onViewerSearch, isViewerShortcutBlocked, onSetImageKind,
     modelOptions = [],
     actions, availableTags, selectedIds,
@@ -153,7 +156,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     clearSelection, gridRef, handleLayoutChange,
     isSearchFocused, setIsSearchFocused, lastSelectedId,
 
-    handleRemoveFromCollection, handleOpenCollectionModal, onSetCollectionMembership, onEditCollection
+    handleRemoveFromCollection, handleOpenCollectionModal, onSetCollectionMembership,     onEditCollection,
+    visualSearchActive = false,
+    onResetVisualSearch,
 }) => {
     // Hooks
     const { t } = useTranslation();
@@ -208,7 +213,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     // Derived
     // Store Access
     const {
-        images,
+        images: queriedImages,
         globalTotal,
         sourceKindCounts,
         scopeCounts,
@@ -224,6 +229,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         loadMoreImages,
         isLoadingMore
     } = useSearch();
+    const photoSearchBusy = Boolean(searchProps.visualSearchBusy);
+    const images = visualSearchActive ? presentationImages : queriedImages;
     const isSearchPending = isFiltering || isSearchDraftPending;
     const shouldShowSearchSkeleton = isSearchPending && images.length === 0;
     // const images = useSearchStore(s => s.images); // Images available in context
@@ -273,7 +280,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         filters.pinnedOnly ? 'pinned-only' : 'unpinned-scope',
         filters.showGrids ? 'show-grids' : 'hide-grids',
         filters.showIntermediates ? 'show-intermediates' : 'hide-intermediates',
-        filters.showInvokeImageAssets ? 'show-invoke-assets' : 'hide-invoke-assets'
+        filters.showInvokeImageAssets ? 'show-invoke-assets' : 'hide-invoke-assets',
+        ...(visualSearchActive ? ['photo-search'] : []),
     ].join('|'), [
         layoutMode,
         settings.thumbnailSize,
@@ -284,7 +292,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         filters.pinnedOnly,
         filters.showGrids,
         filters.showIntermediates,
-        filters.showInvokeImageAssets
+        filters.showInvokeImageAssets,
+        visualSearchActive,
     ]);
 
     const renderGridItem = React.useCallback((img: AIImage, style: React.CSSProperties, index: number, layout?: GridLayoutPosition) => (
@@ -476,6 +485,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                                         modelOptions={modelOptions}
                                     />
                                 </React.Suspense>
+                            ) : visualSearchActive && photoSearchBusy ? (
+                                <div data-testid="photo-search-pending" className="flex h-full items-center justify-center" aria-live="polite" aria-busy="true" aria-label={t('Search by photo')}>
+                                    <ViewLoadingFallback />
+                                </div>
                             ) : (images.length > 0 || isSearchPending) ? (
                                 <>
                                     {shouldShowSearchSkeleton ? (
@@ -497,9 +510,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                                             onContextMenu={(e, id) => handlers.setContextMenu({ x: e.clientX, y: e.clientY, imageId: id })}
                                             onRangeSelection={handleRangeSelection}
                                             onBackgroundClick={clearSelection}
-                                            hasMoreImages={hasMoreImages}
-                                            isLoadingMore={isLoadingMore}
-                                            onLoadMore={loadMoreImages}
+                                            hasMoreImages={visualSearchActive ? false : hasMoreImages}
+                                            isLoadingMore={visualSearchActive ? false : isLoadingMore}
+                                            onLoadMore={visualSearchActive ? undefined : loadMoreImages}
                                         />
                                     ) : (
                                         <>
@@ -533,7 +546,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                                                 gap={16}
                                                 padding={24}
                                                 scrollContainerRef={scrollContainerRef}
-                                                onEndReached={loadMoreImages}
+                                                onEndReached={visualSearchActive ? undefined : loadMoreImages}
                                                 getItemRatio={(img) => {
                                                     const w = img.width || 1;
                                                     const h = img.height || 1;
@@ -549,7 +562,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                                                 transitionKey={galleryTransitionKey}
                                                 suspendResizeLayout={isFilterPanelLayoutTransitioning}
                                             />
-                                            {isLoadingMore && (
+                                            {!visualSearchActive && isLoadingMore && (
                                                 <div className="w-full py-8 flex justify-center items-center">
                                                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sage-500"></div>
                                                 </div>
@@ -557,6 +570,21 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                                         </>
                                     )}
                                 </>
+                            ) : visualSearchActive && images.length === 0 ? (
+                                <div className="h-full flex flex-col items-center justify-center text-gray-500 p-8 text-center max-w-md mx-auto">
+                                    <div className="p-6 bg-zinc-100 dark:bg-white/5 rounded-full mb-6 border border-zinc-200 dark:border-white/5 opacity-50">
+                                        <Search className="w-12 h-12 text-zinc-400 dark:text-zinc-500" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold mb-3 text-gray-800 dark:text-gray-100">{t('No similar photos found')}</h3>
+                                    <p className="text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">{t('Photo search looks through the current library.')}</p>
+                                    <button
+                                        type="button"
+                                        onClick={onResetVisualSearch}
+                                        className="px-8 py-3.5 bg-zinc-800 dark:bg-white/10 hover:bg-zinc-700 dark:hover:bg-white/20 text-white rounded-2xl font-bold transition-all"
+                                    >
+                                        {t('Reset photo search')}
+                                    </button>
+                                </div>
                             ) : globalTotal === 0 ? (
                                 <LibraryEmptyStateContainer onImport={onOpenImportModal} />
                             ) : (

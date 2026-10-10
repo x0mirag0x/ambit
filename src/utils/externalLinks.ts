@@ -1,7 +1,6 @@
 import {
-    GITHUB_SPONSORS_URL,
+    DONATION_URL,
     ISSUES_URL,
-    KO_FI_URL,
     RELEASES_URL,
     REPOSITORY_URL,
     UPSTREAM_REPOSITORY_URL,
@@ -29,8 +28,7 @@ const allowedExternalUrls = new Set(
         ISSUES_URL,
         RELEASES_URL,
         UPSTREAM_REPOSITORY_URL,
-        GITHUB_SPONSORS_URL,
-        KO_FI_URL,
+        DONATION_URL,
         GEMINI_API_KEY_URL,
     ].map((url) => normalizeAllowedExternalUrl(url)).filter((url): url is string => !!url)
 );

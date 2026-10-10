@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coffee, Heart, X } from 'lucide-react';
+import { Heart, X } from 'lucide-react';
 import { APP_FULL_NAME } from '../../constants/app';
 import { ENABLED_DONATION_PROVIDERS } from '../../constants/support';
 import { openExternalUrl } from '../../utils/externalLinks';
@@ -78,30 +78,22 @@ export const DonationModal: React.FC<DonationModalProps> = ({ isOpen, onClose })
 
                             {ENABLED_DONATION_PROVIDERS.length > 0 ? (
                                 <div className="flex flex-col gap-3 w-full">
-                                    {ENABLED_DONATION_PROVIDERS.map((provider) => {
-                                        const ProviderIcon = provider.id === 'github-sponsors' ? Heart : Coffee;
-                                        const isKoFi = provider.id === 'ko-fi';
-
-                                        return (
-                                            <button
-                                                key={provider.id}
-                                                type="button"
-                                                onClick={() => provider.url && handleOpenLink(provider.url)}
-                                                className={`flex items-center justify-center gap-3 w-full py-3 rounded-xl font-bold transition-all shadow-lg hover:scale-[1.02] ${isKoFi
-                                                    ? 'bg-[#FF5E5B] hover:bg-[#ff4845] text-white'
-                                                    : 'bg-gray-800 hover:bg-gray-700 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-gray-900'
-                                                    }`}
-                                            >
-                                                <ProviderIcon className="w-5 h-5" /> {t(provider.ctaLabel)}
-                                            </button>
-                                        );
-                                    })}
+                                    {ENABLED_DONATION_PROVIDERS.map((provider) => (
+                                        <button
+                                            key={provider.id}
+                                            type="button"
+                                            onClick={() => provider.url && handleOpenLink(provider.url)}
+                                            className="flex items-center justify-center gap-3 w-full py-3 rounded-xl font-bold transition-all shadow-lg hover:scale-[1.02] bg-gray-800 hover:bg-gray-700 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-gray-900"
+                                        >
+                                            <Heart className="w-5 h-5" /> {t(provider.ctaLabel)}
+                                        </button>
+                                    ))}
                                 </div>
                             ) : (
                                 <div className="w-full rounded-xl border border-dashed border-gray-300 dark:border-gray-700 bg-gray-50/90 dark:bg-black/20 px-4 py-4 text-left">
                                     <div className="font-semibold text-gray-900 dark:text-white">{t('Donations are not configured yet')}</div>
                                     <div className="text-sm text-gray-500 dark:text-gray-400">
-                                        {t('Add your Ko-fi, GitHub Sponsors, or Patreon URL in')} <code>src/constants/support.ts</code> {t('when the pages are live.')}</div>
+                                        {t('Add a donation URL in')} <code>src/constants/support.ts</code> {t('when the page is live.')}</div>
                                 </div>
                             )}
 

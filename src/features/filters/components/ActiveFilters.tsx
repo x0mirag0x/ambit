@@ -5,6 +5,7 @@ import { useCollections } from '../../../contexts/CollectionContext';
 import { useSearch } from '../../../contexts/SearchContext';
 import { getDateFilterLabel } from '../../../utils/dateFilters';
 import { getEffectiveImageKind } from '../../../utils/filterState';
+import { generationTypeLabel, localizeFilterSentinel } from '../filterLabels';
 import { useTranslation } from 'react-i18next';
 
 interface ActiveFiltersProps {
@@ -32,6 +33,7 @@ const hasChipVisibleCriteria = (filters: FilterState, dateLabel: string | null, 
     (filters.hypernetworks?.length ?? 0) > 0 ||
     (filters.samplers?.length ?? 0) > 0 ||
     (filters.generationTypes?.length ?? 0) > 0 ||
+    !!filters.similarColor ||
     (filters.controlNets?.length ?? 0) > 0 ||
     (filters.ipAdapters?.length ?? 0) > 0 ||
     filters.minSteps !== undefined ||
@@ -56,6 +58,9 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = () => {
         if (label.startsWith('Date: ')) return t('Date: {{value}}', { value: label.slice(6) });
         return t(label);
     };
+    const displayModel = (value: string) => localizeFilterSentinel(value, t);
+    const displaySentinel = (value: string) => localizeFilterSentinel(value, t);
+    const displayGenerationType = (value: string) => t(generationTypeLabel(value));
     const dateFilterLabel = getDateFilterLabel(filters);
     const smartDateFilterLabel = activeSmartCol?.filters ? getDateFilterLabel(activeSmartCol.filters) : null;
     const smartSourceKind = activeSmartCol?.filters ? getEffectiveImageKind(activeSmartCol.filters) : 'all';
@@ -115,13 +120,13 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = () => {
                 <>
                     {activeSmartCol.filters.models?.map(m => (
                         <div key={`smart-model-${m}`} className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 text-xs border border-gray-200 dark:border-zinc-700 opacity-80 cursor-not-allowed" title={t('Smart Rule: {{m}}', { m: m })}>
-                            <span className={FILTER_CHIP_LABEL_CLASS}>{m}</span>
+                            <span className={FILTER_CHIP_LABEL_CLASS}>{displayModel(m)}</span>
                             <div className="w-3 h-3 flex items-center justify-center text-[10px]">🔒</div>
                         </div>
                     ))}
                     {activeSmartCol.filters.tools?.map(tool => (
                         <div key={`smart-tool-${tool}`} className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 text-xs border border-gray-200 dark:border-zinc-700 opacity-80 cursor-not-allowed" title={t('Smart Collection Rule')}>
-                            <span>{tool}</span>
+                            <span>{displaySentinel(tool)}</span>
                             <div className="w-3 h-3 flex items-center justify-center text-[10px]">🔒</div>
                         </div>
                     ))}
@@ -181,13 +186,13 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = () => {
                     ))}
                     {activeSmartCol.filters.samplers?.map(s => (
                         <div key={`smart-sampler-${s}`} className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 text-xs border border-gray-200 dark:border-zinc-700 opacity-80 cursor-not-allowed" title={t('Smart Rule: {{s}}', { s: s })}>
-                            <span className={FILTER_CHIP_LABEL_CLASS}>{s}</span>
+                            <span className={FILTER_CHIP_LABEL_CLASS}>{displaySentinel(s)}</span>
                             <div className="w-3 h-3 flex items-center justify-center text-[10px]">🔒</div>
                         </div>
                     ))}
                     {activeSmartCol.filters.generationTypes?.map(g => (
                         <div key={`smart-gentype-${g}`} className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 text-xs border border-gray-200 dark:border-zinc-700 opacity-80 cursor-not-allowed" title={t('Smart Collection Rule')}>
-                            <span>{g}</span>
+                            <span>{displayGenerationType(g)}</span>
                             <div className="w-3 h-3 flex items-center justify-center text-[10px]">🔒</div>
                         </div>
                     ))}
@@ -243,14 +248,14 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = () => {
 
             {visibleModels.map(m => (
                 <div key={m} title={m} className="flex items-center gap-1 rounded-full border border-gray-200 bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
-                    <span className={FILTER_CHIP_LABEL_CLASS}>{m}</span>
+                    <span className={FILTER_CHIP_LABEL_CLASS}>{displayModel(m)}</span>
                     <button type="button" aria-label={t('Clear Model Filter {{m}}', { m: m })} onClick={() => setFilters(f => ({ ...f, models: f.models.filter(x => x !== m) }))}><X className="w-3 h-3" /></button>
                 </div>
             ))}
 
             {visibleTools.map(tool => (
                 <div key={tool} title={tool} className="flex items-center gap-1 rounded-full border border-gray-200 bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
-                    <span>{tool}</span>
+                    <span>{displaySentinel(tool)}</span>
                     <button type="button" aria-label={t('Clear Tool Filter {{tool}}', { tool })} onClick={() => setFilters(f => ({ ...f, tools: f.tools.filter(x => x !== tool) }))}><X className="w-3 h-3" /></button>
                 </div>
             ))}
@@ -278,14 +283,22 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = () => {
 
             {visibleSamplers.map(s => (
                 <div key={s} title={s} className="flex items-center gap-1 rounded-full border border-gray-200 bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
-                    <span className={FILTER_CHIP_LABEL_CLASS}>{s}</span>
+                    <span className={FILTER_CHIP_LABEL_CLASS}>{displaySentinel(s)}</span>
                     <button type="button" aria-label={t('Clear Sampler Filter {{s}}', { s: s })} onClick={() => setFilters(f => ({ ...f, samplers: (f.samplers || []).filter(x => x !== s) }))}><X className="w-3 h-3" /></button>
                 </div>
             ))}
 
+            {filters.similarColor ? (
+                <div className="flex items-center gap-1 rounded-full border border-gray-200 bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
+                    <span className="h-3 w-3 rounded-full border border-black/10" style={{ backgroundColor: filters.similarColor }} />
+                    <span>{t('Similar color')}</span>
+                    <button type="button" aria-label={t('Clear color filter')} onClick={() => setFilters(f => ({ ...f, similarColor: undefined }))}><X className="w-3 h-3" /></button>
+                </div>
+            ) : null}
+
             {visibleGenTypes.map(g => (
                 <div key={g} title={g} className="flex items-center gap-1 rounded-full border border-gray-200 bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
-                    <span>{g}</span>
+                    <span>{displayGenerationType(g)}</span>
                     <button type="button" aria-label={t('Clear Generation Type Filter {{g}}', { g: g })} onClick={() => setFilters(f => ({ ...f, generationTypes: (f.generationTypes || []).filter(x => x !== g) }))}><X className="w-3 h-3" /></button>
                 </div>
             ))}

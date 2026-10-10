@@ -13,6 +13,23 @@ export const AI_PROMPTS = {
       Keep it professional and concise.
     `,
 
+    ANALYSIS_RU: `
+      You are an expert AI Image Generation Prompt Engineer.
+      Analyze the following prompt used for an image generation:
+
+      "{{prompt}}"
+
+      Provide 3 specific improvements or variations to enhance the visual quality or change the style slightly.
+
+      LANGUAGE:
+      - Write the analysis report and every explanation in Russian.
+      - The improved prompt inside "### Applied Example" must stay in English so it can be pasted into an image generator. Do not put Russian words inside that prompt.
+      - After the English prompt, add a section titled exactly "### Russian translation" with a natural Russian translation of that English prompt.
+
+      Format the output using Markdown. Use "### Analysis" for the list, "### Applied Example" for the English prompt, and "### Russian translation" for the translation underneath it.
+      Keep it professional and concise.
+    `,
+
     VARIATIONS: `Take the following image generation prompt and create 3 distinct variations of it.
             
             Original Prompt: "{{prompt}}"

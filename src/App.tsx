@@ -53,6 +53,8 @@ import { startupDiagnostics } from './utils/startupDiagnostics';
 import { commands } from './bindings';
 import { isTauriRuntime } from './services/runtime';
 import { useTranslation } from 'react-i18next';
+import { useVisualSearchStore } from './stores/visualSearchStore';
+import { backfillVisualSignatures, searchSimilarImages } from './services/visualSearchService';
 
 const ImageViewer = React.lazy(() => import('./features/viewer/components/ImageViewer').then(module => ({ default: module.ImageViewer })));
 const VideoViewer = React.lazy(() => import('./features/viewer/components/VideoViewer').then(module => ({ default: module.VideoViewer })));
@@ -152,6 +154,26 @@ export default function App() {
         refreshMetadata,
         refreshHiddenAvailability
     } = useSearch();
+    const visualSearchActive = useVisualSearchStore(state => state.active);
+    const visualSearchBusy = useVisualSearchStore(state => state.searching);
+    const visualSearchImages = useVisualSearchStore(state => state.images);
+    const resetVisualSearch = useVisualSearchStore(state => state.reset);
+    const beginVisualSearch = useVisualSearchStore(state => state.begin);
+    const showVisualSearch = useVisualSearchStore(state => state.show);
+    const visualSearchGenerationRef = useRef(0);
+    const resetPhotoSearch = useCallback(() => {
+        visualSearchGenerationRef.current += 1;
+        resetVisualSearch();
+    }, [resetVisualSearch]);
+    const filtersForPhotoSearchRef = useRef(filters);
+    useEffect(() => {
+        if (filtersForPhotoSearchRef.current === filters) return;
+        filtersForPhotoSearchRef.current = filters;
+        const visualSearch = useVisualSearchStore.getState();
+        if (!visualSearch.active && !visualSearch.searching) return;
+        resetPhotoSearch();
+    }, [filters, resetPhotoSearch]);
+    const galleryImages = visualSearchActive ? visualSearchImages : images;
     const activeCollectionIdRef = useRef(filters.collectionId);
     const imagesRef = useRef(images);
     const selectedImageIndexRef = useRef(selectedImageIndex);
@@ -179,7 +201,8 @@ export default function App() {
 
         setViewerSessionImages(current => {
             if (current) return current;
-            const snapshot = imagesRef.current;
+            const visualSearch = useVisualSearchStore.getState();
+            const snapshot = (visualSearch.active ? visualSearch.images : imagesRef.current).slice();
             viewerSessionImagesRef.current = snapshot;
             return snapshot;
         });
@@ -201,7 +224,8 @@ export default function App() {
 
         setViewerSessionImages(current => {
             if (current) return current;
-            const snapshot = imagesRef.current;
+            const visualSearch = useVisualSearchStore.getState();
+            const snapshot = (visualSearch.active ? visualSearch.images : imagesRef.current).slice();
             viewerSessionImagesRef.current = snapshot;
             return snapshot;
         });
@@ -210,6 +234,7 @@ export default function App() {
         getImage: (imageId) => (
             images.find(image => image.id === imageId)
             ?? viewerSessionImages?.find(image => image.id === imageId)
+            ?? useVisualSearchStore.getState().images.find(image => image.id === imageId)
             ?? (directViewerImage?.id === imageId ? directViewerImage : undefined)
         ),
         updateImage: (imageId, updater) => {
@@ -275,7 +300,7 @@ export default function App() {
     const {
         selectedIds, setSelectedIds, lastSelectedId, setLastSelectedId,
         handleImageClick, handleSelectionToggle, handleRangeSelection, clearSelection
-    } = useSelection(images);
+    } = useSelection(galleryImages);
     const handleViewerImageClick = useCallback((
         event: React.MouseEvent,
         id: string,
@@ -328,7 +353,7 @@ export default function App() {
         viewingImageId,
         selectedImageIndex,
         setSelectedImageIndex,
-        viewerImages: viewerSessionImages ?? images,
+        viewerImages: viewerSessionImages ?? galleryImages,
         setViewerSessionImages,
         fileOps,
         selectedIds,
@@ -600,17 +625,67 @@ export default function App() {
         });
         setRecentSearches(prev => [term, ...prev.filter(search => search !== term)].slice(0, 8));
     }, [setFilters, setRecentSearches]);
-    const submitNavbarSearch = useCallback((query: string) => {
-        if (!query.trim()) {
-            void submitSearch(query);
-            return;
+    const searchByPhoto = useCallback(async (source: File | string) => {
+        const generation = ++visualSearchGenerationRef.current;
+        beginVisualSearch();
+        try {
+            const results = typeof source === 'string'
+                ? await searchSimilarImages(source)
+                : (await import('./services/browserMockData')).getBrowserMockImages()
+                    .filter(image => image.mediaType !== 'video' && !image.isDeleted)
+                    .slice(0, 12);
+            if (generation !== visualSearchGenerationRef.current) return;
+            showVisualSearch(results);
+        } catch (error) {
+            if (generation !== visualSearchGenerationRef.current) return;
+            console.error('Photo search failed', error);
+            showVisualSearch([]);
         }
+    }, [beginVisualSearch, showVisualSearch]);
 
+    const findSimilarColor = useCallback((color: string) => {
+        resetPhotoSearch();
+        setFilters(previous => ({ ...previous, similarColor: color }));
+        setViewerRevealGrantId(null);
+        setSelectedImageIndex(null);
+        setViewingImageId(null);
+        if (viewMode !== 'grid' && viewMode !== 'timeline') changeViewMode('grid');
+    }, [changeViewMode, resetPhotoSearch, setFilters, viewMode]);
+
+    useEffect(() => {
+        if (!isSettingsLoaded || !isTauriRuntime()) return;
+        let cancelled = false;
+        const run = async () => {
+            let remaining = 1;
+            let previous = Number.POSITIVE_INFINITY;
+            while (!cancelled && remaining > 0) {
+                try {
+                    const result = await backfillVisualSignatures(24);
+                    remaining = result.remaining;
+                    if (result.updated === 0 || remaining >= previous) break;
+                    previous = remaining;
+                } catch (error) {
+                    console.warn('Visual signature backfill stopped', error);
+                    break;
+                }
+                await new Promise(resolve => window.setTimeout(resolve, 50));
+            }
+        };
+        void run();
+        return () => { cancelled = true; };
+    }, [isSettingsLoaded]);
+
+    const submitNavbarSearch = useCallback((query: string) => {
+        const visualSearch = useVisualSearchStore.getState();
+        if (query.trim() || visualSearch.active || visualSearch.searching) {
+            resetPhotoSearch();
+        }
         void submitSearch(query);
+        if (!query.trim()) return;
         if (viewMode === 'dashboard' || viewMode === 'maintenance') {
             changeViewMode('grid');
         }
-    }, [changeViewMode, submitSearch, viewMode]);
+    }, [changeViewMode, resetPhotoSearch, submitSearch, viewMode]);
 
     const openSearchHelp = useCallback(() => {
         modals.setShortcutsModalTab('search');
@@ -628,7 +703,11 @@ export default function App() {
         onFocus: () => setIsSearchFocused(true),
         onBlur: () => setIsSearchFocused(false),
         onOpenSearchHelp: openSearchHelp,
-    }), [isAiSearchEnabled, isSearchingAi, inputRef, isSearchFocused, openSearchHelp, submitNavbarSearch, toggleAiSearch]);
+        visualSearchActive,
+        visualSearchBusy,
+        onSearchByPhoto: (source: File | string) => { void searchByPhoto(source); },
+        onResetVisualSearch: resetPhotoSearch,
+    }), [isAiSearchEnabled, isSearchingAi, inputRef, isSearchFocused, openSearchHelp, resetPhotoSearch, searchByPhoto, submitNavbarSearch, toggleAiSearch, visualSearchActive, visualSearchBusy]);
 
     const activeCollection = filters.collectionId
         ? (collections.find(c => c.id === filters.collectionId) ?? null)
@@ -644,8 +723,8 @@ export default function App() {
         totalImages
     );
     const currentLibraryPresentation: RetainedLibraryPresentation = {
-        images,
-        totalImages,
+        images: galleryImages,
+        totalImages: visualSearchActive ? visualSearchImages.length : totalImages,
         scopeTotal,
         scopeName,
         availableTags,
@@ -753,6 +832,10 @@ export default function App() {
     }, [images, isInvokeOwnerScopeBlocking]);
 
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        if (!visualSearchActive) return;
+        scrollContainerRef.current?.scrollTo({ top: 0 });
+    }, [visualSearchActive, visualSearchImages]);
     const workspaceRef = useRef<HTMLElement>(null);
     const gridRef = useRef<VirtualGridHandle>(null);
 
@@ -780,7 +863,7 @@ export default function App() {
         viewMode,
         disabled: isRetainingPreviousRuntimeView,
         selectedIds,
-        filteredImages: images,
+        filteredImages: galleryImages,
         lastSelectedId,
         isViewerOpen: viewingImageId !== null || selectedImageIndex !== null || isMaintenanceViewerOpen,
         gridRef,
@@ -982,7 +1065,9 @@ export default function App() {
                 displayedCount={libraryPresentation.totalImages}
                 scopeTotal={libraryPresentation.scopeTotal}
                 scopeName={libraryPresentation.scopeName}
-                isFiltering={isFiltering}
+                isFiltering={isFiltering || visualSearchBusy}
+                visualSearchActive={visualSearchActive}
+                onResetVisualSearch={resetPhotoSearch}
                 fileOps={fileOps}
                 onOpenImportModal={openImportModal}
                 clearAllFilters={clearAllFilters}
@@ -1082,6 +1167,7 @@ export default function App() {
                 onCloseExport={() => setExportIds(new Set())}
                 exportIds={exportIds}
                 pendingViewerDeleteId={modals.pendingViewerDeleteId}
+                onDeleteCancel={() => modals.setPendingViewerDeleteId(null)}
                 collectionToDeleteId={modals.collectionToDelete}
                 addToCollectionMode={modals.addToCollectionMode}
                 sourceCollectionId={modals.sourceCollectionId}
@@ -1233,6 +1319,7 @@ export default function App() {
                             onToggleSidebar={() => setSettings(p => ({ ...p, defaultTheaterMode: !p.defaultTheaterMode }))}
                             searchHighlights={searchHighlights}
                             onOpenReferencedImage={handleOpenReferencedImage}
+                            onFindSimilarColor={findSimilarColor}
                         />
                     ) : null}
                 </AnimatePresence>

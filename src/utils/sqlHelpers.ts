@@ -175,9 +175,10 @@ const parseSearchToken = (token: SearchToken): SearchCondition | null => {
             else { sql = "height = ?"; param = Number(val); }
         } else if (key === 'model') {
             const modelParam = `%${val}%`;
+            const sql = `(resolved_model_name LIKE ? OR json_extract(metadata_json, '$.model') LIKE ? OR json_extract(metadata_json, '$.overrideModel') LIKE ?)`;
             return {
-                sql: `(resolved_model_name LIKE ? OR json_extract(metadata_json, '$.model') LIKE ?)`,
-                params: [modelParam, modelParam],
+                sql: token.isNegative ? `NOT ${sql}` : sql,
+                params: [modelParam, modelParam, modelParam],
                 isPositivePrompt: false
             };
         } else if (key === 'seed') {
@@ -532,7 +533,19 @@ export const buildSqlWhereClause = (
         conditions.push(`(${genTypeConditions.join(' OR ')})`);
     }
 
-    // 11. Date Range
+    // 11. Dominant colour. Squared Euclidean distance keeps the predicate index-friendly enough for a library scan of three integers.
+    if (filters.similarColor && !excludeCategories.includes('similarColor')) {
+        const channels = filters.similarColor.replace('#', '');
+        if (/^[0-9a-fA-F]{6}$/.test(channels)) {
+            const red = Number.parseInt(channels.slice(0, 2), 16);
+            const green = Number.parseInt(channels.slice(2, 4), 16);
+            const blue = Number.parseInt(channels.slice(4, 6), 16);
+            conditions.push(`dominant_r IS NOT NULL AND ((dominant_r - ?) * (dominant_r - ?) + (dominant_g - ?) * (dominant_g - ?) + (dominant_b - ?) * (dominant_b - ?)) <= 5184`);
+            params.push(red, red, green, green, blue, blue);
+        }
+    }
+
+    // 12. Date Range
     const dateBounds = getDateFilterBounds(filters);
     const effectiveDateBounds = buildEffectiveDateConditions(dateBounds);
     conditions.push(...effectiveDateBounds.conditions);

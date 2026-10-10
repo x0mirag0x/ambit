@@ -1,11 +1,13 @@
 import * as React from 'react';
-import { LoaderCircle, Search, Sparkles, X } from 'lucide-react';
+import { Camera, LoaderCircle, Search, Sparkles, X } from 'lucide-react';
 import { FilterState } from '../../../types';
 import { APP_NAME } from '../../../constants/app';
 import { useSearch } from '../../../contexts/SearchContext';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import type { SearchBarOption } from './SearchBarPopover';
 import { useTranslation } from 'react-i18next';
+import { isTauriRuntime } from '../../../services/runtime';
+import { formatModelName } from '../../../utils/formatUtils';
 
 const SearchBarPopover = React.lazy(() => import('./SearchBarPopover').then(module => ({ default: module.SearchBarPopover })));
 
@@ -28,6 +30,10 @@ interface SearchBarProps {
         onFocus: () => void;
         onBlur: () => void;
         onOpenSearchHelp: () => void;
+        visualSearchActive?: boolean;
+        visualSearchBusy?: boolean;
+        onSearchByPhoto?: (source: File | string) => void;
+        onResetVisualSearch?: () => void;
     };
     recentSearches: string[];
     setRecentSearches: React.Dispatch<React.SetStateAction<string[]>>;
@@ -49,7 +55,7 @@ export const SearchBar = React.memo(({
     onDraftPendingChange,
 }: SearchBarProps) => {
     const { t } = useTranslation();
-    const { filters, setFilters } = useSearch();
+    const { filters, setFilters, facets } = useSearch();
     const [localValue, setLocalValue] = React.useState(filters.searchQuery);
     const [activeOptionIndex, setActiveOptionIndex] = React.useState(-1);
     const [areOptionsDismissed, setAreOptionsDismissed] = React.useState(false);
@@ -119,6 +125,34 @@ export const SearchBar = React.memo(({
         });
     }, [localValue, operatorSuggestions, searchProps.isAiSearchEnabled, searchReadinessApi]);
 
+    const modelValueSuggestions = React.useMemo(() => {
+        if (searchProps.isAiSearchEnabled || matchingOperators.length > 0) return [];
+        const lastSpace = localValue.lastIndexOf(' ');
+        const lastToken = localValue.slice(lastSpace + 1);
+        const match = /^model:(.*)$/i.exec(lastToken);
+        if (!match) return [];
+
+        const typed = match[1].toLowerCase();
+        const seen = new Set<string>();
+        const suggestions: { value: string; description: string }[] = [];
+        for (const item of facets?.checkpoints ?? []) {
+            const rawName = item.name?.trim();
+            if (!rawName || rawName === 'Unknown') continue;
+            const display = formatModelName(rawName) || rawName;
+            const key = display.toLowerCase();
+            if (seen.has(key)) continue;
+            if (typed && !key.includes(typed) && !rawName.toLowerCase().includes(typed)) continue;
+            const value = /[\s"]/.test(display)
+                ? `"model:${display.replace(/"/g, '\\"')}"`
+                : `model:${display}`;
+            if (value.toLowerCase() === lastToken.toLowerCase()) continue;
+            seen.add(key);
+            suggestions.push({ value, description: String(item.count) });
+            if (suggestions.length >= 12) break;
+        }
+        return suggestions;
+    }, [facets, localValue, matchingOperators.length, searchProps.isAiSearchEnabled]);
+
     const options = React.useMemo<SearchBarOption[]>(() => {
         if (areOptionsDismissed) return [];
 
@@ -131,6 +165,15 @@ export const SearchBar = React.memo(({
             }));
         }
 
+        if (modelValueSuggestions.length > 0) {
+            return modelValueSuggestions.map((suggestion, index) => ({
+                id: `${listboxId}-option-${index}`,
+                kind: 'operator' as const,
+                value: suggestion.value,
+                description: suggestion.description,
+            }));
+        }
+
         if (!localValue && recentSearches.length > 0) {
             return recentSearches.map((value, index) => ({
                 id: `${listboxId}-option-${index}`,
@@ -140,7 +183,7 @@ export const SearchBar = React.memo(({
         }
 
         return [];
-    }, [areOptionsDismissed, listboxId, localValue, matchingOperators, recentSearches]);
+    }, [areOptionsDismissed, listboxId, localValue, matchingOperators, modelValueSuggestions, recentSearches]);
 
     const activeOption = activeOptionIndex >= 0 ? options[activeOptionIndex] : undefined;
 
@@ -300,6 +343,7 @@ export const SearchBar = React.memo(({
         }
     };
 
+    const photoInputRef = React.useRef<HTMLInputElement>(null);
     const listLabel = options[0]?.kind === 'recent' ? t('Recent searches') : t('Search operator suggestions');
     const accessibleName = searchProps.isAiSearchEnabled
         ? t('Ask {{appName}} with AI', { appName: APP_NAME })
@@ -310,11 +354,12 @@ export const SearchBar = React.memo(({
 
     return (
         <div
-            className="group relative z-30 flex w-full max-w-lg items-center gap-2"
+            className="group relative z-30 flex w-full max-w-lg items-start gap-2"
             onFocusCapture={handleFocusCapture}
             onBlurCapture={handleBlurCapture}
         >
-            <div className={`relative flex-1 rounded-xl transition-shadow duration-200 ${isStandardSearchPending ? 'shadow-[0_0_18px_rgba(198,164,90,0.24)] dark:shadow-[0_0_20px_rgba(198,164,90,0.18)]' : ''}`}>
+            <div className="relative min-w-0 flex-1">
+            <div className={`relative rounded-xl transition-shadow duration-200 ${isStandardSearchPending ? 'shadow-[0_0_18px_rgba(198,164,90,0.24)] dark:shadow-[0_0_20px_rgba(198,164,90,0.18)]' : ''}`}>
                 {showLoadingIndicator ? (
                     <LoaderCircle
                         aria-hidden="true"
@@ -337,11 +382,49 @@ export const SearchBar = React.memo(({
                     aria-busy={showLoadingIndicator}
                     readOnly={searchProps.isSearchingAi}
                     placeholder={searchProps.isAiSearchEnabled ? t('Ask {{APP_NAME}}...', { APP_NAME: APP_NAME }) : t('Search in {{scopeName}}...', { scopeName: localizeScopeName(scopeName, t) })}
-                    className={`w-full bg-gray-100 dark:bg-zinc-800/50 border rounded-xl py-2 pl-10 pr-10 text-sm focus:outline-none transition-all text-gray-900 dark:text-gray-100 placeholder-gray-500 ${searchProps.isAiSearchEnabled ? 'border-amethyst-300 dark:border-amethyst-800 focus:border-amethyst-500/50 focus:ring-1 focus:ring-amethyst-500/30' : 'border-gray-200 dark:border-white/10 focus:border-sage-500/50 focus:ring-1 focus:ring-sage-500/30'}`}
+                    className={`w-full bg-gray-100 dark:bg-zinc-800/50 border rounded-xl py-2 pl-10 ${localValue ? 'pr-16' : 'pr-10'} text-sm focus:outline-none transition-all text-gray-900 dark:text-gray-100 placeholder-gray-500 ${searchProps.isAiSearchEnabled ? 'border-amethyst-300 dark:border-amethyst-800 focus:border-amethyst-500/50 focus:ring-1 focus:ring-amethyst-500/30' : 'border-gray-200 dark:border-white/10 focus:border-sage-500/50 focus:ring-1 focus:ring-sage-500/30'}`}
                     value={localValue}
                     onChange={handleSearchChange}
                     onKeyDown={handleKeyDown}
                     autoComplete="off"
+                />
+                <button
+                    type="button"
+                    aria-label={t('Search by photo')}
+                    disabled={searchProps.visualSearchBusy}
+                    onClick={() => {
+                        void (async () => {
+                            if (!isTauriRuntime()) {
+                                photoInputRef.current?.click();
+                                return;
+                            }
+                            const { open } = await import('@tauri-apps/plugin-dialog');
+                            const selected = await open({
+                                multiple: false,
+                                filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp'] }],
+                            });
+                            if (typeof selected === 'string') searchProps.onSearchByPhoto?.(selected);
+                        })();
+                    }}
+                    className={`absolute top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-sage-600 dark:text-zinc-500 dark:hover:text-sage-300 ${localValue && !searchProps.isSearchingAi ? 'right-8' : 'right-2'}`}
+                >
+                    {searchProps.visualSearchBusy ? (
+                        <LoaderCircle aria-hidden="true" className="w-4 h-4 animate-spin" />
+                    ) : (
+                        <Camera aria-hidden="true" className="w-4 h-4" />
+                    )}
+                </button>
+                <input
+                    ref={photoInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/gif,image/bmp"
+                    className="hidden"
+                    aria-hidden="true"
+                    onChange={event => {
+                        const file = event.target.files?.[0];
+                        event.target.value = '';
+                        if (file) searchProps.onSearchByPhoto?.(file);
+                    }}
                 />
                 {localValue && !searchProps.isSearchingAi ? (
                     <button
@@ -353,7 +436,6 @@ export const SearchBar = React.memo(({
                         <X aria-hidden="true" className="w-3.5 h-3.5" />
                     </button>
                 ) : null}
-
                 {searchProps.isFocused ? (
                     <React.Suspense fallback={null}>
                         <SearchBarPopover
@@ -371,6 +453,19 @@ export const SearchBar = React.memo(({
                             onSelectOption={selectOption}
                         />
                     </React.Suspense>
+                ) : null}
+            </div>
+                {searchProps.visualSearchActive ? (
+                    <div className="relative z-[60] mt-2 flex items-center gap-2">
+                        <span className="rounded-full border border-sage-500/40 bg-sage-500/10 px-2.5 py-1 text-[11px] font-semibold text-sage-700 dark:text-sage-200">{t('Search by photo')}</span>
+                        <button
+                            type="button"
+                            onClick={searchProps.onResetVisualSearch}
+                            className="text-[11px] font-semibold text-gray-500 hover:text-gray-900 dark:text-zinc-400 dark:hover:text-white"
+                        >
+                            {t('Reset photo search')}
+                        </button>
+                    </div>
                 ) : null}
             </div>
             <TooltipButton

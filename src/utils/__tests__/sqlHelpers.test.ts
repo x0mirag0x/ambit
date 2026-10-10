@@ -340,8 +340,12 @@ describe('sqlHelpers', () => {
 
             it('handles model and all-field scoped searches in positive and negative forms', () => {
                 const model = buildSqlWhereClause({ ...defaultFilters, searchQuery: 'model:pony' }, false, 'blur', []);
-                expect(model.where).toContain('(resolved_model_name LIKE ? OR json_extract(metadata_json, \'$.model\') LIKE ?)');
-                expect(model.params).toEqual(['%pony%', '%pony%']);
+                expect(model.where).toContain('(resolved_model_name LIKE ? OR json_extract(metadata_json, \'$.model\') LIKE ? OR json_extract(metadata_json, \'$.overrideModel\') LIKE ?)');
+                expect(model.params).toEqual(['%pony%', '%pony%', '%pony%']);
+
+                const negativeModel = buildSqlWhereClause({ ...defaultFilters, searchQuery: '-model:pony' }, false, 'blur', []);
+                expect(negativeModel.where).toContain('NOT (resolved_model_name LIKE ? OR json_extract(metadata_json, \'$.model\') LIKE ? OR json_extract(metadata_json, \'$.overrideModel\') LIKE ?)');
+                expect(negativeModel.params).toEqual(['%pony%', '%pony%', '%pony%']);
 
                 const all = buildSqlWhereClause({ ...defaultFilters, searchQuery: 'all:detail' }, false, 'blur', []);
                 expect(all.where).toContain('(path LIKE ? OR metadata_json LIKE ?)');
@@ -387,8 +391,8 @@ describe('sqlHelpers', () => {
             it('should AND OR prompt groups with advanced filters', () => {
                 const { where, params } = buildSqlWhereClause({ ...defaultFilters, searchQuery: 'orc OR elf model:pony' }, false, 'blur', []);
                 expect(where).toContain("(positive_prompt LIKE ? OR positive_prompt LIKE ?)");
-                expect(where).toContain("(resolved_model_name LIKE ? OR json_extract(metadata_json, '$.model') LIKE ?)");
-                expect(params).toEqual(['%orc%', '%elf%', '%pony%', '%pony%']);
+                expect(where).toContain("(resolved_model_name LIKE ? OR json_extract(metadata_json, '$.model') LIKE ? OR json_extract(metadata_json, '$.overrideModel') LIKE ?)");
+                expect(params).toEqual(['%orc%', '%elf%', '%pony%', '%pony%', '%pony%']);
             });
 
             it('should handle dangling OR safely', () => {

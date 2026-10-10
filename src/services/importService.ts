@@ -27,6 +27,30 @@ import {
 import { listenWithCleanup } from '../utils/tauriListener';
 import { cancelVideoImport, importVideoPaths, type VideoImportSummary } from './videoService';
 
+const USER_OVERRIDE_FIELDS = ['positivePrompt', 'negativePrompt', 'tool', 'model', 'overrideModel', 'generationType', 'generationMode'] as const;
+
+export const applyPersistedUserOverrides = (metadata: ImageMetadata, previous: Partial<ImageMetadata> | undefined): void => {
+    const sources = previous?.fieldSources;
+    if (!sources) return;
+    metadata.fieldSources = { ...metadata.fieldSources };
+    for (const key of USER_OVERRIDE_FIELDS) {
+        if (sources[key] !== 'user_override') continue;
+        const value = previous?.[key];
+        if (value === undefined) continue;
+        metadata[key] = value as never;
+        metadata.fieldSources[key] = 'user_override';
+    }
+    if (sources.model === 'user_override' || sources.overrideModel === 'user_override') {
+        const model = previous?.overrideModel || previous?.model;
+        if (model) {
+            metadata.model = model;
+            metadata.overrideModel = model;
+            metadata.fieldSources.model = 'user_override';
+            metadata.fieldSources.overrideModel = 'user_override';
+        }
+    }
+};
+
 /**
  * Queries the database for paths that already exist.
  * Used to skip already-imported files during rescan.
@@ -408,6 +432,14 @@ async function processImageFileEntries(
                     img.displayTimestamp = img.sourceKind === 'photograph'
                         ? (img.captureWallTimeMs ?? img.timestamp)
                         : img.timestamp;
+
+                    if (existing.metadataJson) {
+                        try {
+                            applyPersistedUserOverrides(img.metadata, JSON.parse(existing.metadataJson) as Partial<ImageMetadata>);
+                        } catch (error) {
+                            console.warn('[Import] Failed to preserve user metadata overrides', error);
+                        }
+                    }
                 });
 
                 const imagesToUpdate = batchImages.filter(img => {

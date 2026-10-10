@@ -61,7 +61,7 @@ export const MetadataGeneratorField: React.FC<MetadataGeneratorFieldProps> = ({
                                 setIsEditing(false);
                             }
                         }} autoFocus className="w-full rounded border border-gray-200 bg-white p-2 text-xs text-gray-900 outline-none focus:border-sage-500 dark:border-white/10 dark:bg-zinc-900 dark:text-white">
-                            {Object.values(GeneratorTool).map(tool => <option key={tool} value={tool}>{tool}</option>)}
+                            {Object.values(GeneratorTool).map(tool => <option key={tool} value={tool}>{tool === GeneratorTool.UNKNOWN || tool === GeneratorTool.OTHER ? t(tool) : tool}</option>)}
                         </select>
                         <div className="flex justify-end gap-2">
                             <button type="button" onClick={() => { setDraft(value); setIsEditing(false); }} className="px-2 py-1 text-xs text-gray-500 hover:text-gray-900 dark:text-zinc-500 dark:hover:text-white">{t('Cancel')}</button>
@@ -69,7 +69,7 @@ export const MetadataGeneratorField: React.FC<MetadataGeneratorFieldProps> = ({
                         </div>
                     </div>
                 ) : (
-                    <div className="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 pr-9 text-sm font-medium text-gray-700 dark:border-white/10 dark:bg-black dark:text-zinc-200">{value}</div>
+                    <div className="w-full rounded-lg border border-gray-200 bg-gray-50 p-2.5 pr-9 text-sm font-medium text-gray-700 dark:border-white/10 dark:bg-black dark:text-zinc-200">{value === GeneratorTool.UNKNOWN || value === GeneratorTool.OTHER ? t(value) : value}</div>
                 )}
             </div>
         </MetadataField>

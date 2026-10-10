@@ -6,7 +6,7 @@ import { ArchitectureSection } from '../ArchitectureSection';
 vi.mock('../FilterPrimitives', () => ({
     SectionHeader: ({ title, action, onToggle }: { title: string; action?: React.ReactNode; onToggle: () => void }) => <div><button onClick={onToggle}>{title}</button>{action}</div>,
     SearchInput: ({ value, onChange, placeholder }: { value: string; onChange: (value: string) => void; placeholder: string }) => <input value={value} onChange={event => onChange(event.target.value)} placeholder={placeholder} />,
-    SelectableRow: ({ label, isSelected, onClick }: { label: string; isSelected: boolean; onClick: () => void }) => <button data-selected={isSelected} onClick={onClick}>{label}</button>
+    SelectableRow: ({ label, detail, isSelected, onClick }: { label: string; detail?: string; isSelected: boolean; onClick: () => void }) => <button data-selected={isSelected} onClick={onClick}>{label}{detail ? ` ${detail}` : ''}</button>
 }));
 
 const filters = (models: string[] = []): FilterState => ({
@@ -18,7 +18,7 @@ describe('ArchitectureSection', () => {
     it('stays collapsed and forwards header toggles', () => {
         const onToggle = vi.fn();
         render(<ArchitectureSection filters={filters()} setFilters={vi.fn()} models={['flux']} isOpen={false} onToggle={onToggle} />);
-        fireEvent.click(screen.getByText('Model Architecture'));
+        fireEvent.click(screen.getByText('Model'));
         expect(onToggle).toHaveBeenCalledTimes(1);
         expect(screen.queryByRole('button', { name: 'Search Models' })).toBeNull();
     });
@@ -32,15 +32,32 @@ describe('ArchitectureSection', () => {
         const { container } = render(<ArchitectureSection filters={current} setFilters={setFilters} models={models} isOpen onToggle={vi.fn()} />);
 
         expect(container.querySelector('.max-h-48')).toBeTruthy();
+        expect(screen.getByPlaceholderText('Search models...')).toBeTruthy();
+        expect(screen.queryByRole('button', { name: 'Search Models' })).toBeNull();
         fireEvent.click(screen.getByText('flux-dev'));
         expect(current.models).toEqual([]);
         fireEvent.click(screen.getByText('sdxl_base'));
         expect(current.models).toEqual(['sdxl_base']);
 
-        fireEvent.click(screen.getByRole('button', { name: 'Search Models' }));
         fireEvent.change(screen.getByPlaceholderText('Search models...'), { target: { value: 'missing' } });
         expect(screen.getByText('No models found')).toBeTruthy();
-        fireEvent.click(screen.getByRole('button', { name: 'Hide Model Search' }));
+    });
+
+    it('shows counts and keeps the search toggle for a short list', () => {
+        render(
+            <ArchitectureSection
+                filters={filters()}
+                setFilters={vi.fn()}
+                models={[{ name: 'Nano', count: 3 }, { name: 'Unknown', count: 1 }]}
+                isOpen
+                onToggle={vi.fn()}
+            />
+        );
+
+        expect(screen.getByText('Nano 3')).toBeTruthy();
+        expect(screen.getByText('Unknown 1')).toBeTruthy();
         expect(screen.queryByPlaceholderText('Search models...')).toBeNull();
+        fireEvent.click(screen.getByRole('button', { name: 'Search Models' }));
+        expect(screen.getByPlaceholderText('Search models...')).toBeTruthy();
     });
 });

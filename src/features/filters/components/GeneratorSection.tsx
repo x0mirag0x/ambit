@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { FilterState, GeneratorTool } from '../../../types';
 import { SectionHeader, SelectableRow } from './FilterPrimitives';
+import { localizeFilterSentinel } from '../filterLabels';
 import { useTranslation } from 'react-i18next';
 
 interface GeneratorSectionProps {
@@ -57,7 +58,7 @@ export const GeneratorSection: React.FC<GeneratorSectionProps> = ({
                         return (
                             <SelectableRow
                                 key={tool}
-                                label={tool === 'Unknown' ? t('Unknown') : tool}
+                                label={localizeFilterSentinel(tool, t)}
                                 isSelected={filters.tools.includes(tool as GeneratorTool)}
                                 onClick={() => toggleTool(tool as GeneratorTool)}
                                 className={available ? '' : 'opacity-40 line-through'}

@@ -5,6 +5,7 @@ import { AIImage, AppSettings, RecoveryStyle } from '../types';
 import { useToast } from './useToast';
 import { imageToAnalysisBase64 } from '../services/imageService';
 import { useLibraryStore } from '../stores/libraryStore';
+import { useVisualSearchStore } from '../stores/visualSearchStore';
 import { useSettingsStore } from '../stores/settingsStore';
 import {
     getImagesByIds,
@@ -55,6 +56,7 @@ export const useMaintenanceOps = ({
             const result = await removeImagesFromLibrary(ids);
             const affectedIds = new Set(result.affectedIds);
             setImages(prev => prev.filter(img => !affectedIds.has(img.id)));
+            useVisualSearchStore.getState().removeByIds(affectedIds);
             removeImagesFromQueryCaches(queryClient, affectedIds);
             addToast(t('toast.removedItems', { count: affectedIds.size }), 'success');
 

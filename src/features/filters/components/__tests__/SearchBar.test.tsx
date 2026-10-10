@@ -4,6 +4,7 @@ import { act, fireEvent, render, screen } from '../../../../test/testUtils';
 import { SearchBar } from '../SearchBar';
 import { FilterState } from '../../../../types';
 import { createDefaultFilters } from '../../../../utils/filterState';
+import type { Facets } from '../../../../services/db/searchRepo';
 
 const searchContextMocks = vi.hoisted(() => ({
     useSearch: vi.fn(),
@@ -35,6 +36,7 @@ interface SearchHarnessOptions {
     isFiltering?: boolean;
     submitNavigatesToGrid?: boolean;
     onDraftPendingChange?: (isPending: boolean) => void;
+    facets?: Facets;
 }
 
 const renderSearchBar = (initialFilters: FilterState = createDefaultFilters(), options: SearchHarnessOptions = {}) => {
@@ -51,6 +53,7 @@ const renderSearchBar = (initialFilters: FilterState = createDefaultFilters(), o
     searchContextMocks.useSearch.mockImplementation(() => ({
         filters: currentFilters,
         setFilters,
+        facets: options.facets,
     }));
 
     const view = render(
@@ -254,6 +257,39 @@ describe('SearchBar query readiness and trigger behavior', () => {
         fireEvent.keyDown(input, { key: 'ArrowDown' });
         fireEvent.keyDown(input, { key: 'Tab' });
         expect((input as HTMLInputElement).value).toBe('model: x file:');
+    });
+
+    it('suggests library models after model: including names with spaces', async () => {
+        renderSearchBar(createDefaultFilters(), {
+            facets: {
+                checkpoints: [
+                    { name: 'Nano', count: 2 },
+                    { name: 'Seedance 2.5', count: 4 },
+                    { name: 'Unknown', count: 9 },
+                ],
+                loras: [],
+                embeddings: [],
+                hypernetworks: [],
+                controlNets: [],
+                ipAdapters: [],
+                tools: [],
+            },
+        });
+        await flushSearchPopover();
+        const input = screen.getByRole('combobox');
+
+        fireEvent.change(input, { target: { value: 'model:' } });
+        expect(screen.getByRole('option', { name: /model:Nano/ })).toBeTruthy();
+        expect(screen.getByRole('option', { name: /"model:Seedance 2\.5"/ })).toBeTruthy();
+        expect(screen.queryByRole('option', { name: /Unknown/ })).toBeNull();
+
+        fireEvent.keyDown(input, { key: 'ArrowDown' });
+        fireEvent.keyDown(input, { key: 'Enter' });
+        expect((input as HTMLInputElement).value).toBe('model:Nano ');
+
+        fireEvent.change(input, { target: { value: 'model:seed' } });
+        fireEvent.click(screen.getByRole('option', { name: /Seedance 2\.5/ }));
+        expect((input as HTMLInputElement).value).toBe('"model:Seedance 2.5" ');
     });
 
     it('falls through unrelated keys and submits when no suggestion is active', async () => {

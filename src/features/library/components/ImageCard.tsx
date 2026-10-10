@@ -4,12 +4,30 @@ import * as React from 'react';
 import { useState } from 'react';
 import { formatImageDisplayDate } from '../../../utils/imageDates';
 import { Heart, CheckCircle, Pin, EyeOff, Unlink, Image as ImageIcon, Trash2, Play, Video } from 'lucide-react';
-import { AIImage, isVideoAsset, getEffectiveSourceKind } from '../../../types';
+import { AIImage, ImageMetadata, isVideoAsset, getEffectiveSourceKind } from '../../../types';
 import { SmartImage } from '../../../features/library/components/SmartImage';
 import { formatModelName } from '../../../utils/formatUtils';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import { getInvokeImageAssetLabel } from '../../../utils/invokeImageSource';
 import { useTranslation } from 'react-i18next';
+
+const isUnknownModelName = (value: string): boolean => {
+  const normalized = value.trim().toLocaleLowerCase();
+  return normalized === '' || normalized === 'unknown' || normalized === 'unknown model';
+};
+
+const generationModelLabel = (metadata: ImageMetadata): string => {
+  const override = metadata.overrideModel?.trim();
+  if (override) return formatModelName(override);
+  const modelValue = metadata.model as unknown;
+  const raw = typeof modelValue === 'string'
+    ? modelValue
+    : modelValue && typeof modelValue === 'object' && 'name' in modelValue
+      ? String((modelValue as { name?: unknown }).name ?? '')
+      : '';
+  if (isUnknownModelName(raw)) return '';
+  return formatModelName(raw);
+};
 
 interface ImageCardProps {
   image: AIImage;
@@ -54,6 +72,20 @@ export const ImageCard: React.FC<ImageCardProps> = ({
   const hasVideoPoster = isVideo && image.thumbnailSource === 'ambit-video-v1';
   const invokeAssetLabel = getInvokeImageAssetLabel(image.invokeImageCategory);
   const invokeAssetMarkerLabel = invokeAssetLabel ? `Asset · ${invokeAssetLabel}` : undefined;
+  const modelLabel = generationModelLabel(image.metadata);
+  const typeLabel = isVideo
+    ? t('Video')
+    : sourceKind === 'photograph'
+      ? t('Photo')
+      : sourceKind === 'other'
+        ? t('Other')
+        : '';
+  const generatedBadge = modelLabel
+    || (image.metadata.modelHash ? `Hash: ${image.metadata.modelHash.slice(0, 8)}` : '')
+    || t('Model');
+  const badgeTitle = typeLabel
+    ? (modelLabel ? `${typeLabel} · ${modelLabel}` : typeLabel)
+    : generatedBadge;
 
   // Auto-blur when mouse leaves the card area for privacy
   const handleMouseLeave = () => {
@@ -220,22 +252,15 @@ export const ImageCard: React.FC<ImageCardProps> = ({
         <div className={`pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-gray-900/90 via-transparent to-transparent transition-opacity duration-300 ease-spring p-4 flex flex-col justify-end ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 focus-within:opacity-100'}`}>
           <div className="flex justify-between items-end translate-y-4 group-hover:translate-y-0 focus-within:translate-y-0 transition-transform duration-500 ease-spring">
             <div className="min-w-0">
-              <div className="text-xs font-bold text-white truncate drop-shadow-md font-sans">
-                {(() => {
-                  if (isVideo) return image.videoCodec;
-                  if (sourceKind === 'photograph') return image.photoMetadata?.cameraModel || 'Photo';
-                  if (sourceKind === 'other') return 'Other';
-                  const modelValue = image.metadata.model as unknown;
-                  const model = typeof modelValue === 'string'
-                    ? modelValue
-                    : modelValue && typeof modelValue === 'object' && 'name' in modelValue
-                      ? String((modelValue as { name?: unknown }).name || '')
-                      : '';
-                  if (image.metadata.overrideModel) return formatModelName(image.metadata.overrideModel);
-                  if (model && model !== 'Unknown') return formatModelName(model);
-                  if (image.metadata.modelHash) return `Hash: ${image.metadata.modelHash.slice(0, 8)}`;
-                  return 'Model';
-                })()}
+              <div className="flex min-w-0 text-xs font-bold text-white drop-shadow-md font-sans" title={badgeTitle}>
+                {typeLabel ? (
+                  <>
+                    <span className="shrink-0">{typeLabel}</span>
+                    {modelLabel ? <span className="min-w-0 truncate"> · {modelLabel}</span> : null}
+                  </>
+                ) : (
+                  <span className="min-w-0 truncate">{generatedBadge}</span>
+                )}
               </div>
               <div className="text-[10px] text-gray-300 font-mono">
                 {!isVideo && sourceKind !== 'generated' ? t('{{v0}} · ', { v0: formatImageDisplayDate(image) }) : ''}

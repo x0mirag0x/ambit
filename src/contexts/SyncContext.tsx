@@ -956,8 +956,8 @@ export const SyncProvider: React.FC<{
                     : undefined;
                 addToast(
                     failureMessage
-                        ? `Could not change InvokeAI owner scope: ${failureMessage.replace(/[.!?]+$/, '')}. The previous view was restored.`
-                        : 'Could not change InvokeAI owner scope. The previous view was restored.',
+                        ? t('Could not change InvokeAI owner scope: {{v0}}. The previous view was restored.', { v0: failureMessage.replace(/[.!?]+$/, '') })
+                        : t('Could not change InvokeAI owner scope. The previous view was restored.'),
                     'error'
                 );
                 return false;
@@ -1120,7 +1120,7 @@ export const SyncProvider: React.FC<{
         const ownerAdmission = await ensureInvokeOwnerScope();
         if (!ownerAdmission.allowed || !ownerAdmission.scope) {
             if (options.mode === 'manual') {
-                addToast(ownerAdmission.reason || 'InvokeAI sync is blocked by owner scope.', 'warning');
+                addToast(ownerAdmission.reason || t('InvokeAI sync is blocked by owner scope.'), 'warning');
             } else {
                 console.info('[InvokeAI Sync] Skipped by owner scope.', { reason: ownerAdmission.reason });
             }

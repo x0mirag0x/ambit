@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { AIImage, AppSettings, FilterState, Collection, RecoveryStyle, getDetectedSourceKind, isVideoAsset, type SourceKind } from '../types';
 import { useToast } from './useToast';
 import { useSearchStore } from '../stores/searchStore';
+import { useVisualSearchStore } from '../stores/visualSearchStore';
 import { useSettingsStore } from '../stores/settingsStore';
 import { useCollectionStore } from '../stores/collectionStore';
 import {
@@ -90,13 +91,31 @@ export const useAppActions = ({
     const refreshSmartCounts = useCollectionStore(s => s.refreshSmartCounts);
 
     const { openModal, closeModal, pendingViewerDeleteId, setPendingViewerDeleteId } = modals;
-    const getImage = (id: string) => activeImageState?.getImage(id) ?? images.find(image => image.id === id);
+    const getImage = (id: string) => (
+        activeImageState?.getImage(id)
+        ?? images.find(image => image.id === id)
+        ?? useVisualSearchStore.getState().images.find(image => image.id === id)
+    );
     const updateImage = (id: string, updater: (image: AIImage) => AIImage) => {
         if (activeImageState) {
             activeImageState.updateImage(id, updater);
-            return;
+        } else {
+            setImages(prev => prev.map(image => image.id === id ? updater(image) : image));
         }
-        setImages(prev => prev.map(image => image.id === id ? updater(image) : image));
+        useVisualSearchStore.getState().patchByIds([id], updater);
+    };
+    const patchVisibleResults = (ids: Iterable<string>, updater: (image: AIImage) => AIImage) => {
+        useVisualSearchStore.getState().patchByIds(ids, updater);
+    };
+    const selectedActionImages = (ids: Iterable<string>) => {
+        const visualImages = useVisualSearchStore.getState().active
+            ? useVisualSearchStore.getState().images
+            : [];
+        return Array.from(ids).flatMap((id) => {
+            const image = images.find(candidate => candidate.id === id)
+                ?? visualImages.find(candidate => candidate.id === id);
+            return image ? [image] : [];
+        });
     };
 
     const refreshCollectionsAfterImageFlagChange = React.useCallback(() => {
@@ -214,7 +233,8 @@ export const useAppActions = ({
     }, [settings.confirmDelete, openModal, setPendingViewerDeleteId, executeDeleteByIds]);
 
     const handleDeleteViewerImage = (id: string) => {
-        requestDeleteForId(id);
+        setPendingViewerDeleteId(id);
+        openModal('deleteConfirm');
     };
 
     const handleExportConfirm = async (filename: string, folder: string, ids?: Set<string>) => {
@@ -226,11 +246,15 @@ export const useAppActions = ({
     };
 
     const handleBulkFavorite = () => {
-        const anyUnfavorite = images.some(img => selectedIds.has(img.id) && !img.isFavorite);
-        const previousImages = images;
         const ids = Array.from(selectedIds);
+        const selectedImages = selectedActionImages(ids);
+        const anyUnfavorite = selectedImages.some(img => !img.isFavorite);
+        const previousImages = images;
 
         setImages(prev => prev.map(img => selectedIds.has(img.id) ? { ...img, isFavorite: anyUnfavorite } : img));
+        patchVisibleResults(ids, image => (
+            image.isFavorite === anyUnfavorite ? image : { ...image, isFavorite: anyUnfavorite }
+        ));
         patchImageFlagsInQueryCaches(queryClient, ids, { isFavorite: anyUnfavorite });
 
         void persistFavoriteChanges(ids, anyUnfavorite, previousImages);
@@ -256,9 +280,10 @@ export const useAppActions = ({
     };
 
     const handleBulkPin = () => {
-        const anyUnpinned = images.some(img => selectedIds.has(img.id) && !img.isPinned);
-        const previousImages = images;
         const ids = Array.from(selectedIds);
+        const selectedImages = selectedActionImages(ids);
+        const anyUnpinned = selectedImages.some(img => !img.isPinned);
+        const previousImages = images;
         const nextImages = applyOptimisticPinOrder(
             previousImages,
             ids,
@@ -267,6 +292,9 @@ export const useAppActions = ({
         );
 
         setImages(nextImages);
+        patchVisibleResults(ids, image => (
+            image.isPinned === anyUnpinned ? image : { ...image, isPinned: anyUnpinned }
+        ));
         patchImageFlagsInQueryCaches(queryClient, ids, { isPinned: anyUnpinned }, {
             previousOrder: previousImages,
             nextOrder: nextImages,
@@ -295,7 +323,7 @@ export const useAppActions = ({
 
             let newValue = overrideValue;
             if (newValue === undefined) {
-                const currentImage = images.find(candidate => candidate.id === image.id);
+                const currentImage = getImage(image.id);
                 if (!currentImage) return image;
                 newValue = !currentImage.userMasked;
             }
@@ -305,6 +333,7 @@ export const useAppActions = ({
         };
 
         setImages(prev => prev.map(updateMaskedImage));
+        patchVisibleResults(idsToToggle, updateMaskedImage);
         updateImagesQueryCaches(queryClient, updateMaskedImage);
 
         const promises: Promise<void>[] = [];
@@ -313,7 +342,7 @@ export const useAppActions = ({
             if (overrideValue !== undefined) {
                 promises.push(toggleImageMask(id, overrideValue));
             } else {
-                const img = images.find(i => i.id === id);
+                const img = getImage(id);
                 if (img) {
                     promises.push(toggleImageMask(id, !img.userMasked));
                 }
@@ -367,6 +396,7 @@ export const useAppActions = ({
 
             setImages(previous => previous.map(patchImage));
             setViewerSessionImages(previous => previous?.map(patchImage) ?? null);
+            patchVisibleResults(ids, patchImage);
             await Promise.all([
                 queryClient.invalidateQueries({ queryKey: ['images'] }),
                 queryClient.invalidateQueries({ queryKey: ['libraryStats'] }),
@@ -478,6 +508,9 @@ export const useAppActions = ({
             activeImageState.updateImage(id, image => ({ ...image, isPinned: newPinned }));
             patchImageFlagsInQueryCaches(queryClient, [id], { isPinned: newPinned });
         }
+        patchVisibleResults([id], image => (
+            image.isPinned === newPinned ? image : { ...image, isPinned: newPinned }
+        ));
 
         if (options.showToast !== false) {
             addToast(newPinned ? t("Pinned to top") : t("Unpinned"), "info");

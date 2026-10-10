@@ -11,6 +11,7 @@ mod startup_log;
 #[cfg(windows)]
 mod startup_webview;
 mod thumb;
+mod visual;
 mod watcher;
 
 #[cfg(all(feature = "qa-profile", not(debug_assertions)))]
@@ -50,6 +51,9 @@ pub fn create_builder() -> tauri_specta::Builder<tauri::Wry> {
             security::delete_api_key,
             // db commands
             db::commands::image_commands::save_images_batch,
+            db::commands::visual_commands::search_similar_images,
+            db::commands::visual_commands::get_image_palette,
+            db::commands::visual_commands::backfill_visual_signatures,
             db::commands::image_commands::reconcile_invoke_owner_inventory,
             db::commands::image_commands::reconcile_invoke_image_sources,
             db::commands::image_commands::replace_invoke_image_references,
