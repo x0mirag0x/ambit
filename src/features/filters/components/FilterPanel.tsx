@@ -13,7 +13,8 @@ import type { FacetItem } from '../../../services/db/searchRepo';
 import { DateRangeSection } from './DateRangeSection';
 import { getDateFilterLabel } from '../../../utils/dateFilters';
 import { GuidanceSection } from './GuidanceSection';
-import { APP_NAME } from '../../../constants/app';
+import { DvoynaWordmark } from '../../../components/brand/DvoynaWordmark';
+import { ColorFilterSection } from './ColorFilterSection';
 import { REPOSITORY_URL } from '../../../constants/support';
 import { useAppVersion } from '../../../hooks/useAppVersion';
 import { openExternalUrl } from '../../../utils/externalLinks';
@@ -216,7 +217,8 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                 minCfg: undefined,
                 maxCfg: undefined,
                 controlNets: [],
-                ipAdapters: []
+                ipAdapters: [],
+                similarColor: undefined
                 // Preserve collectionId and view options
             }));
         } else {
@@ -231,7 +233,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
     // Tab-Specific Dirty Checks (for dot indicators)
     // Note: dateRange is NOT included in isOrganizeDirty because Date Range is a global section in the footer, not part of Organize tab
     const isOrganizeDirty = !!(filters.collectionId || filters.favoritesOnly || filters.pinnedOnly);
-    const isGenerateDirty = !!(filters.tools.length > 0 || filters.minSteps || filters.maxSteps || filters.minCfg || filters.maxCfg || (filters.samplers && filters.samplers.length > 0) || (filters.generationTypes && filters.generationTypes.length > 0) || filters.controlNets.length > 0 || filters.ipAdapters.length > 0);
+    const isGenerateDirty = !!(filters.tools.length > 0 || filters.minSteps || filters.maxSteps || filters.minCfg || filters.maxCfg || (filters.samplers && filters.samplers.length > 0) || (filters.generationTypes && filters.generationTypes.length > 0) || filters.controlNets.length > 0 || filters.ipAdapters.length > 0 || filters.similarColor);
     const isResourcesDirty = !!(filters.models.length > 0 || filters.loras.length > 0 || (filters.embeddings && filters.embeddings.length > 0) || (filters.hypernetworks && filters.hypernetworks.length > 0) || filters.controlNets.length > 0 || filters.ipAdapters.length > 0);
 
     const allResourceItems = React.useMemo(() => [
@@ -506,6 +508,8 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                                 isOpen={expanded.params} onToggle={() => toggleSection('params')}
                             />
 
+                            <ColorFilterSection filters={filters} setFilters={setFilters} />
+
                             <GuidanceSection
                                 filters={filters} setFilters={setFilters}
                                 isOpen={expanded.guidance} onToggle={() => toggleSection('guidance')}
@@ -524,7 +528,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
             {/* Footer / Status */}
             <div className="p-4 border-t border-gray-200 dark:border-white/5 text-[10px] text-gray-600 dark:text-zinc-400 flex items-center justify-between min-w-[18rem]">
                 <div className="flex items-center gap-2">
-                    <span className="font-medium hover:text-gray-900 dark:hover:text-zinc-200 transition-colors cursor-default">{APP_NAME}</span>
+                    <DvoynaWordmark className="text-[22px] leading-none" />
                 </div>
                 <div className="flex items-center gap-3">
                     <TooltipButton

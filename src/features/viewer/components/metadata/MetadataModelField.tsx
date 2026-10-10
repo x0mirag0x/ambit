@@ -209,8 +209,8 @@ export const MetadataModelField: React.FC<MetadataModelFieldProps> = ({
                     </div>
                 ) : (
                     <div className="flex w-full items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-2.5 pr-9 dark:border-white/10 dark:bg-black">
-                        <div className={`truncate text-sm font-medium text-gray-900 dark:text-gray-100 ${presentation.isHashFallback ? 'font-mono' : 'font-sans'}`} title={presentation.value}>
-                            {presentation.isHashFallback ? presentation.value : formatModelName(presentation.value)}
+                        <div className={`truncate text-sm font-medium text-gray-900 dark:text-gray-100 ${presentation.isHashFallback ? 'font-mono' : 'font-sans'}`} title={presentation.value === 'Unknown' ? t('Unknown') : presentation.value}>
+                            {presentation.isHashFallback ? presentation.value : presentation.value === 'Unknown' ? t('Unknown') : formatModelName(presentation.value)}
                         </div>
                         {presentation.isHashFallback ? <TooltipButton
                             label={t('About unresolved model hash')}

@@ -151,11 +151,29 @@ export function mapRowToImage(row: ImageRow): AIImage {
         ...buildLightMetadata(row),
         ...metadata,
         seed: asNumber(metadata.seed) ?? asNumber(row.seed),
-        model: asString(row.resolved_model_name) || metadata.model || asString(row.model_name) || 'Unknown',
         modelHash: metadata.modelHash || asString(row.model_hash),
-        tool: (metadata.tool || asString(row.tool) || GeneratorTool.UNKNOWN) as GeneratorTool,
-        positivePrompt: metadata.positivePrompt || asString(row.positive_prompt) || '',
-        negativePrompt: metadata.negativePrompt || asString(row.negative_prompt) || ''
+        model: (metadata.fieldSources?.model === 'user_override' || metadata.fieldSources?.overrideModel === 'user_override')
+            ? (asString(row.resolved_model_name) || metadata.overrideModel || metadata.model || 'Unknown')
+            : (asString(row.resolved_model_name) || metadata.model || asString(row.model_name) || 'Unknown'),
+        positivePrompt: metadata.fieldSources?.positivePrompt === 'user_override'
+            ? (asString(row.positive_prompt) || metadata.positivePrompt || '')
+            : (metadata.positivePrompt || asString(row.positive_prompt) || ''),
+        negativePrompt: metadata.fieldSources?.negativePrompt === 'user_override'
+            ? (asString(row.negative_prompt) || metadata.negativePrompt || '')
+            : (metadata.negativePrompt || asString(row.negative_prompt) || ''),
+        tool: (metadata.fieldSources?.tool === 'user_override'
+            ? (asString(row.tool) || metadata.tool)
+            : (metadata.tool || asString(row.tool) || GeneratorTool.UNKNOWN)) as GeneratorTool,
+        generationType: (metadata.fieldSources?.generationType === 'user_override' || metadata.fieldSources?.generationMode === 'user_override')
+            ? ((asString(row.generation_type) || metadata.generationType || 'unknown') as ImageMetadata['generationType'])
+            : metadata.generationType,
+        generationMode: asString(row.media_type) === 'video'
+            ? asVideoGenerationMode(
+                (metadata.fieldSources?.generationMode === 'user_override' || metadata.fieldSources?.generationType === 'user_override')
+                    ? (asString(row.generation_type) || metadata.generationMode)
+                    : (metadata.generationMode || asString(row.generation_type))
+            )
+            : metadata.generationMode
     };
     const originalMetadata = parseJson<ImageMetadata>(row.original_parsed_json);
 

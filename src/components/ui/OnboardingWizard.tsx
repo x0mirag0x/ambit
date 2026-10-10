@@ -174,7 +174,7 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({
 
             setVerificationStatus('success');
             addToast(
-                overrideKey ? 'Environment API key verified' : 'API key verified and saved securely',
+                overrideKey ? t('Environment API key verified') : t('API key verified and saved securely'),
                 'success'
             );
         } catch (error) {

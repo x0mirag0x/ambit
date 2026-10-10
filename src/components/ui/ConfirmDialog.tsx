@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, Trash2, X, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -86,7 +87,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
     }
   };
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div
@@ -149,7 +150,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                     <span className="flex items-center justify-center gap-2">
                       <Loader2 className="w-5 h-5 animate-spin" />
                       {t('Processing...')}</span>
-                  ) : confirmLabel}
+                  ) : t(confirmLabel)}
                 </button>
                 <button
                   onClick={onCancel}
@@ -174,6 +175,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 };

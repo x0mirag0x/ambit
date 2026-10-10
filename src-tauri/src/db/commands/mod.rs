@@ -6,6 +6,7 @@ pub mod filter_commands;
 pub mod image_commands;
 pub mod maintenance;
 pub mod reparse_commands;
+pub mod visual_commands;
 
 /// Standard wrapper for Tauri commands to reduce boilerplate.
 /// Handles async spawn_blocking, connection setup, and error mapping.

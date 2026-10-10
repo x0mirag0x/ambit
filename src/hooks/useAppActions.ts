@@ -214,7 +214,8 @@ export const useAppActions = ({
     }, [settings.confirmDelete, openModal, setPendingViewerDeleteId, executeDeleteByIds]);
 
     const handleDeleteViewerImage = (id: string) => {
-        requestDeleteForId(id);
+        setPendingViewerDeleteId(id);
+        openModal('deleteConfirm');
     };
 
     const handleExportConfirm = async (filename: string, folder: string, ids?: Set<string>) => {

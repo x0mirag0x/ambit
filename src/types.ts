@@ -263,6 +263,8 @@ export interface FilterState {
   hypernetworks: string[];
   samplers: string[]; // Filter by sampler name
   generationTypes: string[]; // Filter by generation type (txt2img, img2img, etc.)
+  /** Dominant-colour search. Absent until the user picks a swatch. */
+  similarColor?: string;
   controlNets: string[];
   ipAdapters: string[];
   dateRange: 'all' | 'today' | 'week' | 'month' | 'custom';

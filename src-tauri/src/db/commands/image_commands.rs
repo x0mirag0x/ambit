@@ -543,7 +543,7 @@ fn save_images_batch_inner(
                     CAST(json_extract(?8, '$.seed') AS INTEGER),
                     CAST(json_extract(?8, '$.cfg') AS REAL),
                     REPLACE(REPLACE(LOWER(json_extract(?8, '$.sampler')), '_', ' '), '-', ' '),
-                    json_extract(?8, '$.generationType'),
+                    COALESCE(NULLIF(json_extract(?8, '$.generationMode'), ''), json_extract(?8, '$.generationType')),
                     ?27,
                     ?8,
                     COALESCE(NULLIF(json_extract(?8, '$.positivePrompt'), ''), NULLIF(json_extract(?8, '$.positive_prompt'), '')),
@@ -563,7 +563,26 @@ fn save_images_batch_inner(
                     timestamp=excluded.timestamp,
                     file_size=excluded.file_size,
                     file_hash=excluded.file_hash,
-                    metadata_json=excluded.metadata_json,
+                    metadata_json=CASE
+                        WHEN json_extract(images.metadata_json, '$.fieldSources.positivePrompt') = 'user_override'
+                          OR json_extract(images.metadata_json, '$.fieldSources.negativePrompt') = 'user_override'
+                          OR json_extract(images.metadata_json, '$.fieldSources.tool') = 'user_override'
+                          OR json_extract(images.metadata_json, '$.fieldSources.model') = 'user_override'
+                          OR json_extract(images.metadata_json, '$.fieldSources.overrideModel') = 'user_override'
+                          OR json_extract(images.metadata_json, '$.fieldSources.generationMode') = 'user_override'
+                          OR json_extract(images.metadata_json, '$.fieldSources.generationType') = 'user_override'
+                        THEN json_patch(excluded.metadata_json, json_object(
+                            'positivePrompt', CASE WHEN json_extract(images.metadata_json, '$.fieldSources.positivePrompt') = 'user_override' THEN json_extract(images.metadata_json, '$.positivePrompt') ELSE json_extract(excluded.metadata_json, '$.positivePrompt') END,
+                            'negativePrompt', CASE WHEN json_extract(images.metadata_json, '$.fieldSources.negativePrompt') = 'user_override' THEN json_extract(images.metadata_json, '$.negativePrompt') ELSE json_extract(excluded.metadata_json, '$.negativePrompt') END,
+                            'tool', CASE WHEN json_extract(images.metadata_json, '$.fieldSources.tool') = 'user_override' THEN json_extract(images.metadata_json, '$.tool') ELSE json_extract(excluded.metadata_json, '$.tool') END,
+                            'model', CASE WHEN json_extract(images.metadata_json, '$.fieldSources.model') = 'user_override' OR json_extract(images.metadata_json, '$.fieldSources.overrideModel') = 'user_override' THEN COALESCE(json_extract(images.metadata_json, '$.overrideModel'), json_extract(images.metadata_json, '$.model')) ELSE json_extract(excluded.metadata_json, '$.model') END,
+                            'overrideModel', CASE WHEN json_extract(images.metadata_json, '$.fieldSources.overrideModel') = 'user_override' OR json_extract(images.metadata_json, '$.fieldSources.model') = 'user_override' THEN COALESCE(json_extract(images.metadata_json, '$.overrideModel'), json_extract(images.metadata_json, '$.model')) ELSE json_extract(excluded.metadata_json, '$.overrideModel') END,
+                            'generationType', CASE WHEN json_extract(images.metadata_json, '$.fieldSources.generationType') = 'user_override' OR json_extract(images.metadata_json, '$.fieldSources.generationMode') = 'user_override' THEN COALESCE(json_extract(images.metadata_json, '$.generationType'), json_extract(images.metadata_json, '$.generationMode')) ELSE json_extract(excluded.metadata_json, '$.generationType') END,
+                            'generationMode', CASE WHEN json_extract(images.metadata_json, '$.fieldSources.generationMode') = 'user_override' OR json_extract(images.metadata_json, '$.fieldSources.generationType') = 'user_override' THEN COALESCE(json_extract(images.metadata_json, '$.generationMode'), json_extract(images.metadata_json, '$.generationType')) ELSE json_extract(excluded.metadata_json, '$.generationMode') END,
+                            'fieldSources', json_patch(IFNULL(json_extract(excluded.metadata_json, '$.fieldSources'), json('{}')), IFNULL(json_extract(images.metadata_json, '$.fieldSources'), json('{}')))
+                        ))
+                        ELSE excluded.metadata_json
+                    END,
                     thumbnail_path=CASE
                         WHEN (__PRESERVE_ACTIVE_REPLACEMENT__) THEN images.thumbnail_path
                         ELSE COALESCE(NULLIF(excluded.thumbnail_path, ''), images.thumbnail_path)
@@ -638,17 +657,17 @@ fn save_images_batch_inner(
                     invoke_source_id=COALESCE(excluded.invoke_source_id, images.invoke_source_id),
                     model_hash=excluded.model_hash,
                     model_name=excluded.model_name,
-                    tool=excluded.tool,
-                    resolved_model_name=excluded.resolved_model_name,
+                    tool=CASE WHEN json_extract(images.metadata_json, '$.fieldSources.tool') = 'user_override' THEN images.tool ELSE excluded.tool END,
+                    resolved_model_name=CASE WHEN json_extract(images.metadata_json, '$.fieldSources.model') = 'user_override' OR json_extract(images.metadata_json, '$.fieldSources.overrideModel') = 'user_override' THEN images.resolved_model_name ELSE excluded.resolved_model_name END,
                     steps=excluded.steps,
                     seed=excluded.seed,
                     cfg=excluded.cfg,
                     sampler=excluded.sampler,
-                    generation_type=excluded.generation_type,
+                    generation_type=CASE WHEN json_extract(images.metadata_json, '$.fieldSources.generationMode') = 'user_override' OR json_extract(images.metadata_json, '$.fieldSources.generationType') = 'user_override' THEN images.generation_type ELSE excluded.generation_type END,
                     parser_version=excluded.parser_version,
                     original_parsed_json=COALESCE(images.original_parsed_json, excluded.original_parsed_json),
-                    positive_prompt=excluded.positive_prompt,
-                    negative_prompt=excluded.negative_prompt,
+                    positive_prompt=CASE WHEN json_extract(images.metadata_json, '$.fieldSources.positivePrompt') = 'user_override' THEN images.positive_prompt ELSE excluded.positive_prompt END,
+                    negative_prompt=CASE WHEN json_extract(images.metadata_json, '$.fieldSources.negativePrompt') = 'user_override' THEN images.negative_prompt ELSE excluded.negative_prompt END,
                     detected_source_kind=excluded.detected_source_kind,
                     source_kind_override=images.source_kind_override,
                     source_kind=COALESCE(images.source_kind_override, excluded.detected_source_kind),
@@ -881,6 +900,12 @@ fn save_images_batch_inner(
                 ip_stmt
                     .execute(params![img.id, img.metadata_json])
                     .map_err(|e| e.to_string())?;
+                crate::db::commands::visual_commands::store_visual_signature(
+                    &tx,
+                    &img.id,
+                    &img.path,
+                    img.is_missing || img.is_deleted,
+                )?;
             }
         }
 
@@ -3269,6 +3294,45 @@ mod tests {
             conn.execute_batch(&migration.sql)
                 .expect("apply migrations");
         }
+    }
+
+    #[test]
+    fn rescan_keeps_user_metadata_overrides() {
+        let conn = Connection::open_in_memory().expect("memory db");
+        apply_all_migrations(&conn);
+        let mut image = create_image_record(
+            "keep",
+            10,
+            20,
+            r#"{"model":"Parsed","tool":"ComfyUI","positivePrompt":"parsed prompt","negativePrompt":"parsed negative","generationType":"txt2img"}"#,
+        );
+        super::save_images_batch_inner(&conn, &[image.clone()]).expect("insert");
+        conn.execute(
+            "UPDATE images SET metadata_json = ?1, positive_prompt = 'user prompt', negative_prompt = 'user negative', tool = 'Midjourney', resolved_model_name = 'My model', generation_type = 'image_to_video' WHERE id = 'keep'",
+            [r#"{"model":"My model","overrideModel":"My model","tool":"Midjourney","positivePrompt":"user prompt","negativePrompt":"user negative","generationType":"image_to_video","generationMode":"image_to_video","fieldSources":{"positivePrompt":"user_override","negativePrompt":"user_override","tool":"user_override","model":"user_override","overrideModel":"user_override","generationType":"user_override","generationMode":"user_override"}}"#],
+        )
+        .expect("apply user edit");
+        image.timestamp = 11;
+        image.file_size = 21;
+        image.metadata_json = r#"{"model":"Parsed again","tool":"ComfyUI","positivePrompt":"parsed prompt","negativePrompt":"parsed negative","generationType":"txt2img"}"#.to_string();
+        super::save_images_batch_inner(&conn, &[image]).expect("rescan");
+        let row: (String, String, String, String, String) = conn
+            .query_row(
+                "SELECT positive_prompt, negative_prompt, tool, resolved_model_name, generation_type FROM images WHERE id = 'keep'",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?, row.get(4)?)),
+            )
+            .expect("row");
+        assert_eq!(
+            row,
+            (
+                "user prompt".to_string(),
+                "user negative".to_string(),
+                "Midjourney".to_string(),
+                "My model".to_string(),
+                "image_to_video".to_string()
+            )
+        );
     }
 
     struct TemporaryDatabase {

@@ -223,8 +223,8 @@ export const ImageCard: React.FC<ImageCardProps> = ({
               <div className="text-xs font-bold text-white truncate drop-shadow-md font-sans">
                 {(() => {
                   if (isVideo) return image.videoCodec;
-                  if (sourceKind === 'photograph') return image.photoMetadata?.cameraModel || 'Photo';
-                  if (sourceKind === 'other') return 'Other';
+                  if (sourceKind === 'photograph') return image.photoMetadata?.cameraModel || t('Photo');
+                  if (sourceKind === 'other') return t('Other');
                   const modelValue = image.metadata.model as unknown;
                   const model = typeof modelValue === 'string'
                     ? modelValue
@@ -234,7 +234,7 @@ export const ImageCard: React.FC<ImageCardProps> = ({
                   if (image.metadata.overrideModel) return formatModelName(image.metadata.overrideModel);
                   if (model && model !== 'Unknown') return formatModelName(model);
                   if (image.metadata.modelHash) return `Hash: ${image.metadata.modelHash.slice(0, 8)}`;
-                  return 'Model';
+                  return t('Model');
                 })()}
               </div>
               <div className="text-[10px] text-gray-300 font-mono">

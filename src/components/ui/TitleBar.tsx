@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import type { Window as TauriWindow } from "@tauri-apps/api/window";
 import { Minus, Square, X } from "lucide-react";
-import { APP_NAME } from "../../constants/app";
+import { DvoynaWordmark } from "../brand/DvoynaWordmark";
 import { useSettingsStore } from "../../stores/settingsStore";
 import { isTauriRuntime } from "../../services/runtime";
 import { areDeveloperFeaturesEnabled } from "../../utils/settingsUtils";
@@ -121,9 +121,7 @@ export const TitleBar = () => {
                         alt=""
                         className="h-7 w-7 shrink-0 drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]"
                     />
-                    <span className="text-[13px] font-semibold tracking-[0.18em] text-zinc-700 dark:text-zinc-300">
-                        {APP_NAME.toUpperCase()}
-                    </span>
+                    <DvoynaWordmark className="text-[26px] leading-none" />
                     {profileBadge && !isCaptureMode() && (
                         <span className="ml-2 px-1.5 py-0.5 bg-ember-500/20 text-ember-600 dark:text-ember-300 text-[9px] font-bold rounded animate-pulse">
                             {profileBadge}

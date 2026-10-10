@@ -32,6 +32,7 @@ const hasChipVisibleCriteria = (filters: FilterState, dateLabel: string | null, 
     (filters.hypernetworks?.length ?? 0) > 0 ||
     (filters.samplers?.length ?? 0) > 0 ||
     (filters.generationTypes?.length ?? 0) > 0 ||
+    !!filters.similarColor ||
     (filters.controlNets?.length ?? 0) > 0 ||
     (filters.ipAdapters?.length ?? 0) > 0 ||
     filters.minSteps !== undefined ||
@@ -282,6 +283,14 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = () => {
                     <button type="button" aria-label={t('Clear Sampler Filter {{s}}', { s: s })} onClick={() => setFilters(f => ({ ...f, samplers: (f.samplers || []).filter(x => x !== s) }))}><X className="w-3 h-3" /></button>
                 </div>
             ))}
+
+            {filters.similarColor ? (
+                <div className="flex items-center gap-1 rounded-full border border-gray-200 bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
+                    <span className="h-3 w-3 rounded-full border border-black/10" style={{ backgroundColor: filters.similarColor }} />
+                    <span>{t('Similar color')}</span>
+                    <button type="button" aria-label={t('Clear color filter')} onClick={() => setFilters(f => ({ ...f, similarColor: undefined }))}><X className="w-3 h-3" /></button>
+                </div>
+            ) : null}
 
             {visibleGenTypes.map(g => (
                 <div key={g} title={g} className="flex items-center gap-1 rounded-full border border-gray-200 bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:border-white/10 dark:bg-white/5 dark:text-gray-300">

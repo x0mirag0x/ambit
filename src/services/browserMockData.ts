@@ -8,6 +8,7 @@ import { isKnownInvokeImageAsset } from '../utils/invokeImageSource';
 import { createDefaultFilters, getEffectiveImageKind, normalizeMediaTypeFilter } from '../utils/filterState';
 import { addLibraryScopeCount, createEmptyLibraryScopeCounts } from '../utils/libraryScopeCounts';
 import { getEffectiveMaskedKeywords, isImageMasked } from '../utils/maskingUtils';
+import { colorsAreSimilar } from '../utils/colorDistance';
 
 const STORAGE_KEY = 'ambit_browser_mock_state_v1';
 const MOCK_COUNT = 180;
@@ -45,6 +46,17 @@ const PROMPTS = [
     'isometric workshop, tiny tools, clean product render',
 ];
 const INVOKE_IMAGE_CATEGORIES = ['general', 'user', 'control', 'mask', 'other', 'future-category', undefined] as const;
+
+export const mockImageDominantColor = (id: string): string => {
+    const index = Number(id.replace(/\D/g, '')) - 1;
+    return colorForIndex(Number.isFinite(index) && index >= 0 ? index : 0);
+};
+
+export const mockImagePalette = (id: string): string[] => {
+    const index = Number(id.replace(/\D/g, '')) - 1;
+    const safe = Number.isFinite(index) && index >= 0 ? index : 0;
+    return [colorForIndex(safe), colorForIndex(safe + 2)];
+};
 
 const colorForIndex = (index: number): string => {
     const colors = ['#3b6f6a', '#8b5e34', '#5e6f9f', '#7b4f72', '#637047', '#9a5b54'];
@@ -584,6 +596,7 @@ const filterImages = (
         if (!matchesSelectedValues(image.metadata.ipAdapters, filters.ipAdapters, filters.matchModes?.ipAdapters)) return false;
         if (!matchesSelectedValues([image.metadata.sampler], filters.samplers)) return false;
         if (!matchesSelectedValues([image.metadata.generationType ?? 'unknown'], filters.generationTypes)) return false;
+        if (filters.similarColor && !colorsAreSimilar(filters.similarColor, mockImageDominantColor(image.id))) return false;
         if (filters.minSteps !== undefined && image.metadata.steps < filters.minSteps) return false;
         if (filters.maxSteps !== undefined && image.metadata.steps > filters.maxSteps) return false;
         if (filters.minCfg !== undefined && image.metadata.cfg < filters.minCfg) return false;

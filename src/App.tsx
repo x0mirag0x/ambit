@@ -53,6 +53,8 @@ import { startupDiagnostics } from './utils/startupDiagnostics';
 import { commands } from './bindings';
 import { isTauriRuntime } from './services/runtime';
 import { useTranslation } from 'react-i18next';
+import { useVisualSearchStore } from './stores/visualSearchStore';
+import { backfillVisualSignatures, searchSimilarImages } from './services/visualSearchService';
 
 const ImageViewer = React.lazy(() => import('./features/viewer/components/ImageViewer').then(module => ({ default: module.ImageViewer })));
 const VideoViewer = React.lazy(() => import('./features/viewer/components/VideoViewer').then(module => ({ default: module.VideoViewer })));
@@ -600,7 +602,62 @@ export default function App() {
         });
         setRecentSearches(prev => [term, ...prev.filter(search => search !== term)].slice(0, 8));
     }, [setFilters, setRecentSearches]);
+    const visualSearchActive = useVisualSearchStore(state => state.active);
+    const visualSearchBusy = useVisualSearchStore(state => state.searching);
+    const visualSearchImages = useVisualSearchStore(state => state.images);
+    const resetVisualSearch = useVisualSearchStore(state => state.reset);
+    const beginVisualSearch = useVisualSearchStore(state => state.begin);
+    const showVisualSearch = useVisualSearchStore(state => state.show);
+
+    const searchByPhoto = useCallback(async (source: File | string) => {
+        beginVisualSearch();
+        try {
+            if (typeof source === 'string') {
+                showVisualSearch(await searchSimilarImages(source));
+                return;
+            }
+            const { getBrowserMockImages } = await import('./services/browserMockData');
+            showVisualSearch(getBrowserMockImages().filter(image => image.mediaType !== 'video' && !image.isDeleted).slice(0, 12));
+        } catch (error) {
+            console.error('Photo search failed', error);
+            showVisualSearch([]);
+        }
+    }, [beginVisualSearch, showVisualSearch]);
+
+    const findSimilarColor = useCallback((color: string) => {
+        resetVisualSearch();
+        setFilters(previous => ({ ...previous, similarColor: color }));
+        setViewerRevealGrantId(null);
+        setSelectedImageIndex(null);
+        setViewingImageId(null);
+        if (viewMode !== 'grid' && viewMode !== 'timeline') changeViewMode('grid');
+    }, [changeViewMode, resetVisualSearch, setFilters, viewMode]);
+
+    useEffect(() => {
+        if (!isSettingsLoaded || !isTauriRuntime()) return;
+        let cancelled = false;
+        const run = async () => {
+            let remaining = 1;
+            let previous = Number.POSITIVE_INFINITY;
+            while (!cancelled && remaining > 0) {
+                try {
+                    const result = await backfillVisualSignatures(24);
+                    remaining = result.remaining;
+                    if (result.updated === 0 || remaining >= previous) break;
+                    previous = remaining;
+                } catch (error) {
+                    console.warn('Visual signature backfill stopped', error);
+                    break;
+                }
+                await new Promise(resolve => window.setTimeout(resolve, 50));
+            }
+        };
+        void run();
+        return () => { cancelled = true; };
+    }, [isSettingsLoaded]);
+
     const submitNavbarSearch = useCallback((query: string) => {
+        if (query.trim()) resetVisualSearch();
         if (!query.trim()) {
             void submitSearch(query);
             return;
@@ -610,7 +667,7 @@ export default function App() {
         if (viewMode === 'dashboard' || viewMode === 'maintenance') {
             changeViewMode('grid');
         }
-    }, [changeViewMode, submitSearch, viewMode]);
+    }, [changeViewMode, resetVisualSearch, submitSearch, viewMode]);
 
     const openSearchHelp = useCallback(() => {
         modals.setShortcutsModalTab('search');
@@ -628,7 +685,11 @@ export default function App() {
         onFocus: () => setIsSearchFocused(true),
         onBlur: () => setIsSearchFocused(false),
         onOpenSearchHelp: openSearchHelp,
-    }), [isAiSearchEnabled, isSearchingAi, inputRef, isSearchFocused, openSearchHelp, submitNavbarSearch, toggleAiSearch]);
+        visualSearchActive,
+        visualSearchBusy,
+        onSearchByPhoto: (source: File | string) => { void searchByPhoto(source); },
+        onResetVisualSearch: resetVisualSearch,
+    }), [isAiSearchEnabled, isSearchingAi, inputRef, isSearchFocused, openSearchHelp, resetVisualSearch, searchByPhoto, submitNavbarSearch, toggleAiSearch, visualSearchActive, visualSearchBusy]);
 
     const activeCollection = filters.collectionId
         ? (collections.find(c => c.id === filters.collectionId) ?? null)
@@ -643,9 +704,10 @@ export default function App() {
             (activeSmartCollection ? totalImages : globalTotal),
         totalImages
     );
+    const galleryImages = visualSearchActive ? visualSearchImages : images;
     const currentLibraryPresentation: RetainedLibraryPresentation = {
-        images,
-        totalImages,
+        images: galleryImages,
+        totalImages: visualSearchActive ? visualSearchImages.length : totalImages,
         scopeTotal,
         scopeName,
         availableTags,
@@ -982,7 +1044,9 @@ export default function App() {
                 displayedCount={libraryPresentation.totalImages}
                 scopeTotal={libraryPresentation.scopeTotal}
                 scopeName={libraryPresentation.scopeName}
-                isFiltering={isFiltering}
+                isFiltering={isFiltering || visualSearchBusy}
+                visualSearchActive={visualSearchActive}
+                onResetVisualSearch={resetVisualSearch}
                 fileOps={fileOps}
                 onOpenImportModal={openImportModal}
                 clearAllFilters={clearAllFilters}
@@ -1082,6 +1146,7 @@ export default function App() {
                 onCloseExport={() => setExportIds(new Set())}
                 exportIds={exportIds}
                 pendingViewerDeleteId={modals.pendingViewerDeleteId}
+                onDeleteCancel={() => modals.setPendingViewerDeleteId(null)}
                 collectionToDeleteId={modals.collectionToDelete}
                 addToCollectionMode={modals.addToCollectionMode}
                 sourceCollectionId={modals.sourceCollectionId}
@@ -1233,6 +1298,7 @@ export default function App() {
                             onToggleSidebar={() => setSettings(p => ({ ...p, defaultTheaterMode: !p.defaultTheaterMode }))}
                             searchHighlights={searchHighlights}
                             onOpenReferencedImage={handleOpenReferencedImage}
+                            onFindSimilarColor={findSimilarColor}
                         />
                     ) : null}
                 </AnimatePresence>

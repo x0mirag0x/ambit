@@ -22,7 +22,13 @@ const formatGenType = (type: string): string => {
         'extras': 'Extras/Upscale',
         'grid': 'Grid',
         'saved': 'Saved',
-        'unknown': 'Unknown'
+        'unknown': 'Unknown',
+        'text_to_video': 'Text to video',
+        'image_to_video': 'Image to video',
+        'first_last_frame_to_video': 'First/last frame',
+        'video_editing': 'Video editing',
+        'audio_lip_sync': 'Audio / lip sync',
+        'guided_video': 'Guided video'
     };
     return labels[type] || type;
 };

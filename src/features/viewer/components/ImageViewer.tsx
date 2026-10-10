@@ -7,6 +7,9 @@ import { useZoomPan } from '../../../hooks/useZoomPan';
 import { ImageCanvas } from './ImageCanvas';
 import { MetadataSidebar } from './MetadataSidebar';
 import { usePalette } from '../../../hooks/usePalette';
+import { isBrowserMockMode } from '../../../services/runtime';
+import { mockImagePalette } from '../../../services/browserMockData';
+import { getStoredImagePalette } from '../../../services/visualSearchService';
 import { useImageAI } from '../../../hooks/useImageAI';
 import { useSettingsStore } from '../../../stores/settingsStore';
 import { useCollectionStore } from '../../../stores/collectionStore';
@@ -58,6 +61,7 @@ interface ImageViewerProps {
     onToggleSidebar?: () => void;
     searchHighlights?: PromptHighlightSpec;
     onOpenReferencedImage?: (imageId: string) => Promise<boolean>;
+    onFindSimilarColor?: (color: string) => void;
 }
 
 import { AIResultModal } from './AIResultModal';
@@ -147,7 +151,8 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
     isSidebarOpen = true,
     onToggleSidebar,
     searchHighlights,
-    onOpenReferencedImage
+    onOpenReferencedImage,
+    onFindSimilarColor,
 }) => {
     const { t } = useTranslation();
     const metadataDisclosure = useMetadataDisclosureState();
@@ -255,9 +260,29 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
 
     // --- Hooks ---
     const { scale, position, isDragging, resetZoom, zoomIn, zoomOut, handlers } = useZoomPan();
-    const { palette, isLoading: isPaletteLoading } = usePalette(
-        mediaExposureBlocked ? null : displayImage.url
+    const { palette: computedPalette, isLoading: isComputedPaletteLoading } = usePalette(
+        mediaExposureBlocked || isBrowserMockMode() ? null : displayImage.url
     );
+    const [storedPalette, setStoredPalette] = React.useState<string[]>([]);
+    React.useEffect(() => {
+        if (isBrowserMockMode() || mediaExposureBlocked) {
+            setStoredPalette([]);
+            return;
+        }
+        let active = true;
+        void getStoredImagePalette(displayImage.id)
+            .then(colors => {
+                if (active) setStoredPalette(colors);
+            })
+            .catch(() => {
+                if (active) setStoredPalette([]);
+            });
+        return () => { active = false; };
+    }, [displayImage.id, mediaExposureBlocked]);
+    const palette = isBrowserMockMode()
+        ? mockImagePalette(displayImage.id)
+        : (storedPalette.length > 0 ? storedPalette : computedPalette);
+    const isPaletteLoading = !isBrowserMockMode() && storedPalette.length === 0 && isComputedPaletteLoading;
     const { addToast } = useToast();
     const ai = useImageAI({
         aiModel: getEffectiveAiModel(settings),
@@ -555,6 +580,7 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
                     isLoading={isReallyLoading}
                     searchHighlights={searchHighlights}
                     onOpenReferencedImage={onOpenReferencedImage}
+                    onFindSimilarColor={onFindSimilarColor}
                 />
             </div>
 

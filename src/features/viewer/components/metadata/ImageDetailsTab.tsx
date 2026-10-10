@@ -17,6 +17,7 @@ interface ImageDetailsTabProps {
     onSetCollectionMembership?: (assetId: string, collectionId: string, shouldBelong: boolean) => Promise<boolean>;
     palette: string[];
     isPaletteLoading: boolean;
+    onFindSimilarColor?: (color: string) => void;
 }
 
 const formatFileSize = (bytes?: number): string => {
@@ -36,6 +37,7 @@ export const ImageDetailsTab: React.FC<ImageDetailsTabProps> = ({
     onSetCollectionMembership,
     palette,
     isPaletteLoading,
+    onFindSimilarColor,
 }) => {
     const { t } = useTranslation();
     const [copiedColor, setCopiedColor] = React.useState<string | null>(null);
@@ -97,9 +99,13 @@ export const ImageDetailsTab: React.FC<ImageDetailsTabProps> = ({
                         {palette.map(color => (
                             <button
                                 type="button"
-                                aria-label={t('Copy Color {{color}}', { color: color })}
+                                aria-label={onFindSimilarColor ? t('Show images with a similar color') : t('Copy Color {{color}}', { color: color })}
                                 key={color}
                                 onClick={() => {
+                                    if (onFindSimilarColor) {
+                                        onFindSimilarColor(color);
+                                        return;
+                                    }
                                     void navigator.clipboard.writeText(color);
                                     setCopiedColor(color);
                                     setTimeout(() => setCopiedColor(null), 1500);

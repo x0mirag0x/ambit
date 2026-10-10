@@ -66,7 +66,7 @@ export const FolderItem: React.FC<FolderItemProps> = ({ folder, scanningIds, onR
 
             <div className="flex shrink-0 items-center justify-end gap-4 sm:col-start-2">
                 {!folder.isManaged && (
-                    <span className="min-w-[4.5rem] whitespace-nowrap text-right text-xs font-medium tabular-nums text-gray-400 dark:text-gray-500">{folder.imageCount} images</span>
+                    <span className="min-w-[4.5rem] whitespace-nowrap text-right text-xs font-medium tabular-nums text-gray-400 dark:text-gray-500">{t('{{n}} images', { n: folder.imageCount })}</span>
                 )}
 
                 <TooltipButton
