@@ -27,11 +27,12 @@ vi.mock('framer-motion', () => {
     };
 });
 
-const renderModal = () => {
+const renderModal = (activeCollection: { id: string; name: string } | null = null) => {
     const onClose = vi.fn();
     const onOpenSettings = vi.fn();
     const onImportFiles = vi.fn();
     const onImportVideos = vi.fn();
+    const onImportFolder = vi.fn();
     const result = render(
         <ImportModal
             isOpen={true}
@@ -39,10 +40,12 @@ const renderModal = () => {
             onOpenSettings={onOpenSettings}
             onImportFiles={onImportFiles}
             onImportVideos={onImportVideos}
+            onImportFolder={onImportFolder}
+            activeCollection={activeCollection}
         />
     );
 
-    return { ...result, onClose, onOpenSettings, onImportFiles, onImportVideos };
+    return { ...result, onClose, onOpenSettings, onImportFiles, onImportVideos, onImportFolder };
 };
 
 describe('ImportModal', () => {
@@ -103,7 +106,7 @@ describe('ImportModal', () => {
     });
 
     it('routes every remaining import action and closes after handoff', () => {
-        const { onClose, onOpenSettings, onImportFiles, onImportVideos } = renderModal();
+        const { onClose, onOpenSettings, onImportFiles, onImportVideos, onImportFolder } = renderModal();
 
         fireEvent.click(screen.getByRole('button', { name: 'ComfyUI' }));
         fireEvent.click(screen.getByRole('button', { name: 'SD WebUI' }));
@@ -113,10 +116,41 @@ describe('ImportModal', () => {
 
         expect(onOpenSettings).toHaveBeenNthCalledWith(1, 'comfyui');
         expect(onOpenSettings).toHaveBeenNthCalledWith(2, 'a1111');
-        expect(onOpenSettings).toHaveBeenNthCalledWith(3, 'folders');
-        expect(onImportFiles).toHaveBeenCalledOnce();
-        expect(onImportVideos).toHaveBeenCalledOnce();
+        expect(onImportFiles).toHaveBeenCalledWith({ addToActiveCollection: false });
+        expect(onImportVideos).toHaveBeenCalledWith({ addToActiveCollection: false });
+        expect(onImportFolder).toHaveBeenCalledWith({ addToActiveCollection: false });
         expect(onClose).toHaveBeenCalledTimes(5);
+    });
+
+    it('hides the collection checkbox while the whole library is open', () => {
+        renderModal();
+        expect(screen.queryByRole('checkbox', { name: /Add to collection/ })).toBeNull();
+    });
+
+    it('offers to add a one-time import to the open collection and remembers an unchecked choice', () => {
+        const view = renderModal({ id: 'vk', name: 'Посты VK' });
+        const checkbox = screen.getByRole('checkbox', { name: 'Add to collection: Посты VK' });
+        expect((checkbox as HTMLInputElement).checked).toBe(true);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Select Videos' }));
+        expect(view.onImportVideos).toHaveBeenCalledWith({ addToActiveCollection: true });
+
+        view.rerender(
+            <ImportModal
+                isOpen={true}
+                onClose={view.onClose}
+                onOpenSettings={view.onOpenSettings}
+                onImportFiles={view.onImportFiles}
+                onImportVideos={view.onImportVideos}
+                onImportFolder={view.onImportFolder}
+                activeCollection={{ id: 'vk', name: 'Посты VK' }}
+            />
+        );
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Add to collection: Посты VK' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Select Images' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Add Folder' }));
+        expect(view.onImportFiles).toHaveBeenCalledWith({ addToActiveCollection: false });
+        expect(view.onImportFolder).toHaveBeenCalledWith({ addToActiveCollection: false });
     });
 
     it('keeps focus on the dialog when no focusable descendants are available', () => {
@@ -161,6 +195,7 @@ describe('ImportModal', () => {
                 onOpenSettings={vi.fn()}
                 onImportFiles={vi.fn()}
                 onImportVideos={vi.fn()}
+                onImportFolder={vi.fn()}
             />
         );
         expect(screen.queryByRole('dialog')).toBeNull();

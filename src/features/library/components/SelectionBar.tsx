@@ -4,10 +4,11 @@ import { isImageMasked } from '../../../utils/maskingUtils';
 import { useSettingsStore } from '../../../stores/settingsStore';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import { useTranslation } from 'react-i18next';
+import { FAVORITE_ICON_CLASS } from '../../../theme/favorite';
 
 const BUTTON_BASE_CLASS = "p-2 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500/50";
 const NEUTRAL_BUTTON_CLASS = `${BUTTON_BASE_CLASS} text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10`;
-const ACTIVE_FAVORITE_BUTTON_CLASS = `${BUTTON_BASE_CLASS} text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20`;
+const ACTIVE_FAVORITE_BUTTON_CLASS = `${BUTTON_BASE_CLASS} ${FAVORITE_ICON_CLASS} hover:bg-favorite/10`;
 const ACTIVE_PIN_BUTTON_CLASS = `${BUTTON_BASE_CLASS} text-sage-600 dark:text-sage-400 hover:text-sage-700 dark:hover:text-sage-300 hover:bg-sage-50 dark:hover:bg-sage-900/20`;
 
 interface SelectionBarProps {

@@ -1,7 +1,12 @@
 import { act, fireEvent, render, screen, waitFor } from '../../../test/testUtils';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { InvokeOwnerScopeState } from '../../../contexts/SyncContext';
+import i18n from '../../../i18n';
 import { InvokeOwnerScopeGate } from '../InvokeOwnerScopeGate';
+
+afterEach(async () => {
+    await i18n.changeLanguage('en');
+});
 
 const renderGate = (state: InvokeOwnerScopeState) => {
     const callbacks = {
@@ -113,6 +118,45 @@ describe('InvokeOwnerScopeGate', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Open Settings' }));
         expect(callbacks.onRetry).toHaveBeenCalledTimes(1);
         expect(callbacks.onOpenSettings).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows the all-users confirmation in Russian, including unassigned rows', async () => {
+        await i18n.changeLanguage('ru');
+        const discovery = {
+            schemaMode: 'multi_user' as const,
+            dbPath: 'D:/Invoke/databases/invokeai.db',
+            imagesRoot: 'D:/Invoke',
+            owners: [{
+                ownerId: 'owner-a',
+                displayName: 'Artemis',
+                imageCount: 12,
+                intermediateImageCount: 4,
+                boardCount: 3,
+            }],
+            unassignedImageCount: 2,
+            unassignedBoardCount: 5,
+        };
+        const { unmount } = renderGate({
+            status: 'selection_required',
+            rootPath: 'D:/Invoke',
+            discovery,
+        });
+
+        expect(screen.getByText('8 стандартных изображений')).toBeTruthy();
+        expect(screen.getByText('4 промежуточных')).toBeTruthy();
+        expect(screen.getByText('3 досок')).toBeTruthy();
+        fireEvent.click(screen.getByRole('button', { name: /все пользователи/i }));
+        expect(screen.getByRole('heading', { name: 'Показать изображения всех пользователей InvokeAI?' })).toBeTruthy();
+        expect(screen.getByText('Dvoyna Vault покажет содержимое InvokeAI всех владельцев, включая 2 строк изображений без владельца и 5 досок без владельца, в галерее, коллекциях, обслуживании и ссылках. Вернуться к одному владельцу можно в любой момент.')).toBeTruthy();
+        unmount();
+
+        renderGate({
+            status: 'selection_required',
+            rootPath: 'D:/Invoke',
+            discovery: { ...discovery, unassignedImageCount: 0, unassignedBoardCount: 0 },
+        });
+        fireEvent.click(screen.getByRole('button', { name: /все пользователи/i }));
+        expect(screen.getByText('Dvoyna Vault покажет изображения и доски всех владельцев InvokeAI из этой локальной базы. Вернуться к одному владельцу можно в любой момент.')).toBeTruthy();
     });
 
     it('offers recovery instead of an indefinite spinner for an offline scope that cannot be admitted', () => {

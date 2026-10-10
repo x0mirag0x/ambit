@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Collection, FilterState } from '../../../types';
-import { X, Save, Trash2, Filter, Users, RotateCcw, AlertTriangle } from 'lucide-react';
+import { X, Save, Trash2, Filter, Users, RotateCcw, AlertTriangle, Heart } from 'lucide-react';
+import { FAVORITE_CHIP_CLASS, FAVORITE_ICON_CLASS } from '../../../theme/favorite';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getDateFilterLabel } from '../../../utils/dateFilters';
 import { getEffectiveImageKind } from '../../../utils/filterState';
@@ -186,8 +187,8 @@ export const CollectionEditorModal: React.FC<CollectionEditorModalProps> = ({
         // Favorites
         if (draftFilters.favoritesOnly) {
             chips.push(
-                <div key="fav" className="flex items-center gap-1 rounded-md border border-red-200 bg-red-100 px-2 py-1 text-xs text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
-                    <div className="w-3 h-3 text-red-500 dark:text-red-300">❤️</div>
+                <div key="fav" className={`flex items-center gap-1 rounded-md border px-2 py-1 text-xs ${FAVORITE_CHIP_CLASS}`}>
+                    <Heart aria-hidden="true" className={`h-3 w-3 ${FAVORITE_ICON_CLASS}`} />
                     <span>{t('Favorites')}</span>
                     <button type="button" aria-label={t('Remove Favorites Rule')} onClick={() => removeFilter('favoritesOnly', null)} className="hover:text-red-600"><X className="w-3 h-3" /></button>
                 </div>

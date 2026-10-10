@@ -145,14 +145,15 @@ export const useImportOps = ({
                 }, undefined, abortCtrl.signal);
                 if (result.wasCancelled) {
                     addToast(t(MANUAL_IMPORT_CANCELLED_MESSAGE), 'info');
-                    return;
+                    return result;
                 }
                 await commitImportResult(result);
-                return;
+                return result;
             }
 
             const result = await processWebFiles(files);
             await commitImportResult(result);
+            return result;
         } catch (error) {
             addToast(t('Import failed'), "error");
         } finally {
@@ -183,14 +184,15 @@ export const useImportOps = ({
                 }, undefined, abortCtrl.signal);
                 if (result.wasCancelled) {
                     addToast(t(MANUAL_IMPORT_CANCELLED_MESSAGE), 'info');
-                    return;
+                    return result;
                 }
                 await commitImportResult(result);
-                return;
+                return result;
             }
 
             const result = await processWebFiles(files);
             await commitImportResult(result);
+            return result;
         } catch (error) {
             addToast(t('Import failed'), "error");
         } finally {

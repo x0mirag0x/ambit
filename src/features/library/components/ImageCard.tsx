@@ -10,6 +10,7 @@ import { formatModelName } from '../../../utils/formatUtils';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import { getInvokeImageAssetLabel } from '../../../utils/invokeImageSource';
 import { useTranslation } from 'react-i18next';
+import { FAVORITE_ICON_CLASS } from '../../../theme/favorite';
 
 const isUnknownModelName = (value: string): boolean => {
   const normalized = value.trim().toLocaleLowerCase();
@@ -207,7 +208,7 @@ export const ImageCard: React.FC<ImageCardProps> = ({
             aria-label={t('Favorite')}
             className="transition-all duration-300 animate-in zoom-in"
           >
-            <Heart className="w-5 h-5 fill-red-500 text-red-500 drop-shadow-md" />
+            <Heart className={`w-5 h-5 drop-shadow-md ${FAVORITE_ICON_CLASS}`} />
           </div>
         )}
       </div>
@@ -301,7 +302,7 @@ export const ImageCard: React.FC<ImageCardProps> = ({
                   onToggleFavorite(e);
                 }}
               >
-                <Heart className={`w-4 h-4 ${image.isFavorite ? 'fill-red-500 text-red-500' : 'text-white'}`} />
+                <Heart className={`w-4 h-4 ${image.isFavorite ? FAVORITE_ICON_CLASS : 'text-white'}`} />
               </TooltipButton>
             </div>
           </div>

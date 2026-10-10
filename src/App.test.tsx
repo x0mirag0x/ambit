@@ -8,6 +8,8 @@ import { GeneratorTool, type AIImage, type AppSettings, type Collection, type Fi
 import type { InvokeOwnerScopeState } from './contexts/SyncContext';
 import App from './App';
 import { settingsPersistenceCoordinator } from './utils/settingsPersistenceCoordinator';
+import type { ImportResult } from './services/importService';
+import { createEmptyTouchedFacetResources } from './utils/touchedFacetTypes';
 import { useLibraryStore } from './stores/libraryStore';
 import { useVisualSearchStore } from './stores/visualSearchStore';
 
@@ -89,7 +91,10 @@ type ImportModalProbe = {
     isOpen: boolean;
     onClose: () => void;
     onOpenSettings: (tab: string) => void;
-    onImportFiles: () => void;
+    activeCollection: { id: string; name: string } | null;
+    onImportFiles: (request?: { addToActiveCollection: boolean }) => void;
+    onImportVideos: (request?: { addToActiveCollection: boolean }) => void;
+    onImportFolder: (request?: { addToActiveCollection: boolean }) => void;
 };
 
 type ViewerProbe = {
@@ -194,6 +199,7 @@ const mocks = vi.hoisted(() => ({
     handleImportPaths: vi.fn().mockResolvedValue(undefined),
     handleImportFolders: vi.fn().mockResolvedValue(undefined),
     importImages: vi.fn(),
+    listImportedLibraryIds: vi.fn().mockResolvedValue([]),
     removeImagesFromCollection: vi.fn(async (
         _imageIds: string[],
         _collectionId: string,
@@ -453,6 +459,9 @@ vi.mock('./contexts/SyncContext', () => ({
     })
 }));
 vi.mock('./hooks/useFolderMonitor', () => ({ useFolderMonitor: mocks.folderMonitor }));
+vi.mock('./services/importCollectionMembership', () => ({
+    listImportedLibraryIds: (...args: unknown[]) => mocks.listImportedLibraryIds(...args),
+}));
 vi.mock('./hooks/useGlobalShortcuts', () => ({ useGlobalShortcuts: mocks.shortcuts }));
 vi.mock('./features/viewer/utils/searchHighlights', () => ({ derivePromptHighlightSpec: vi.fn(() => ({ terms: ['sunset'] })) }));
 
@@ -542,6 +551,8 @@ describe('App orchestration', () => {
         mocks.aiSearchOptions = null;
         mocks.dragDropOptions = null;
         mocks.fileInputRef.current = null;
+        mocks.listImportedLibraryIds.mockReset();
+        mocks.listImportedLibraryIds.mockResolvedValue([]);
         mocks.updater.update = null;
         mocks.updater.isDialogOpen = false;
         mocks.updater.status = 'idle';
@@ -1492,7 +1503,7 @@ describe('App orchestration', () => {
         expect(requireProbe(captured.viewer, 'ImageViewer').canNavigateNext).toBe(false);
     });
 
-    it('photo search reset restores the full library', () => {
+    it('photo search clear restores the full library', () => {
         const match = image('match');
         const library = [image('one'), image('two'), image('three')];
         mocks.images = library;
@@ -2234,6 +2245,97 @@ describe('App orchestration', () => {
             expect.any(Error)
         );
         expect(clickSpy).toHaveBeenCalled();
+    });
+
+    it('adds one-time image, video, and folder imports to the open collection', async () => {
+        const active: Collection = {
+            id: 'vk',
+            name: 'Посты VK',
+            imageIds: ['old'],
+            count: 1,
+            createdAt: 1,
+            source: 'ambit',
+        };
+        const smart: SmartCollection = {
+            id: 'smart-a',
+            name: 'Smart A',
+            imageIds: [],
+            count: 2,
+            createdAt: 2,
+            source: 'ambit',
+            filters: createDefaultFilters({ searchQuery: 'portrait' }),
+        };
+        const result = (ids: string[], skipped = 0): ImportResult => ({
+            images: ids.map(image),
+            stats: { processed: ids.length + skipped, imported: ids.length, skipped, errors: 0 },
+            handledPaths: ids,
+            failedPaths: [],
+            touchedFacetTypes: [],
+            touchedFacetResources: createEmptyTouchedFacetResources(),
+            wasCancelled: false,
+            completedSourcePaths: [],
+            cancelledSourcePaths: [],
+        });
+        mocks.collections = [active, smart];
+        mocks.filters = createDefaultFilters({ collectionId: 'vk' });
+        (window as Window & { __TAURI_INTERNALS__?: unknown }).__TAURI_INTERNALS__ = {};
+        render(<App />);
+
+        expect(requireProbe(captured.importModal, 'ImportModal').activeCollection).toEqual({ id: 'vk', name: 'Посты VK' });
+
+        mocks.handleImportPaths.mockResolvedValueOnce(result(['C:/new.png']));
+        mocks.listImportedLibraryIds.mockResolvedValueOnce(['C:/new.png', 'C:/old.png']);
+        vi.mocked(open).mockResolvedValueOnce(['C:/new.png', 'C:/old.png']);
+        await act(async () => requireProbe(captured.importModal, 'ImportModal').onImportFiles({ addToActiveCollection: true }));
+        expect(mocks.handleImportPaths).toHaveBeenCalledWith(['C:/new.png', 'C:/old.png']);
+        expect(mocks.listImportedLibraryIds).toHaveBeenCalledWith({
+            filePaths: ['C:/new.png', 'C:/old.png'],
+            directoryPaths: [],
+            importedImages: [expect.objectContaining({ id: 'C:/new.png' })],
+        });
+        expect(mocks.addImagesToCollection).toHaveBeenCalledWith(['C:/new.png', 'C:/old.png'], 'vk');
+
+        mocks.addImagesToCollection.mockClear();
+        mocks.listImportedLibraryIds.mockClear();
+        mocks.handleImportPaths.mockResolvedValueOnce(result([]));
+        vi.mocked(open).mockResolvedValueOnce(['C:/video.mp4']);
+        await act(async () => requireProbe(captured.importModal, 'ImportModal').onImportVideos({ addToActiveCollection: false }));
+        expect(mocks.handleImportPaths).toHaveBeenCalledWith(['C:/video.mp4']);
+        expect(mocks.listImportedLibraryIds).not.toHaveBeenCalled();
+        expect(mocks.addImagesToCollection).not.toHaveBeenCalled();
+
+        mocks.handleImportFolders.mockResolvedValueOnce(result([], 2));
+        mocks.listImportedLibraryIds.mockResolvedValueOnce(['C:/albums/kept.png']);
+        vi.mocked(open).mockResolvedValueOnce('C:/albums');
+        await act(async () => requireProbe(captured.importModal, 'ImportModal').onImportFolder({ addToActiveCollection: true }));
+        expect(mocks.handleImportFolders).toHaveBeenCalledWith([{ path: 'C:/albums' }]);
+        expect(mocks.listImportedLibraryIds).toHaveBeenCalledWith({
+            filePaths: [],
+            directoryPaths: ['C:/albums'],
+            importedImages: [],
+        });
+        expect(mocks.addImagesToCollection).toHaveBeenCalledWith(['C:/albums/kept.png'], 'vk');
+    });
+
+    it('hides collection import while the whole library or a smart collection is open', () => {
+        const smart: SmartCollection = {
+            id: 'smart-a',
+            name: 'Smart A',
+            imageIds: [],
+            count: 2,
+            createdAt: 1,
+            source: 'ambit',
+            filters: createDefaultFilters({ favoritesOnly: true }),
+        };
+        mocks.collections = [smart];
+        mocks.filters = createDefaultFilters();
+        const library = render(<App />);
+        expect(requireProbe(captured.importModal, 'ImportModal').activeCollection).toBeNull();
+        library.unmount();
+
+        mocks.filters = createDefaultFilters({ collectionId: 'smart-a' });
+        render(<App />);
+        expect(requireProbe(captured.importModal, 'ImportModal').activeCollection).toBeNull();
     });
 
     it('derives smart collection scope labels and counts', () => {

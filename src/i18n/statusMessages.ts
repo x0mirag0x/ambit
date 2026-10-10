@@ -41,6 +41,8 @@ const STATUS_PATTERNS: readonly StatusPattern[] = [
     { re: /^Finished: (\d+) thumbnails optimized$/, key: 'progress.finishedThumbnails', map: (match) => ({ count: number(match[1]) }) },
     { re: /^Optimized (\d+) thumbnails; (\d+) need attention$/, key: 'progress.optimizedThumbnailsWithAttention', map: (match) => ({ count: number(match[1]), optimized: number(match[1]), attention: number(match[2]) }) },
     { re: /^Connected! Found (\d+) images\.$/, key: 'progress.connectedImages', map: (match) => ({ count: number(match[1]) }) },
+    { re: /^Scanning (.+) library\.\.\.$/, key: 'progress.scanningLibrary', map: (match) => ({ name: match[1] }) },
+    { re: /^Importing: (\d+) \/ (\d+)$/, key: 'progress.importingFraction', map: (match) => ({ current: number(match[1]), total: number(match[2]) }) },
     { re: /^Lookup failed: (.+)$/, key: 'progress.lookupFailed', map: (match) => ({ message: match[1] }) },
     { re: /^MediaInfo stdout exceeded (\d+) bytes$/, key: 'progress.mediainfoStdoutExceeded', map: (match) => ({ bytes: number(match[1]) }) },
 ];

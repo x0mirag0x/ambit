@@ -69,6 +69,7 @@ import { commands } from '../bindings';
 import type { InvokeScopeCacheBuildClaim, InvokeScopeCacheRepairPlan } from '../bindings';
 import { unwrap } from '../utils/spectaUtils';
 import { useTranslation } from 'react-i18next';
+import { translateRuntimeMessage } from '../i18n/statusMessages';
 
 export type { InvokeOwnerScopeState } from '../stores/invokeOwnerScopeStore';
 
@@ -956,7 +957,7 @@ export const SyncProvider: React.FC<{
                     : undefined;
                 addToast(
                     failureMessage
-                        ? t('Could not change InvokeAI owner scope: {{v0}}. The previous view was restored.', { v0: failureMessage.replace(/[.!?]+$/, '') })
+                        ? t('Could not change InvokeAI owner scope: {{v0}}. The previous view was restored.', { v0: translateRuntimeMessage(failureMessage).replace(/[.!?]+$/, '') })
                         : t('Could not change InvokeAI owner scope. The previous view was restored.'),
                     'error'
                 );
@@ -987,7 +988,7 @@ export const SyncProvider: React.FC<{
                     if (rollbackAdmission.allowed) {
                         const message = error instanceof Error ? error.message : String(error);
                         addToast(
-                            t('Could not change InvokeAI owner scope: {{v0}}. The previous view was restored.', { v0: message.replace(/[.!?]+$/, '') }),
+                            t('Could not change InvokeAI owner scope: {{v0}}. The previous view was restored.', { v0: translateRuntimeMessage(message).replace(/[.!?]+$/, '') }),
                             'error'
                         );
                         return false;
@@ -1007,7 +1008,7 @@ export const SyncProvider: React.FC<{
                 error: message,
                 failure: { kind: 'preparation_failed', details: message },
             });
-            addToast(t('Could not update InvokeAI owner scope: {{message}}', { message: message }), 'error');
+            addToast(t('Could not update InvokeAI owner scope: {{message}}', { message: translateRuntimeMessage(message) }), 'error');
             return false;
         } finally {
             if (ownerScopePromiseRef.current?.promise === promise) {

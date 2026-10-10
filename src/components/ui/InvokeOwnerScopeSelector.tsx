@@ -24,15 +24,18 @@ export const InvokeOwnerScopeSelector: React.FC<InvokeOwnerScopeSelectorProps> =
     const unassignedBoards = discovery.unassignedBoardCount ?? 0;
     const unassignedDetails = [
         discovery.unassignedImageCount > 0
-            ? `${discovery.unassignedImageCount.toLocaleString()} unassigned image rows`
+            ? t('{{n}} unassigned image rows', { n: discovery.unassignedImageCount.toLocaleString() })
             : null,
         unassignedBoards > 0
-            ? `${unassignedBoards.toLocaleString()} unassigned boards`
+            ? t('{{n}} unassigned boards', { n: unassignedBoards.toLocaleString() })
             : null,
-    ].filter((value): value is string => value !== null).join(' and ');
-    const allUsersMessage = unassignedDetails
-        ? `Dvoyna Vault will show every owner's InvokeAI content, including ${unassignedDetails}, across the gallery, collections, maintenance views, and references. You can return to a single owner at any time.`
-        : "Dvoyna Vault will show every owner's InvokeAI images and boards from this local database. You can return to a single owner at any time.";
+    ].filter((value): value is string => value !== null);
+    const unassignedSummary = unassignedDetails.length === 2
+        ? t('{{left}} and {{right}}', { left: unassignedDetails[0], right: unassignedDetails[1] })
+        : unassignedDetails[0] ?? '';
+    const allUsersMessage = unassignedSummary
+        ? t("Dvoyna Vault will show every owner's InvokeAI content, including {{details}}, across the gallery, collections, maintenance views, and references. You can return to a single owner at any time.", { details: unassignedSummary })
+        : t("Dvoyna Vault will show every owner's InvokeAI images and boards from this local database. You can return to a single owner at any time.");
 
     return (
         <div className="space-y-3">
@@ -70,13 +73,15 @@ export const InvokeOwnerScopeSelector: React.FC<InvokeOwnerScopeSelectorProps> =
                             <span className="flex shrink-0 items-center gap-2">
                                 <span className="text-right text-[10px] font-bold text-gray-500">
                                     <span className="block">
-                                        {standardImageCount.toLocaleString()} {intermediateImageCount > 0 ? t('standard images') : 'images'}
+                                        {intermediateImageCount > 0
+                                            ? t('{{n}} standard images', { n: standardImageCount.toLocaleString() })
+                                            : t('{{n}} images', { n: standardImageCount.toLocaleString() })}
                                     </span>
                                     {intermediateImageCount > 0 && (
-                                        <span className="block">{intermediateImageCount.toLocaleString()} intermediates</span>
+                                        <span className="block">{t('{{n}} intermediates', { n: intermediateImageCount.toLocaleString() })}</span>
                                     )}
                                     {owner.boardCount !== undefined && (
-                                        <span className="block">{owner.boardCount.toLocaleString()} boards</span>
+                                        <span className="block">{t('{{n}} boards', { n: owner.boardCount.toLocaleString() })}</span>
                                     )}
                                 </span>
                                 {selected ? <Check className="h-4 w-4 text-sage-600 dark:text-sage-300" aria-hidden="true" /> : null}

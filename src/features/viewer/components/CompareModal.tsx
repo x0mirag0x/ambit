@@ -15,6 +15,7 @@ import {
 import { useSettingsStore } from '../../../stores/settingsStore';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import { useTranslation } from 'react-i18next';
+import { FAVORITE_ICON_CLASS } from '../../../theme/favorite';
 
 interface CompareModalProps {
     imageA: AIImage;
@@ -175,7 +176,7 @@ const ImageActions = ({
             }}
             className="p-2.5 bg-black/60 hover:bg-black/90 rounded-full transition-all group cursor-pointer border border-white/10 backdrop-blur-md"
         >
-            <Heart className={`w-4 h-4 transition-transform group-hover:scale-110 ${img.isFavorite ? 'fill-red-500 text-red-500' : 'text-white'}`} />
+            <Heart className={`w-4 h-4 transition-transform group-hover:scale-110 ${img.isFavorite ? FAVORITE_ICON_CLASS : 'text-white'}`} />
         </TooltipButton>
 
         {onTogglePin && (
@@ -718,7 +719,7 @@ export const CompareModal: React.FC<CompareModalProps> = ({
                         </div>
 
                         <DiffRow label={t('Model')} valA={imageA.metadata.model} valB={imageB.metadata.model} />
-                        <DiffRow label={t('Seed')} valA={imageA.metadata.seed ?? 'Unknown'} valB={imageB.metadata.seed ?? 'Unknown'} />
+                        <DiffRow label={t('Seed')} valA={imageA.metadata.seed ?? t('Unknown')} valB={imageB.metadata.seed ?? t('Unknown')} />
                         <DiffRow label={t('Steps')} valA={imageA.metadata.steps} valB={imageB.metadata.steps} />
                         <DiffRow label={t('CFG')} valA={imageA.metadata.cfg} valB={imageB.metadata.cfg} />
                         <DiffRow label={t('Size')} valA={`${imageA.width}x${imageA.height}`} valB={`${imageB.width}x${imageB.height}`} />
@@ -747,8 +748,8 @@ export const CompareModal: React.FC<CompareModalProps> = ({
                                     renderPromptDiff(imageA.metadata.positivePrompt, imageB.metadata.positivePrompt)
                                 ) : (
                                     <div className="space-y-4">
-                                        {renderRawPrompt(imageA.metadata.positivePrompt, "Original (Image A)")}
-                                        {renderRawPrompt(imageB.metadata.positivePrompt, "New (Image B)")}
+                                        {renderRawPrompt(imageA.metadata.positivePrompt, t('Original (Image A)'))}
+                                        {renderRawPrompt(imageB.metadata.positivePrompt, t('New (Image B)'))}
                                     </div>
                                 )
                             )}

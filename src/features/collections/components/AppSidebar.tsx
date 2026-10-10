@@ -4,6 +4,7 @@ import { ViewMode, FilterState } from '../../../types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import { useTranslation } from 'react-i18next';
+import { FAVORITE_ICON_CLASS } from '../../../theme/favorite';
 
 interface AppSidebarProps {
   viewMode: ViewMode;
@@ -58,7 +59,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         <div className="h-px w-8 bg-gray-300 dark:bg-white/10 my-2" />
 
         <NavButton state="toggle" active={isFilterPanelOpen && (viewMode === 'grid' || viewMode === 'timeline' || viewMode === 'dashboard')} pressed={isFilterPanelOpen} onClick={() => setIsFilterPanelOpen(p => !p)} icon={<Filter />} tooltip={isFilterPanelOpen ? t('Hide Filters') : t('Show Filters')} />
-        <NavButton state="toggle" active={filters.favoritesOnly} onClick={() => setFilters(prev => ({ ...prev, favoritesOnly: !prev.favoritesOnly }))} icon={<Heart className={filters.favoritesOnly ? "fill-red-500 text-red-500" : ""} />} tooltip={filters.favoritesOnly ? t('Disable Favorites Only') : t('Show Favorites Only')} />
+        <NavButton state="toggle" active={filters.favoritesOnly} onClick={() => setFilters(prev => ({ ...prev, favoritesOnly: !prev.favoritesOnly }))} icon={<Heart className={filters.favoritesOnly ? FAVORITE_ICON_CLASS : ""} />} tooltip={filters.favoritesOnly ? t('Disable Favorites Only') : t('Show Favorites Only')} />
         <NavButton state="toggle" active={!!filters.pinnedOnly} onClick={() => setFilters(prev => ({ ...prev, pinnedOnly: !prev.pinnedOnly }))} icon={<Pin className={filters.pinnedOnly ? "fill-white text-white" : ""} />} tooltip={filters.pinnedOnly ? t('Disable Pinned Only') : t('Show Pinned Only')} />
       </nav>
 

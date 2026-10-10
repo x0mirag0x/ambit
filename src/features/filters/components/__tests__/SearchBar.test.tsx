@@ -347,6 +347,36 @@ describe('SearchBar query readiness and trigger behavior', () => {
         expect(harness.searchProps.onBlur).toHaveBeenCalled();
     });
 
+    it('photo search clear button exits photo search', () => {
+        const onResetVisualSearch = vi.fn();
+        renderSearchBar(createDefaultFilters(), {
+            searchProps: { visualSearchActive: true, onResetVisualSearch, isFocused: false },
+        });
+
+        expect(screen.queryByText('Search by photo')).toBeNull();
+        expect(screen.queryByText('Reset photo search')).toBeNull();
+        const camera = screen.getByRole('button', { name: 'Search by photo' });
+        expect(camera.getAttribute('aria-pressed')).toBe('true');
+        expect(camera.className).toContain('text-sage-600');
+        expect(camera.className).toContain('dark:text-sage-300');
+        fireEvent.focus(camera);
+        expect(screen.getByRole('tooltip').textContent).toBe('Photo search is active');
+
+        const clear = screen.getByRole('button', { name: 'Reset photo search' });
+        expect(clear.className).toContain('right-2');
+        expect(clear.className).toContain('text-gray-400');
+        fireEvent.click(clear);
+        expect(onResetVisualSearch).toHaveBeenCalledOnce();
+    });
+
+    it('keeps the photo-search camera unlabeled as active until a search is running', () => {
+        renderSearchBar(createDefaultFilters(), { searchProps: { isFocused: false } });
+        const camera = screen.getByRole('button', { name: 'Search by photo' });
+        expect(camera.getAttribute('aria-pressed')).toBe('false');
+        expect(screen.queryByRole('button', { name: 'Reset photo search' })).toBeNull();
+        expect(screen.queryByRole('tooltip')).toBeNull();
+    });
+
     it('clears the query, suggestions, and focuses the input', () => {
         const inputRef = React.createRef<HTMLInputElement>();
         const focus = vi.spyOn(HTMLInputElement.prototype, 'focus');

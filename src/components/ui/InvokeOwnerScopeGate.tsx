@@ -5,6 +5,7 @@ import type { InvokeOwnerSelection } from '../../types';
 import { InvokeOwnerScopeSelector } from './InvokeOwnerScopeSelector';
 import { StartupPreparationCard } from './StartupPreparationCard';
 import { useTranslation } from 'react-i18next';
+import { translateRuntimeMessage } from '../../i18n/statusMessages';
 
 interface InvokeOwnerScopeGateProps {
     state: InvokeOwnerScopeState;
@@ -135,7 +136,7 @@ export const InvokeOwnerScopeGate: React.FC<InvokeOwnerScopeGateProps> = ({
                 {state.error && (
                     <details className="mt-5 rounded-xl border border-gray-200 bg-gray-50/80 p-3 text-xs dark:border-white/10 dark:bg-black/20">
                         <summary className="cursor-pointer font-bold text-gray-700 dark:text-gray-200">{t('Technical details')}</summary>
-                        <p className="mt-2 break-words font-mono leading-5 text-gray-500 dark:text-gray-400">{state.error}</p>
+                        <p className="mt-2 break-words font-mono leading-5 text-gray-500 dark:text-gray-400">{translateRuntimeMessage(state.error)}</p>
                     </details>
                 )}
                 <div className="mt-6 flex flex-col gap-2 min-[394px]:flex-row">

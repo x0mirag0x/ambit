@@ -642,9 +642,45 @@ describe('VideoViewer', () => {
         fireEvent.keyDown(window, { key: 'L' });
         expect(player.currentTime).toBe(30);
 
+        const pause = vi.spyOn(player, 'pause').mockImplementation(() => undefined);
         fireEvent.keyDown(window, { key: 'ArrowLeft' });
         fireEvent.keyDown(window, { key: 'ArrowRight' });
         expect(props.onPrev).toHaveBeenCalledOnce();
+        expect(props.onNext).toHaveBeenCalledOnce();
+        expect(pause).toHaveBeenCalledTimes(2);
+
+        pause.mockClear();
+        vi.mocked(props.onPrev).mockClear();
+        vi.mocked(props.onNext).mockClear();
+        player.focus();
+        fireEvent.keyDown(player, { key: 'ArrowLeft' });
+        fireEvent.keyDown(player, { key: 'ArrowRight' });
+        expect(props.onPrev).not.toHaveBeenCalled();
+        expect(props.onNext).not.toHaveBeenCalled();
+        expect(pause).not.toHaveBeenCalled();
+    });
+
+    it('shows side arrows that pause the current video and move within the result set', async () => {
+        const { props, rerender } = setup();
+        const player = await waitFor(() => {
+            const element = document.querySelector('video') as HTMLVideoElement | null;
+            expect(element).not.toBeNull();
+            return element as HTMLVideoElement;
+        });
+        const pause = vi.spyOn(player, 'pause').mockImplementation(() => undefined);
+        const previous = screen.getByRole('button', { name: 'Previous Image (Left Arrow)' });
+        const next = screen.getByRole('button', { name: 'Next Image (Right Arrow)' });
+
+        fireEvent.click(previous);
+        fireEvent.click(next);
+        expect(props.onPrev).toHaveBeenCalledOnce();
+        expect(props.onNext).toHaveBeenCalledOnce();
+        expect(pause).toHaveBeenCalledTimes(2);
+
+        rerender(<VideoViewer {...props} canNavigatePrevious={false} canNavigateNext={false} />);
+        expect((screen.getByRole('button', { name: 'Previous Image (Left Arrow)' }) as HTMLButtonElement).disabled).toBe(true);
+        expect((screen.getByRole('button', { name: 'Next Image (Right Arrow)' }) as HTMLButtonElement).disabled).toBe(true);
+        fireEvent.click(screen.getByRole('button', { name: 'Next Image (Right Arrow)' }));
         expect(props.onNext).toHaveBeenCalledOnce();
     });
 

@@ -20,6 +20,7 @@ interface ReferenceListProps {
     groups: InvokeReferenceGroup[];
     pendingImageId: string | null;
     title: string;
+    section: 'source' | 'used-by';
     onOpen: (group: InvokeReferenceGroup) => void;
 }
 
@@ -28,11 +29,12 @@ const ReferenceList = ({
     groups,
     pendingImageId,
     title,
+    section,
     onOpen,
 }: ReferenceListProps) => {
     const { t } = useTranslation();
     if (groups.length === 0) return null;
-    const headingId = `invoke-${title === 'Source Images' ? 'source-images' : 'used-by'}-heading`;
+    const headingId = `invoke-${section}-heading`;
 
     return (
         <section aria-labelledby={headingId}>
@@ -45,11 +47,11 @@ const ReferenceList = ({
                     const isAvailable = group.availability === 'available' && Boolean(group.imageId) && !isCurrent;
                     const isPending = isAvailable && pendingImageId === group.imageId;
                     const status = isCurrent
-                        ? 'Current image'
+                        ? t('Current image')
                         : group.availability === 'removed'
-                            ? 'Removed from library'
+                            ? t('Removed from library')
                             : group.availability === 'unresolved'
-                                ? 'Unavailable in Dvoyna Vault'
+                                ? t('Unavailable in Dvoyna Vault')
                                 : null;
 
                     return (
@@ -148,6 +150,7 @@ export const InvokeReferenceLinks = ({ imageId, onOpenImage }: InvokeReferenceLi
                 groups={graph.sourceImages}
                 pendingImageId={pendingImageId}
                 title={t('Source Images')}
+                section="source"
                 onOpen={group => void handleOpen(group)}
             />
             <ReferenceList
@@ -155,6 +158,7 @@ export const InvokeReferenceLinks = ({ imageId, onOpenImage }: InvokeReferenceLi
                 groups={graph.usedBy}
                 pendingImageId={pendingImageId}
                 title={t('Used By')}
+                section="used-by"
                 onOpen={group => void handleOpen(group)}
             />
         </div>

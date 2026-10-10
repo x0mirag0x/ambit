@@ -39,7 +39,7 @@ describe('ViewerToolbar', () => {
     it('renders active favorite, pin, theater, hidden-sidebar, and hidden-control variants', () => {
         const { container } = setup({ image: image({ isFavorite: true, isPinned: true }), showControls: false, isTheaterMode: true, isSidebarOpen: false });
         expect(container.firstElementChild?.className).toContain('opacity-0');
-        expect(screen.getByRole('button', { name: 'Remove from Favorites (F)' }).querySelector('.fill-red-500')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Remove from Favorites (F)' }).querySelector('.fill-favorite\\/85')).toBeTruthy();
         expect(screen.getByRole('button', { name: 'Unpin (P)' }).className).toContain('text-sage-400');
         expect(screen.getByRole('button', { name: 'Exit Theater Mode (Z)' }).className).toContain('text-sage-400');
         expect(screen.queryByRole('button', { name: 'Show Sidebar (I)' })).toBeNull();

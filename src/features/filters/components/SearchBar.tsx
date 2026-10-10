@@ -344,6 +344,55 @@ export const SearchBar = React.memo(({
     };
 
     const photoInputRef = React.useRef<HTMLInputElement>(null);
+    const showTextClear = Boolean(localValue) && !searchProps.isSearchingAi;
+    const showPhotoClear = Boolean(searchProps.visualSearchActive);
+    const cameraPositionClass = showTextClear && showPhotoClear ? 'right-14' : showTextClear || showPhotoClear ? 'right-8' : 'right-2';
+    const cameraClassName = `absolute top-1/2 -translate-y-1/2 p-1 disabled:cursor-wait ${cameraPositionClass} ${showPhotoClear ? 'rounded-md bg-sage-500/15 text-sage-600 dark:text-sage-300' : 'text-gray-400 hover:text-sage-600 dark:text-zinc-500 dark:hover:text-sage-300'}`;
+    const openPhotoSearch = () => {
+        void (async () => {
+            if (!isTauriRuntime()) {
+                photoInputRef.current?.click();
+                return;
+            }
+            const { open } = await import('@tauri-apps/plugin-dialog');
+            const selected = await open({
+                multiple: false,
+                filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp'] }],
+            });
+            if (typeof selected === 'string') searchProps.onSearchByPhoto?.(selected);
+        })();
+    };
+    const cameraButton = showPhotoClear ? (
+        <TooltipButton
+            label={t('Search by photo')}
+            content={t('Photo search is active')}
+            aria-pressed={true}
+            disabled={searchProps.visualSearchBusy}
+            onClick={openPhotoSearch}
+            className={cameraClassName}
+        >
+            {searchProps.visualSearchBusy ? (
+                <LoaderCircle aria-hidden="true" className="w-4 h-4 animate-spin" />
+            ) : (
+                <Camera aria-hidden="true" className="w-4 h-4" />
+            )}
+        </TooltipButton>
+    ) : (
+        <button
+            type="button"
+            aria-label={t('Search by photo')}
+            aria-pressed={false}
+            disabled={searchProps.visualSearchBusy}
+            onClick={openPhotoSearch}
+            className={cameraClassName}
+        >
+            {searchProps.visualSearchBusy ? (
+                <LoaderCircle aria-hidden="true" className="w-4 h-4 animate-spin" />
+            ) : (
+                <Camera aria-hidden="true" className="w-4 h-4" />
+            )}
+        </button>
+    );
     const listLabel = options[0]?.kind === 'recent' ? t('Recent searches') : t('Search operator suggestions');
     const accessibleName = searchProps.isAiSearchEnabled
         ? t('Ask {{appName}} with AI', { appName: APP_NAME })
@@ -382,38 +431,13 @@ export const SearchBar = React.memo(({
                     aria-busy={showLoadingIndicator}
                     readOnly={searchProps.isSearchingAi}
                     placeholder={searchProps.isAiSearchEnabled ? t('Ask {{APP_NAME}}...', { APP_NAME: APP_NAME }) : t('Search in {{scopeName}}...', { scopeName: localizeScopeName(scopeName, t) })}
-                    className={`w-full bg-gray-100 dark:bg-zinc-800/50 border rounded-xl py-2 pl-10 ${localValue ? 'pr-16' : 'pr-10'} text-sm focus:outline-none transition-all text-gray-900 dark:text-gray-100 placeholder-gray-500 ${searchProps.isAiSearchEnabled ? 'border-amethyst-300 dark:border-amethyst-800 focus:border-amethyst-500/50 focus:ring-1 focus:ring-amethyst-500/30' : 'border-gray-200 dark:border-white/10 focus:border-sage-500/50 focus:ring-1 focus:ring-sage-500/30'}`}
+                    className={`w-full bg-gray-100 dark:bg-zinc-800/50 border rounded-xl py-2 pl-10 ${showTextClear && showPhotoClear ? 'pr-24' : showTextClear || showPhotoClear ? 'pr-16' : 'pr-10'} text-sm focus:outline-none transition-all text-gray-900 dark:text-gray-100 placeholder-gray-500 ${searchProps.isAiSearchEnabled ? 'border-amethyst-300 dark:border-amethyst-800 focus:border-amethyst-500/50 focus:ring-1 focus:ring-amethyst-500/30' : 'border-gray-200 dark:border-white/10 focus:border-sage-500/50 focus:ring-1 focus:ring-sage-500/30'}`}
                     value={localValue}
                     onChange={handleSearchChange}
                     onKeyDown={handleKeyDown}
                     autoComplete="off"
                 />
-                <button
-                    type="button"
-                    aria-label={t('Search by photo')}
-                    disabled={searchProps.visualSearchBusy}
-                    onClick={() => {
-                        void (async () => {
-                            if (!isTauriRuntime()) {
-                                photoInputRef.current?.click();
-                                return;
-                            }
-                            const { open } = await import('@tauri-apps/plugin-dialog');
-                            const selected = await open({
-                                multiple: false,
-                                filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif', 'bmp'] }],
-                            });
-                            if (typeof selected === 'string') searchProps.onSearchByPhoto?.(selected);
-                        })();
-                    }}
-                    className={`absolute top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-sage-600 dark:text-zinc-500 dark:hover:text-sage-300 ${localValue && !searchProps.isSearchingAi ? 'right-8' : 'right-2'}`}
-                >
-                    {searchProps.visualSearchBusy ? (
-                        <LoaderCircle aria-hidden="true" className="w-4 h-4 animate-spin" />
-                    ) : (
-                        <Camera aria-hidden="true" className="w-4 h-4" />
-                    )}
-                </button>
+                {cameraButton}
                 <input
                     ref={photoInputRef}
                     type="file"
@@ -426,7 +450,17 @@ export const SearchBar = React.memo(({
                         if (file) searchProps.onSearchByPhoto?.(file);
                     }}
                 />
-                {localValue && !searchProps.isSearchingAi ? (
+                {showPhotoClear ? (
+                    <button
+                        type="button"
+                        aria-label={t('Reset photo search')}
+                        onClick={searchProps.onResetVisualSearch}
+                        className={`absolute top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-900 dark:text-zinc-500 dark:hover:text-white ${showTextClear ? 'right-8' : 'right-2'}`}
+                    >
+                        <X aria-hidden="true" className="w-3.5 h-3.5" />
+                    </button>
+                ) : null}
+                {showTextClear ? (
                     <button
                         type="button"
                         aria-label={t('Clear Search')}
@@ -455,18 +489,6 @@ export const SearchBar = React.memo(({
                     </React.Suspense>
                 ) : null}
             </div>
-                {searchProps.visualSearchActive ? (
-                    <div className="relative z-[60] mt-2 flex items-center gap-2">
-                        <span className="rounded-full border border-sage-500/40 bg-sage-500/10 px-2.5 py-1 text-[11px] font-semibold text-sage-700 dark:text-sage-200">{t('Search by photo')}</span>
-                        <button
-                            type="button"
-                            onClick={searchProps.onResetVisualSearch}
-                            className="text-[11px] font-semibold text-gray-500 hover:text-gray-900 dark:text-zinc-400 dark:hover:text-white"
-                        >
-                            {t('Reset photo search')}
-                        </button>
-                    </div>
-                ) : null}
             </div>
             <TooltipButton
                 label={searchProps.isAiSearchEnabled ? t('Disable AI Search') : t('Enable AI Search')}

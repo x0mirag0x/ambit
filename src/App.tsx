@@ -6,7 +6,7 @@ import { AppLayout } from './components/AppLayout';
 import { GlobalModals } from './components/GlobalModals';
 import { AppContextMenu } from './components/ui/AppContextMenu';
 import { OnboardingWizard, type OnboardingSettingsUpdate } from './components/ui/OnboardingWizard';
-import { ImportModal } from './components/ui/ImportModal';
+import { ImportModal, type ManualImportRequest } from './components/ui/ImportModal';
 import { TitleBar } from './components/ui/TitleBar';
 import { DragOverlay } from './components/ui/DragOverlay';
 import { InvokeOwnerScopeGate } from './components/ui/InvokeOwnerScopeGate';
@@ -44,6 +44,8 @@ import { useWatchers } from './contexts/WatcherContext';
 import { derivePromptHighlightSpec } from './features/viewer/utils/searchHighlights';
 import { settingsPersistenceCoordinator } from './utils/settingsPersistenceCoordinator';
 import { pickVideoPaths } from './services/videoService';
+import { listImportedLibraryIds } from './services/importCollectionMembership';
+import type { ImportResult } from './services/importService';
 import { getImageWithFullMetadata } from './services/db/imageRepo';
 import { INVOKE_REFERENCE_QUERY_KEY } from './services/db/invokeReferenceRepo';
 import type { ActiveImageStateAdapter } from './hooks/activeImageState';
@@ -122,6 +124,8 @@ export default function App() {
     const [gridLayout, setGridLayout] = useState<{ columns: number, rowHeight: number }>({ columns: 1, rowHeight: 200 });
 
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+    const pendingFileImportCollectionId = useRef<string | null>(null);
+    const folderInputRef = useRef<HTMLInputElement>(null);
     const [isCompletingOnboarding, setIsCompletingOnboarding] = useState(false);
     const openImportModal = useCallback(() => setIsImportModalOpen(true), []);
 
@@ -179,6 +183,11 @@ export default function App() {
     const selectedImageIndexRef = useRef(selectedImageIndex);
     const viewingImageIdRef = useRef(viewingImageId);
     const viewerSessionImagesRef = useRef(viewerSessionImages);
+    const manualImportCollection = React.useMemo(() => {
+        if (!filters.collectionId) return null;
+        const collection = collections.find(item => item.id === filters.collectionId);
+        return collection ? { id: collection.id, name: collection.name } : null;
+    }, [collections, filters.collectionId]);
     activeCollectionIdRef.current = filters.collectionId;
     imagesRef.current = images;
     selectedImageIndexRef.current = selectedImageIndex;
@@ -467,7 +476,33 @@ export default function App() {
         modals.openModal('settings');
     }, [modals.openModal, modals.setInitialSettingsTab]);
 
-    const handleSelectFilesImport = useCallback(async () => {
+    const collectionIdForImport = useCallback((addToActiveCollection: boolean) => (
+        addToActiveCollection ? manualImportCollection?.id ?? null : null
+    ), [manualImportCollection]);
+
+    const attachImportedItems = useCallback(async (
+        collectionId: string | null,
+        filePaths: string[],
+        directoryPaths: string[],
+        result: ImportResult | void
+    ) => {
+        if (!collectionId || !result) return;
+        try {
+            const ids = await listImportedLibraryIds({
+                filePaths,
+                directoryPaths,
+                importedImages: result.images,
+            });
+            if (ids.length === 0) return;
+            await colOps.addImagesToCollection(ids, collectionId);
+        } catch (error) {
+            console.error('[Import] Failed to add imported items to the open collection', error);
+            addToast(t('Failed to add to collection'), 'error');
+        }
+    }, [addToast, colOps, t]);
+
+    const handleSelectFilesImport = useCallback(async (request: ManualImportRequest = { addToActiveCollection: false }) => {
+        const collectionId = collectionIdForImport(request.addToActiveCollection);
         const isTauriEnv = typeof window !== 'undefined' && !!(window as Window & { __TAURI_INTERNALS__?: unknown }).__TAURI_INTERNALS__;
 
         if (isTauriEnv) {
@@ -489,7 +524,8 @@ export default function App() {
                     : (typeof selected === 'string' ? [selected] : []);
 
                 if (paths.length > 0) {
-                    await fileOps.handleImportPaths(paths);
+                    const result = await fileOps.handleImportPaths(paths);
+                    await attachImportedItems(collectionId, paths, [], result);
                 }
                 return;
             } catch (error) {
@@ -497,18 +533,54 @@ export default function App() {
             }
         }
 
+        pendingFileImportCollectionId.current = collectionId;
         fileOps.fileInputRef.current?.click();
-    }, [fileOps]);
+    }, [attachImportedItems, collectionIdForImport, fileOps]);
 
-    const handleSelectVideosImport = useCallback(async () => {
+    const handleSelectVideosImport = useCallback(async (request: ManualImportRequest = { addToActiveCollection: false }) => {
+        const collectionId = collectionIdForImport(request.addToActiveCollection);
         try {
             const paths = await pickVideoPaths();
             if (paths.length === 0) return;
-            await fileOps.handleImportPaths(paths);
+            const result = await fileOps.handleImportPaths(paths);
+            await attachImportedItems(collectionId, paths, [], result);
         } catch (error) {
             addToast(t('Video import failed: {{v0}}', { v0: String(error) }), 'error');
         }
-    }, [addToast, fileOps]);
+    }, [addToast, attachImportedItems, collectionIdForImport, fileOps, t]);
+
+    const handleSelectFolderImport = useCallback(async (request: ManualImportRequest = { addToActiveCollection: false }) => {
+        const collectionId = collectionIdForImport(request.addToActiveCollection);
+        const isTauriEnv = typeof window !== 'undefined' && !!(window as Window & { __TAURI_INTERNALS__?: unknown }).__TAURI_INTERNALS__;
+
+        if (isTauriEnv) {
+            try {
+                const { open } = await import('@tauri-apps/plugin-dialog');
+                const selected = await open({
+                    multiple: false,
+                    directory: true,
+                    title: t('Add Folder'),
+                });
+                const directory = typeof selected === 'string' ? selected : null;
+                if (!directory) return;
+                const result = await fileOps.handleImportFolders([{ path: directory }]);
+                await attachImportedItems(collectionId, [], [directory], result);
+                return;
+            } catch (error) {
+                console.error('[App] Native folder picker import failed, falling back to folder input.', error);
+            }
+        }
+
+        pendingFileImportCollectionId.current = collectionId;
+        folderInputRef.current?.click();
+    }, [attachImportedItems, collectionIdForImport, fileOps, t]);
+
+    const handleBrowserFileImport = useCallback(async (event: React.ChangeEvent<HTMLInputElement>, directoryPaths: string[]) => {
+        const collectionId = pendingFileImportCollectionId.current;
+        pendingFileImportCollectionId.current = null;
+        const result = await fileOps.importImages(event);
+        await attachImportedItems(collectionId, [], directoryPaths, result);
+    }, [attachImportedItems, fileOps]);
 
     useFolderMonitor({
         isLoaded,
@@ -1122,8 +1194,10 @@ export default function App() {
                 isOpen={isImportModalOpen}
                 onClose={() => setIsImportModalOpen(false)}
                 onOpenSettings={(tab) => { modals.setInitialSettingsTab(tab); modals.openModal('settings'); }}
-                onImportFiles={() => { void handleSelectFilesImport(); }}
-                onImportVideos={() => { void handleSelectVideosImport(); }}
+                activeCollection={manualImportCollection}
+                onImportFiles={(request) => { void handleSelectFilesImport(request); }}
+                onImportVideos={(request) => { void handleSelectVideosImport(request); }}
+                onImportFolder={(request) => { void handleSelectFolderImport(request); }}
             />
             <input
                 type="file"
@@ -1131,7 +1205,17 @@ export default function App() {
                 className="hidden"
                 multiple
                 accept="image/png,image/jpeg,image/webp"
-                onChange={fileOps.importImages}
+                onChange={(event) => { void handleBrowserFileImport(event, []); }}
+            />
+            <input
+                type="file"
+                ref={(node) => {
+                    folderInputRef.current = node;
+                    node?.setAttribute('webkitdirectory', '');
+                }}
+                className="hidden"
+                multiple
+                onChange={(event) => { void handleBrowserFileImport(event, []); }}
             />
             <DragOverlay isVisible={isDraggingExternal} />
 
