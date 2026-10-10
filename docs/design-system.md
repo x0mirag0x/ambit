@@ -10,7 +10,8 @@ Dvoyna Vault uses a restrained semantic palette. The executable color values in 
 - **Amethyst** identifies AI-assisted features. Do not use it for stacks, versions, collection thumbnails, or non-AI background work.
 - **Harbor** is informational. Use it for discovery, online lookup context, and non-AI background activity, never as a competing primary-action color.
 - **Ember** marks warnings, missing information, modified metadata, and attention states. It replaces semantic amber, orange, and yellow.
-- **Red** is limited to errors, destructive operations, Removed, and favorite-heart conventions. Prefer tinted surfaces; reserve solid red for destructive confirmation.
+- **Red** is limited to errors, destructive operations, and Removed. Prefer tinted surfaces; reserve solid red for destructive confirmation.
+- **Favorite** is one soft rose, `--color-favorite` (`#E8838F`). Hearts use it at 85% opacity. Chips and badges use the same color as a very light translucent surface. The sidebar favorite button keeps the gold background and uses this rose for the heart.
 - **Neutrals** identify providers, resource types, metadata categories, and ordinary filter chips.
 
 For small colored text, use `*-600` on light surfaces and `*-300` on dark surfaces. Use lighter steps for backgrounds and borders. Pair every color cue with text, an icon, or another non-color signal.

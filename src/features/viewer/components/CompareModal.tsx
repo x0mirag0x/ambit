@@ -15,6 +15,7 @@ import {
 import { useSettingsStore } from '../../../stores/settingsStore';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import { useTranslation } from 'react-i18next';
+import { FAVORITE_ICON_CLASS } from '../../../theme/favorite';
 
 interface CompareModalProps {
     imageA: AIImage;
@@ -175,7 +176,7 @@ const ImageActions = ({
             }}
             className="p-2.5 bg-black/60 hover:bg-black/90 rounded-full transition-all group cursor-pointer border border-white/10 backdrop-blur-md"
         >
-            <Heart className={`w-4 h-4 transition-transform group-hover:scale-110 ${img.isFavorite ? 'fill-red-500 text-red-500' : 'text-white'}`} />
+            <Heart className={`w-4 h-4 transition-transform group-hover:scale-110 ${img.isFavorite ? FAVORITE_ICON_CLASS : 'text-white'}`} />
         </TooltipButton>
 
         {onTogglePin && (

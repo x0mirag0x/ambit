@@ -5,6 +5,7 @@ import { AIImage } from '../../../types';
 import { ViewerToolbarButton } from './ViewerToolbarButton';
 import { ViewerToolbarFrame } from './ViewerToolbarFrame';
 import { useTranslation } from 'react-i18next';
+import { FAVORITE_ICON_CLASS } from '../../../theme/favorite';
 
 interface ViewerToolbarProps {
     image: AIImage;
@@ -77,7 +78,7 @@ export const ViewerToolbar: React.FC<ViewerToolbarProps> = ({
                         aria-pressed={image.isFavorite}
                         onClick={onToggleFavorite}
                     >
-                        <Heart className={`w-5 h-5 ${image.isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
+                        <Heart className={`w-5 h-5 ${image.isFavorite ? FAVORITE_ICON_CLASS : ''}`} />
                     </ViewerToolbarButton>
                 )}
                 {onTogglePin && (

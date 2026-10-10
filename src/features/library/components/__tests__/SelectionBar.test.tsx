@@ -138,7 +138,7 @@ describe('SelectionBar', () => {
         const favoriteButton = screen.getByRole('button', { name: 'Remove Selected from Favorites' });
         const pinButton = screen.getByRole('button', { name: 'Unpin Selected Items' });
 
-        expect(favoriteButton.className).toContain('text-red-500');
+        expect(favoriteButton.className).toContain('text-favorite/85');
         expect(favoriteButton.querySelector('svg')?.getAttribute('class')).toContain('fill-current');
         expect(pinButton.className).toContain('text-sage-600');
         expect(pinButton.querySelector('svg')?.getAttribute('class')).toContain('fill-current');

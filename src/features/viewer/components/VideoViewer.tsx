@@ -28,6 +28,7 @@ import { useMetadataDisclosureState } from '../hooks/useMetadataDisclosureState'
 import { useViewerPreferredTab } from '../hooks/useViewerPreferredTab';
 import { useTranslation } from 'react-i18next';
 import { translateRuntimeMessage } from '../../../i18n/statusMessages';
+import { FAVORITE_ICON_CLASS } from '../../../theme/favorite';
 
 type VideoViewerTab = 'details' | 'metadata' | 'workflow';
 
@@ -362,7 +363,7 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
                         aria-pressed={video.isFavorite}
                         onClick={() => onToggleFavorite(video.id)}
                     >
-                        <Heart className={video.isFavorite ? 'fill-red-500 text-red-500' : ''} />
+                        <Heart className={video.isFavorite ? FAVORITE_ICON_CLASS : ''} />
                     </ViewerToolbarButton>}
                     {onTogglePin && (
                         <ViewerToolbarButton

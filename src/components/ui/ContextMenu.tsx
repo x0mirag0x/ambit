@@ -8,6 +8,7 @@ import {
 import { TooltipButton } from './InfoTooltip';
 import type { SourceKind } from '../../types';
 import { useTranslation } from 'react-i18next';
+import { FAVORITE_ICON_CLASS } from '../../theme/favorite';
 
 interface ContextMenuProps {
   x: number;
@@ -122,7 +123,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
       <div className="flex items-center justify-between px-2 pb-1.5 pt-0.5 border-b border-white/5 mb-1">
         <div className="flex gap-0.5">
           <ActionButton
-            icon={<Heart className={`w-4 h-4 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />}
+            icon={<Heart className={`w-4 h-4 ${isFavorite ? FAVORITE_ICON_CLASS : 'text-gray-400'}`} />}
             onClick={() => onToggleFavorite?.()}
             label={isFavorite ? t('Unfavorite') : t('Favorite')}
             pressed={Boolean(isFavorite)}

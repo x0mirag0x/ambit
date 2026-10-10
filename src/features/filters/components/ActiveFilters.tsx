@@ -7,6 +7,7 @@ import { getDateFilterLabel } from '../../../utils/dateFilters';
 import { getEffectiveImageKind } from '../../../utils/filterState';
 import { generationTypeLabel, localizeFilterSentinel } from '../filterLabels';
 import { useTranslation } from 'react-i18next';
+import { FAVORITE_CHIP_CLASS, FAVORITE_ICON_CLASS } from '../../../theme/favorite';
 
 interface ActiveFiltersProps {
     filters: FilterState;
@@ -231,8 +232,8 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = () => {
             )}
 
             {showFavoritesFilter && (
-                <div className="flex items-center gap-1 rounded-full border border-red-200 bg-red-100 px-2 py-0.5 text-xs text-red-600 dark:border-red-500/30 dark:bg-red-500/15 dark:text-red-300">
-                    <Heart aria-hidden="true" className="h-3 w-3 shrink-0 fill-current" />
+                <div className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${FAVORITE_CHIP_CLASS}`}>
+                    <Heart aria-hidden="true" className={`h-3 w-3 shrink-0 ${FAVORITE_ICON_CLASS}`} />
                     <span>{t('Favorites')}</span>
                     <button type="button" aria-label={t('Clear Favorites Filter')} onClick={() => setFilters(f => ({ ...f, favoritesOnly: false }))}><X className="w-3 h-3" /></button>
                 </div>
