@@ -147,6 +147,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     viewMode, changeViewMode, searchProps, layoutMode, setLayoutMode,
     sortOption, setSortOption, displayedCount, scopeTotal, scopeName,
     fileOps, onOpenImportModal, workspaceRef, scrollContainerRef,
+    images: presentationImages,
     handlers, setViewingImageId, onMaintenanceViewerOpenChange, onOpenReferencedImage, onViewerSearch, isViewerShortcutBlocked, onSetImageKind,
     modelOptions = [],
     actions, availableTags, selectedIds,
@@ -212,7 +213,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     // Derived
     // Store Access
     const {
-        images,
+        images: queriedImages,
         globalTotal,
         sourceKindCounts,
         scopeCounts,
@@ -228,6 +229,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         loadMoreImages,
         isLoadingMore
     } = useSearch();
+    const photoSearchBusy = Boolean(searchProps.visualSearchBusy);
+    const images = visualSearchActive ? presentationImages : queriedImages;
     const isSearchPending = isFiltering || isSearchDraftPending;
     const shouldShowSearchSkeleton = isSearchPending && images.length === 0;
     // const images = useSearchStore(s => s.images); // Images available in context
@@ -277,7 +280,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         filters.pinnedOnly ? 'pinned-only' : 'unpinned-scope',
         filters.showGrids ? 'show-grids' : 'hide-grids',
         filters.showIntermediates ? 'show-intermediates' : 'hide-intermediates',
-        filters.showInvokeImageAssets ? 'show-invoke-assets' : 'hide-invoke-assets'
+        filters.showInvokeImageAssets ? 'show-invoke-assets' : 'hide-invoke-assets',
+        ...(visualSearchActive ? ['photo-search'] : []),
     ].join('|'), [
         layoutMode,
         settings.thumbnailSize,
@@ -288,7 +292,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         filters.pinnedOnly,
         filters.showGrids,
         filters.showIntermediates,
-        filters.showInvokeImageAssets
+        filters.showInvokeImageAssets,
+        visualSearchActive,
     ]);
 
     const renderGridItem = React.useCallback((img: AIImage, style: React.CSSProperties, index: number, layout?: GridLayoutPosition) => (
@@ -480,6 +485,10 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                                         modelOptions={modelOptions}
                                     />
                                 </React.Suspense>
+                            ) : visualSearchActive && photoSearchBusy ? (
+                                <div data-testid="photo-search-pending" className="flex h-full items-center justify-center" aria-live="polite" aria-busy="true" aria-label={t('Search by photo')}>
+                                    <ViewLoadingFallback />
+                                </div>
                             ) : (images.length > 0 || isSearchPending) ? (
                                 <>
                                     {shouldShowSearchSkeleton ? (
@@ -501,9 +510,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                                             onContextMenu={(e, id) => handlers.setContextMenu({ x: e.clientX, y: e.clientY, imageId: id })}
                                             onRangeSelection={handleRangeSelection}
                                             onBackgroundClick={clearSelection}
-                                            hasMoreImages={hasMoreImages}
-                                            isLoadingMore={isLoadingMore}
-                                            onLoadMore={loadMoreImages}
+                                            hasMoreImages={visualSearchActive ? false : hasMoreImages}
+                                            isLoadingMore={visualSearchActive ? false : isLoadingMore}
+                                            onLoadMore={visualSearchActive ? undefined : loadMoreImages}
                                         />
                                     ) : (
                                         <>
@@ -537,7 +546,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                                                 gap={16}
                                                 padding={24}
                                                 scrollContainerRef={scrollContainerRef}
-                                                onEndReached={loadMoreImages}
+                                                onEndReached={visualSearchActive ? undefined : loadMoreImages}
                                                 getItemRatio={(img) => {
                                                     const w = img.width || 1;
                                                     const h = img.height || 1;
@@ -553,7 +562,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                                                 transitionKey={galleryTransitionKey}
                                                 suspendResizeLayout={isFilterPanelLayoutTransitioning}
                                             />
-                                            {isLoadingMore && (
+                                            {!visualSearchActive && isLoadingMore && (
                                                 <div className="w-full py-8 flex justify-center items-center">
                                                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sage-500"></div>
                                                 </div>

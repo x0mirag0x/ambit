@@ -1,6 +1,7 @@
 use super::run_blocking;
 use crate::visual::{
-    parse_dhash, rank_similar, signature_from_path, SIMILAR_RESULT_LIMIT,
+    normalize_comparable_path, parse_dhash, rank_similar, signature_from_path,
+    SIMILAR_RESULT_LIMIT,
 };
 use rusqlite::{params, OptionalExtension};
 use tauri::AppHandle;
@@ -27,7 +28,13 @@ pub async fn search_similar_images(
 ) -> Result<Vec<SimilarImageHit>, String> {
     let signature = signature_from_path(&path).ok_or_else(|| "Could not read the search image".to_string())?;
     let query = parse_dhash(&signature.dhash).ok_or_else(|| "Could not hash the search image".to_string())?;
+    let query_path = path;
     run_blocking(app, move |conn| {
+        // The picked file may already be in the library with a null hash if the
+        // silent backfill has not reached it yet. Sign that row, then a bounded
+        // batch of other unsigned images, before ranking.
+        sign_library_copy_of_query(conn, &query_path)?;
+        sign_pending_batch(conn, 400)?;
         let mut statement = conn
             .prepare(
                 "SELECT images.id, images.dhash
@@ -167,6 +174,65 @@ fn mark_visual_signature_unavailable(conn: &rusqlite::Connection, id: &str) -> R
         params![id],
     )
     .map_err(|error| error.to_string())?;
+    Ok(())
+}
+
+fn sign_library_copy_of_query(conn: &rusqlite::Connection, path: &str) -> Result<(), String> {
+    if !visual_columns_ready(conn) {
+        return Ok(());
+    }
+    let wanted = normalize_comparable_path(path);
+    let mut statement = conn
+        .prepare(
+            "SELECT id, path FROM images
+             WHERE media_type = 'image'
+               AND is_deleted = 0
+               AND is_missing = 0
+               AND id IN (SELECT id FROM scoped_images)
+               AND lower(replace(path, char(92), '/')) = ?1
+               AND (dhash IS NULL OR length(dhash) <> 16)",
+        )
+        .map_err(|error| error.to_string())?;
+    let rows = statement
+        .query_map(params![wanted], |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?)))
+        .map_err(|error| error.to_string())?
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|error| error.to_string())?;
+    drop(statement);
+    for (id, stored_path) in rows {
+        if normalize_comparable_path(&stored_path) == wanted {
+            store_visual_signature(conn, &id, &stored_path, false)?;
+        }
+    }
+    Ok(())
+}
+
+fn sign_pending_batch(conn: &rusqlite::Connection, limit: u32) -> Result<(), String> {
+    if !visual_columns_ready(conn) {
+        return Ok(());
+    }
+    let mut statement = conn
+        .prepare(
+            "SELECT id, path FROM images
+             WHERE media_type = 'image'
+               AND is_deleted = 0
+               AND is_missing = 0
+               AND id IN (SELECT id FROM scoped_images)
+               AND (dhash IS NULL OR color_palette IS NULL)
+             LIMIT ?1",
+        )
+        .map_err(|error| error.to_string())?;
+    let rows = statement
+        .query_map(params![limit], |row| {
+            Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))
+        })
+        .map_err(|error| error.to_string())?
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|error| error.to_string())?;
+    drop(statement);
+    for (id, stored_path) in rows {
+        store_visual_signature(conn, &id, &stored_path, false)?;
+    }
     Ok(())
 }
 

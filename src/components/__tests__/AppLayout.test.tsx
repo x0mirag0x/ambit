@@ -281,6 +281,82 @@ describe('AppLayout', () => {
         expect(screen.getByTestId('virtual-grid')).toBeTruthy();
     });
 
+    it('shows the picked library photo in the grid instead of the open library', () => {
+        const flower = { id: 'flower', filename: 'image.jpg', timestamp: 2 } as AIImage;
+        searchState.value = {
+            ...searchState.value,
+            images: [
+                { id: 'other', filename: 'arrows.png', timestamp: 1 },
+                flower,
+                { id: 'later', filename: 'scene.png', timestamp: 3 },
+            ] as AIImage[],
+            globalTotal: 207,
+            totalImages: 207,
+            hasMoreImages: true,
+        };
+
+        const view = render(
+            <AppLayout
+                {...defaultProps}
+                viewMode="grid"
+                visualSearchActive
+                displayedCount={1}
+                scopeTotal={207}
+                images={[flower]}
+                searchProps={{ ...defaultProps.searchProps, visualSearchActive: true, visualSearchBusy: false }}
+            />
+        );
+
+        const gridItems = capturedProps.virtualGrid?.items as Array<{ filename: string }>;
+        expect(gridItems.map(item => item.filename)).toEqual(['image.jpg']);
+
+        view.rerender(
+            <AppLayout
+                {...defaultProps}
+                viewMode="timeline"
+                visualSearchActive
+                displayedCount={1}
+                scopeTotal={207}
+                images={[flower]}
+                searchProps={{ ...defaultProps.searchProps, visualSearchActive: true, visualSearchBusy: false }}
+            />
+        );
+        const timelineImages = capturedProps.timeline?.images as Array<{ filename: string }>;
+        expect(timelineImages.map(item => item.filename)).toEqual(['image.jpg']);
+        expect(capturedProps.timeline?.hasMoreImages).toBe(false);
+    });
+
+    it('shows a spinner while photo search runs and an empty state when nothing matches', () => {
+        searchState.value = {
+            ...searchState.value,
+            images: [{ id: 'library', filename: 'library.png', timestamp: 1 }] as AIImage[],
+            globalTotal: 207,
+        };
+        const view = render(
+            <AppLayout
+                {...defaultProps}
+                viewMode="grid"
+                visualSearchActive
+                images={[]}
+                searchProps={{ ...defaultProps.searchProps, visualSearchBusy: true }}
+            />
+        );
+        expect(screen.getByTestId('photo-search-pending')).toBeTruthy();
+        expect(screen.queryByTestId('virtual-grid')).toBeNull();
+
+        view.rerender(
+            <AppLayout
+                {...defaultProps}
+                viewMode="grid"
+                visualSearchActive
+                images={[]}
+                searchProps={{ ...defaultProps.searchProps, visualSearchBusy: false, onResetVisualSearch: vi.fn() }}
+            />
+        );
+        expect(screen.getByText('No similar photos found')).toBeTruthy();
+        expect(screen.queryByTestId('virtual-grid')).toBeNull();
+    });
+
     it('passes an empty effective keyword list to gallery items while retaining saved keywords', () => {
         useSettingsStore.setState(state => ({
             settings: {

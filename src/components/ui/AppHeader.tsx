@@ -33,6 +33,10 @@ interface AppHeaderProps {
         onFocus: () => void;
         onBlur: () => void;
         onOpenSearchHelp: () => void;
+        visualSearchActive?: boolean;
+        visualSearchBusy?: boolean;
+        onSearchByPhoto?: (source: File | string) => void;
+        onResetVisualSearch?: () => void;
     };
     layoutMode: LayoutMode;
     setLayoutMode: (mode: LayoutMode) => void;

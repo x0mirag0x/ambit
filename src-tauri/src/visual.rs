@@ -38,6 +38,11 @@ pub fn format_dhash(bits: u64) -> String {
     format!("{bits:016x}")
 }
 
+pub fn normalize_comparable_path(path: &str) -> String {
+    let trimmed = path.trim().trim_start_matches(r"\\?\");
+    trimmed.replace('\\', "/").to_ascii_lowercase()
+}
+
 pub fn parse_dhash(value: &str) -> Option<u64> {
     let trimmed = value.trim();
     if trimmed.len() != 16 {
@@ -170,6 +175,19 @@ mod tests {
             ],
         );
         assert_eq!(hits.first().map(|(id, distance)| (id.as_str(), *distance)), Some(("same", 0)));
+    }
+
+    #[test]
+    fn windows_and_posix_paths_refer_to_the_same_file() {
+        let picked = r"C:\Users\RobotComp\Downloads\image.jpg";
+        let stored = "C:/Users/RobotComp/Downloads/Image.JPG";
+        let prefixed = r"\\?\C:\Users\RobotComp\Downloads\image.jpg";
+        assert_eq!(normalize_comparable_path(picked), normalize_comparable_path(stored));
+        assert_eq!(normalize_comparable_path(picked), normalize_comparable_path(prefixed));
+        assert_ne!(
+            normalize_comparable_path(picked),
+            normalize_comparable_path(r"C:\Users\RobotComp\Downloads\other.jpg")
+        );
     }
 
     #[test]

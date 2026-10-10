@@ -370,7 +370,11 @@ export const SearchBar = React.memo(({
                     }}
                     className={`absolute top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-sage-600 dark:text-zinc-500 dark:hover:text-sage-300 ${localValue && !searchProps.isSearchingAi ? 'right-8' : 'right-2'}`}
                 >
-                    <Camera aria-hidden="true" className={`w-4 h-4 ${searchProps.visualSearchBusy ? 'animate-pulse' : ''}`} />
+                    {searchProps.visualSearchBusy ? (
+                        <LoaderCircle aria-hidden="true" className="w-4 h-4 animate-spin" />
+                    ) : (
+                        <Camera aria-hidden="true" className="w-4 h-4" />
+                    )}
                 </button>
                 <input
                     ref={photoInputRef}

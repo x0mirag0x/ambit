@@ -815,6 +815,10 @@ export default function App() {
     }, [images, isInvokeOwnerScopeBlocking]);
 
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        if (!visualSearchActive) return;
+        scrollContainerRef.current?.scrollTo({ top: 0 });
+    }, [visualSearchActive, visualSearchImages]);
     const workspaceRef = useRef<HTMLElement>(null);
     const gridRef = useRef<VirtualGridHandle>(null);
 
