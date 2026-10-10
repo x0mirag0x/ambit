@@ -37,6 +37,30 @@ async saveImagesBatch(images: ImageRecord[]) : Promise<Result<number, string>> {
     else return { status: "error", error: e  as any };
 }
 },
+async searchSimilarImages(path: string) : Promise<Result<SimilarImageHit[], string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("search_similar_images", { path }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getImagePalette(id: string) : Promise<Result<string[], string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_image_palette", { id }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async backfillVisualSignatures(limit: number) : Promise<Result<VisualBackfillResult, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("backfill_visual_signatures", { limit }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
 async reconcileInvokeOwnerInventory(input: InvokeImageOwnerInventoryInput) : Promise<Result<InvokeImageSourceReconcileResult, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("reconcile_invoke_owner_inventory", { input }) };
@@ -956,6 +980,7 @@ thumbnailSource: string | null; chunks: Partial<{ [key in string]: string }>; me
  * Error message if scan failed or resulted in a partial result
  */
 error: string | null; thumbnailVersion: number; detectedSourceKind: SourceKind; photoMetadata: PhotoMetadata | null; photoMetadataError: string | null; captureWallTimeMs: number | null }
+export type SimilarImageHit = { id: string; distance: number }
 export type SourceKind = "generated" | "photograph" | "other"
 export type StartupCacheAction = "restored" | "selective" | "full"
 export type StartupDatabaseRole = "ambit" | "invoke-source" | "mixed"
@@ -1003,6 +1028,7 @@ export type VideoImportOutcome = { status: string; asset: VideoAssetRecord | nul
 export type VideoMetadataConflict = { field: string; selectedValue: string; ignoredValue: string; ignoredSource: MetadataEvidenceSource }
 export type VideoMetadataDiagnostic = { code: string; message: string }
 export type VideoPosterResult = { assetId: string; thumbnailPath: string; thumbnailSource: string }
+export type VisualBackfillResult = { updated: number; remaining: number }
 
 /** tauri-specta globals **/
 

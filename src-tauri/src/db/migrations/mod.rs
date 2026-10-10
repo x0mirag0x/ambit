@@ -152,7 +152,7 @@ mod tests {
     }
 
     #[test]
-    fn migrations_include_mainline_and_photography_through_thumbnail_repair_fix_84() {
+    fn migrations_include_mainline_and_photography_through_visual_signatures_85() {
         let versions: Vec<i64> = get_migrations()
             .iter()
             .map(|migration| migration.version)
@@ -227,7 +227,7 @@ mod tests {
     }
 
     #[test]
-    fn database_at_mainline_49_has_migrations_through_thumbnail_repair_fix_84_pending() {
+    fn database_at_mainline_49_has_migrations_through_visual_signatures_85_pending() {
         let migrations = get_migrations();
         let has_49 = migrations.iter().any(|migration| migration.version == 49);
         let pending_after_49: Vec<i64> = migrations
@@ -241,7 +241,7 @@ mod tests {
             pending_after_49,
             vec![
                 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70,
-                71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84
+                71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85
             ]
         );
     }
