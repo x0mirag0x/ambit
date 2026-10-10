@@ -168,8 +168,47 @@ describe('ImageCard', () => {
         expect(screen.queryByText('Hidden Content')).toBeNull();
         fireEvent.click(screen.getByRole('button', { name: /Open source\.mp4, Video/ }));
         expect(props.onClick).toHaveBeenCalledWith(expect.anything(), true);
-        expect(screen.getByText('AVC')).toBeTruthy();
+        expect(screen.getByTitle('Video · flux_dev').textContent).toBe('Video · flux_dev');
+        expect(screen.queryByText('AVC')).toBeNull();
         expect(screen.getByText('1024x768 · 0:12')).toBeTruthy();
+    });
+
+    it('shows the media type and generation model, and keeps a long model name truncated', () => {
+        const callbacks = { onClick: vi.fn(), onToggleSelection: vi.fn(), onToggleFavorite: vi.fn() };
+        const longModel = 'Seedance 2.5 ultra long checkpoint name that should stay on one line';
+        const { rerender } = render(<ImageCard image={video({ metadata: { ...image().metadata, model: 'Unknown' } })} isSelected={false} {...callbacks} />);
+
+        expect(screen.getByTitle('Video').textContent).toBe('Video');
+        expect(screen.queryByText('AVC')).toBeNull();
+
+        rerender(<ImageCard image={video({ metadata: { ...image().metadata, model: 'Seedance 2.5' } })} isSelected={false} {...callbacks} />);
+        expect(screen.getByTitle('Video · Seedance 2.5').textContent).toBe('Video · Seedance 2.5');
+        expect(screen.queryByText('AVC')).toBeNull();
+
+        rerender(<ImageCard image={video({ metadata: { ...image().metadata, model: 'parsed model', overrideModel: 'Seedance 2.5' } })} isSelected={false} {...callbacks} />);
+        expect(screen.getByTitle('Video · Seedance 2.5')).toBeTruthy();
+        expect(screen.queryByText('parsed model')).toBeNull();
+
+        rerender(<ImageCard image={video({ metadata: { ...image().metadata, model: longModel } })} isSelected={false} {...callbacks} />);
+        const longBadge = screen.getByTitle(`Video · ${longModel}`);
+        expect(longBadge.querySelector('.shrink-0')?.textContent).toBe('Video');
+        expect(longBadge.querySelector('.truncate')?.className).toContain('min-w-0');
+        expect(longBadge.querySelector('.truncate')?.textContent).toBe(` · ${longModel}`);
+
+        rerender(<ImageCard image={image({ sourceKind: 'photograph', metadata: { ...image().metadata, model: 'GPT Image 2' }, photoMetadata: { cameraModel: 'X-T5' } as AIImage['photoMetadata'] })} isSelected={false} {...callbacks} />);
+        expect(screen.getByTitle('Photo · GPT Image 2').textContent).toBe('Photo · GPT Image 2');
+        expect(screen.queryByText('X-T5')).toBeNull();
+
+        rerender(<ImageCard image={image({ sourceKind: 'photograph', metadata: { ...image().metadata, model: 'Unknown' }, photoMetadata: { cameraModel: 'X-T5' } as AIImage['photoMetadata'] })} isSelected={false} {...callbacks} />);
+        expect(screen.getByTitle('Photo').textContent).toBe('Photo');
+        expect(screen.queryByText('X-T5')).toBeNull();
+
+        rerender(<ImageCard image={image({ sourceKind: 'other', metadata: { ...image().metadata, model: 'GPT Image 2' } })} isSelected={false} {...callbacks} />);
+        expect(screen.getByTitle('Other · GPT Image 2').textContent).toBe('Other · GPT Image 2');
+
+        rerender(<ImageCard image={image({ sourceKind: 'other', metadata: { ...image().metadata, model: 'Unknown', modelHash: '1234567890abcdef' } })} isSelected={false} {...callbacks} />);
+        expect(screen.getByTitle('Other').textContent).toBe('Other');
+        expect(screen.queryByText(/Hash:/)).toBeNull();
     });
 
     it('uses only an Dvoyna Vault poster for video cards and has no source-video fallback', () => {
