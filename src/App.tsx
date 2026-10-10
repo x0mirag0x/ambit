@@ -154,6 +154,13 @@ export default function App() {
         refreshMetadata,
         refreshHiddenAvailability
     } = useSearch();
+    const visualSearchActive = useVisualSearchStore(state => state.active);
+    const visualSearchBusy = useVisualSearchStore(state => state.searching);
+    const visualSearchImages = useVisualSearchStore(state => state.images);
+    const resetVisualSearch = useVisualSearchStore(state => state.reset);
+    const beginVisualSearch = useVisualSearchStore(state => state.begin);
+    const showVisualSearch = useVisualSearchStore(state => state.show);
+    const galleryImages = visualSearchActive ? visualSearchImages : images;
     const activeCollectionIdRef = useRef(filters.collectionId);
     const imagesRef = useRef(images);
     const selectedImageIndexRef = useRef(selectedImageIndex);
@@ -181,7 +188,8 @@ export default function App() {
 
         setViewerSessionImages(current => {
             if (current) return current;
-            const snapshot = imagesRef.current;
+            const visualSearch = useVisualSearchStore.getState();
+            const snapshot = (visualSearch.active ? visualSearch.images : imagesRef.current).slice();
             viewerSessionImagesRef.current = snapshot;
             return snapshot;
         });
@@ -203,7 +211,8 @@ export default function App() {
 
         setViewerSessionImages(current => {
             if (current) return current;
-            const snapshot = imagesRef.current;
+            const visualSearch = useVisualSearchStore.getState();
+            const snapshot = (visualSearch.active ? visualSearch.images : imagesRef.current).slice();
             viewerSessionImagesRef.current = snapshot;
             return snapshot;
         });
@@ -212,6 +221,7 @@ export default function App() {
         getImage: (imageId) => (
             images.find(image => image.id === imageId)
             ?? viewerSessionImages?.find(image => image.id === imageId)
+            ?? useVisualSearchStore.getState().images.find(image => image.id === imageId)
             ?? (directViewerImage?.id === imageId ? directViewerImage : undefined)
         ),
         updateImage: (imageId, updater) => {
@@ -277,7 +287,7 @@ export default function App() {
     const {
         selectedIds, setSelectedIds, lastSelectedId, setLastSelectedId,
         handleImageClick, handleSelectionToggle, handleRangeSelection, clearSelection
-    } = useSelection(images);
+    } = useSelection(galleryImages);
     const handleViewerImageClick = useCallback((
         event: React.MouseEvent,
         id: string,
@@ -330,7 +340,7 @@ export default function App() {
         viewingImageId,
         selectedImageIndex,
         setSelectedImageIndex,
-        viewerImages: viewerSessionImages ?? images,
+        viewerImages: viewerSessionImages ?? galleryImages,
         setViewerSessionImages,
         fileOps,
         selectedIds,
@@ -602,13 +612,6 @@ export default function App() {
         });
         setRecentSearches(prev => [term, ...prev.filter(search => search !== term)].slice(0, 8));
     }, [setFilters, setRecentSearches]);
-    const visualSearchActive = useVisualSearchStore(state => state.active);
-    const visualSearchBusy = useVisualSearchStore(state => state.searching);
-    const visualSearchImages = useVisualSearchStore(state => state.images);
-    const resetVisualSearch = useVisualSearchStore(state => state.reset);
-    const beginVisualSearch = useVisualSearchStore(state => state.begin);
-    const showVisualSearch = useVisualSearchStore(state => state.show);
-
     const searchByPhoto = useCallback(async (source: File | string) => {
         beginVisualSearch();
         try {
@@ -704,7 +707,6 @@ export default function App() {
             (activeSmartCollection ? totalImages : globalTotal),
         totalImages
     );
-    const galleryImages = visualSearchActive ? visualSearchImages : images;
     const currentLibraryPresentation: RetainedLibraryPresentation = {
         images: galleryImages,
         totalImages: visualSearchActive ? visualSearchImages.length : totalImages,
@@ -846,7 +848,7 @@ export default function App() {
         viewMode,
         disabled: isRetainingPreviousRuntimeView,
         selectedIds,
-        filteredImages: images,
+        filteredImages: galleryImages,
         lastSelectedId,
         isViewerOpen: viewingImageId !== null || selectedImageIndex !== null || isMaintenanceViewerOpen,
         gridRef,

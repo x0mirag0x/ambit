@@ -9,6 +9,7 @@ import type { InvokeOwnerScopeState } from './contexts/SyncContext';
 import App from './App';
 import { settingsPersistenceCoordinator } from './utils/settingsPersistenceCoordinator';
 import { useLibraryStore } from './stores/libraryStore';
+import { useVisualSearchStore } from './stores/visualSearchStore';
 
 type AppLayoutProbe = {
     isInvokeCollectionCatchupPending: boolean;
@@ -532,6 +533,7 @@ describe('App orchestration', () => {
         mocks.isInvokeSyncActive = false;
         mocks.isLiveSyncing = false;
         useLibraryStore.setState({ isStartupCatchupPending: false });
+        useVisualSearchStore.getState().reset();
         mocks.churnClearAllFiltersIdentity = false;
         mocks.filters = createDefaultFilters();
         mocks.selectedIds = new Set();
@@ -1461,6 +1463,31 @@ describe('App orchestration', () => {
         act(() => requireProbe(captured.appLayout, 'AppLayout').setSelectedImageIndex(0));
         await waitFor(() => expect(captured.viewer?.initiallyRevealed).toBe(false));
         expect(requireProbe(captured.viewer, 'ImageViewer').isMasked).toBe(true);
+    });
+
+    it('click result opens that exact item', async () => {
+        const newest = image('newest');
+        const match = image('match');
+        const neighbor = image('neighbor');
+        mocks.images = [newest, match];
+        useVisualSearchStore.getState().show([match, neighbor]);
+        mocks.handleImageClick.mockImplementation((
+            _event: React.MouseEvent,
+            _id: string,
+            index: number,
+            callback: (nextIndex: number) => void,
+        ) => callback(index));
+        render(<App />);
+
+        const layout = requireProbe(captured.appLayout, 'AppLayout');
+        expect(layout.images.map(item => item.id)).toEqual(['match', 'neighbor']);
+        act(() => layout.handleImageClick({} as React.MouseEvent, match.id, 0, layout.setSelectedImageIndex));
+        await waitFor(() => expect(captured.viewer?.image.id).toBe(match.id));
+        expect(requireProbe(captured.viewer, 'ImageViewer').canNavigatePrevious).toBe(false);
+
+        act(() => requireProbe(captured.viewer, 'ImageViewer').onNext());
+        await waitFor(() => expect(captured.viewer?.image.id).toBe(neighbor.id));
+        expect(requireProbe(captured.viewer, 'ImageViewer').canNavigateNext).toBe(false);
     });
 
     it('opens a referenced asset outside the current query without changing gallery results', async () => {

@@ -7,6 +7,7 @@ import { SearchProvider, useSearch } from '../SearchContext';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { privacyMaskRefreshCoordinator } from '../../utils/privacyMaskRefreshCoordinator';
 import { useInvokeOwnerScopeStore } from '../../stores/invokeOwnerScopeStore';
+import { useVisualSearchStore } from '../../stores/visualSearchStore';
 
 type SearchValue = ReturnType<typeof useSearch>;
 
@@ -238,6 +239,7 @@ describe('SearchProvider', () => {
             privacyMaskIndexRetryToken: 0,
         });
         useInvokeOwnerScopeStore.getState().resetOwnerScopeState();
+        useVisualSearchStore.getState().reset();
     });
 
     afterEach(() => vi.useRealTimers());
@@ -688,6 +690,25 @@ describe('SearchProvider', () => {
             true,
             true
         );
+    });
+
+    it('like on result toggles that item', async () => {
+        const newest = image({ id: 'newest', filename: 'arrows.png' });
+        const libraryCopy = image({ id: 'flower', filename: 'image.jpg', isFavorite: false });
+        const resultCopy = image({ id: 'flower', filename: 'image.jpg', isFavorite: false });
+        (mocks.searchState.current as SearchValue).images = [newest, libraryCopy];
+        useVisualSearchStore.getState().show([resultCopy]);
+        renderProvider();
+
+        await act(() => latest.toggleFavorite('flower'));
+        expect(useVisualSearchStore.getState().images.map(item => item.isFavorite)).toEqual([true]);
+        expect(mocks.updateFavorite).toHaveBeenCalledWith('flower', true);
+        expect((mocks.searchState.current as SearchValue).images.find(item => item.id === 'flower')?.isFavorite).toBe(true);
+        expect((mocks.searchState.current as SearchValue).images.find(item => item.id === 'newest')?.isFavorite).toBe(false);
+
+        await act(() => latest.toggleFavorite('flower'));
+        expect(useVisualSearchStore.getState().images[0]?.isFavorite).toBe(false);
+        expect(mocks.updateFavorite).toHaveBeenLastCalledWith('flower', false);
     });
 
     it('rolls optimistic favorite and pin updates back after persistence failures', async () => {

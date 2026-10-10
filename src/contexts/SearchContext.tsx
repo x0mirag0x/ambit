@@ -5,6 +5,7 @@ import { useSettings } from './SettingsContext';
 import { settingsPersistenceCoordinator } from '../utils/settingsPersistenceCoordinator';
 import { useCollections } from './CollectionContext';
 import { useSearchStore } from '../stores/searchStore';
+import { useVisualSearchStore } from '../stores/visualSearchStore';
 import { appRepository } from '../services/repository';
 import { getDb } from '../services/db/connection';
 
@@ -445,46 +446,84 @@ export const SearchProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
     const toggleFavorite = useCallback(async (id: string) => {
         const imgs = useSearchStore.getState().images;
-        const img = imgs.find(i => i.id === id);
+        const visualSearch = useVisualSearchStore.getState();
+        const visibleImage = visualSearch.active
+            ? visualSearch.images.find(image => image.id === id)
+            : undefined;
+        const libraryImage = imgs.find(image => image.id === id);
+        const img = visibleImage ?? libraryImage;
         if (!img) return;
         const newVal = !img.isFavorite;
 
         try {
-            setImages(imgs.map(i => i.id === id ? { ...i, isFavorite: newVal } : i));
+            if (libraryImage) {
+                setImages(imgs.map(image => image.id === id ? { ...image, isFavorite: newVal } : image));
+            }
+            visualSearch.patchByIds([id], image => (
+                image.isFavorite === newVal ? image : { ...image, isFavorite: newVal }
+            ));
             patchImageFlagsInQueryCaches(queryClient, [id], { isFavorite: newVal });
             await updateFavorite(id, newVal);
             refreshCollectionsAfterImageFlagChange();
         } catch (e) {
             console.error("Toggle favorite failed", e);
-            setImages(imgs);
-            restoreImagesInQueryCaches(queryClient, imgs);
+            if (libraryImage) {
+                setImages(imgs);
+                restoreImagesInQueryCaches(queryClient, imgs);
+            } else {
+                patchImageFlagsInQueryCaches(queryClient, [id], { isFavorite: img.isFavorite });
+            }
+            visualSearch.patchByIds([id], image => (
+                image.isFavorite === img.isFavorite ? image : { ...image, isFavorite: img.isFavorite }
+            ));
         }
     }, [queryClient, refreshCollectionsAfterImageFlagChange, setImages]);
 
     const togglePin = useCallback(async (id: string, isPinned?: boolean) => {
         const imgs = useSearchStore.getState().images;
-        const img = imgs.find(i => i.id === id);
+        const visualSearch = useVisualSearchStore.getState();
+        const visibleImage = visualSearch.active
+            ? visualSearch.images.find(image => image.id === id)
+            : undefined;
+        const libraryImage = imgs.find(image => image.id === id);
+        const img = visibleImage ?? libraryImage;
         if (!img) return;
         const newVal = isPinned !== undefined ? isPinned : !img.isPinned;
-        const nextImages = applyOptimisticPinOrder(imgs, [id], newVal, filters.collectionId !== null);
+        const nextImages = libraryImage
+            ? applyOptimisticPinOrder(imgs, [id], newVal, filters.collectionId !== null)
+            : imgs;
 
         try {
-            setImages(nextImages);
-            patchImageFlagsInQueryCaches(queryClient, [id], { isPinned: newVal }, {
-                previousOrder: imgs,
-                nextOrder: nextImages,
-                reorderQueryKey: imagesQueryKey
-            });
+            if (libraryImage) {
+                setImages(nextImages);
+                patchImageFlagsInQueryCaches(queryClient, [id], { isPinned: newVal }, {
+                    previousOrder: imgs,
+                    nextOrder: nextImages,
+                    reorderQueryKey: imagesQueryKey
+                });
+            } else {
+                patchImageFlagsInQueryCaches(queryClient, [id], { isPinned: newVal });
+            }
+            visualSearch.patchByIds([id], image => (
+                image.isPinned === newVal ? image : { ...image, isPinned: newVal }
+            ));
             await updatePinned(id, newVal);
             refreshCollectionsAfterImageFlagChange();
         } catch (e) {
             console.error("Toggle pin failed", e);
-            setImages(imgs);
-            restoreImagesInQueryCaches(queryClient, imgs, {
-                previousOrder: nextImages,
-                nextOrder: imgs,
-                reorderQueryKey: imagesQueryKey
-            });
+            if (libraryImage) {
+                setImages(imgs);
+                restoreImagesInQueryCaches(queryClient, imgs, {
+                    previousOrder: nextImages,
+                    nextOrder: imgs,
+                    reorderQueryKey: imagesQueryKey
+                });
+            } else {
+                restoreImagesInQueryCaches(queryClient, imgs);
+            }
+            visualSearch.patchByIds([id], image => (
+                image.isPinned === img.isPinned ? image : { ...image, isPinned: img.isPinned }
+            ));
         }
     }, [filters.collectionId, imagesQueryKey, queryClient, refreshCollectionsAfterImageFlagChange, setImages]);
 
