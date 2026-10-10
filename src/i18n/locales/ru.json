@@ -2237,6 +2237,7 @@
   "progress.filesChecked": "{{n}} файлов проверено",
   "progress.repairScanImported": "Повторное сканирование импортировало {{n}} недостающих файлов",
   "Search by photo": "Поиск по фото",
+  "Photo search is active": "Поиск по фото активен",
   "Reset photo search": "Сбросить",
   "No similar photos found": "Похожих изображений не найдено",
   "Photo search looks through the current library.": "Поиск сравнивает фото только с изображениями текущей библиотеки.",

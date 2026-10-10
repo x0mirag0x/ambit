@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { convertFileSrc } from '@tauri-apps/api/core';
-import { ExternalLink, Film, Heart, Link, Pin, Puzzle, RotateCcw, RotateCw, Save, Target, Trash2, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ExternalLink, Film, Heart, Link, Pin, Puzzle, RotateCcw, RotateCw, Save, Target, Trash2, X } from 'lucide-react';
 import { commands } from '../../../bindings';
 import { useCollectionStore } from '../../../stores/collectionStore';
 import { GeneratorTool, isVideoAsset, VideoAsset, type VideoGenerationMode } from '../../../types';
@@ -37,6 +37,16 @@ const VIDEO_VIEWER_TABS: readonly ViewerTabDefinition<VideoViewerTab>[] = [
     { id: 'workflow', label: 'Workflow' },
 ];
 const VIDEO_VIEWER_TAB_IDS = VIDEO_VIEWER_TABS.map(tab => tab.id);
+
+const sideArrowClass = (enabled: boolean) =>
+    `absolute z-30 rounded-full border border-white/5 bg-black/20 p-4 text-white/50 backdrop-blur-sm transition-all focus:opacity-100 enabled:hover:border-white/10 enabled:hover:bg-black/40 enabled:hover:text-white disabled:pointer-events-none disabled:opacity-0 ${enabled ? 'pointer-events-auto opacity-0 group-hover:opacity-100' : 'pointer-events-none opacity-0'}`;
+
+const isNativeMediaControl = (target: EventTarget | null): boolean => {
+    if (!(target instanceof Node)) return false;
+    if (target instanceof HTMLMediaElement) return true;
+    const root = target.getRootNode();
+    return root instanceof ShadowRoot && root.host instanceof HTMLMediaElement;
+};
 
 interface VideoViewerProps {
     video: VideoAsset;
@@ -197,6 +207,11 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
         return () => { cancelled = true; };
     }, [revealed, video.id, video.isMissing, playerKey]);
 
+    const bindPlayer = React.useCallback((node: HTMLVideoElement | null) => {
+        if (playerRef.current && playerRef.current !== node) playerRef.current.pause();
+        playerRef.current = node;
+    }, []);
+
     const seekBy = React.useCallback((seconds: number) => {
         const player = playerRef.current;
         if (!player || !Number.isFinite(player.duration)) return;
@@ -205,11 +220,18 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
         player.currentTime = Math.min(player.duration, Math.max(0, currentTime + seconds));
     }, []);
 
+    const navigateAway = React.useCallback((navigate: () => void) => {
+        playerRef.current?.pause();
+        navigate();
+    }, []);
+
     const handleViewerKeyDown = React.useCallback((event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 onClose();
                 return;
             }
+            const arrowKey = event.key === 'ArrowLeft' || event.key === 'ArrowRight';
+            if (arrowKey && (isNativeMediaControl(event.target) || isNativeMediaControl(document.activeElement))) return;
             if (event.target instanceof Element && event.target.closest('button')) return;
             if (event.key === ' ') {
                 const player = playerRef.current;
@@ -217,8 +239,8 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
                 event.preventDefault();
                 if (player.paused) void player.play().catch(() => undefined);
                 else player.pause();
-            } else if (event.key === 'ArrowRight' && canNavigateNext) onNext();
-            else if (event.key === 'ArrowLeft' && canNavigatePrevious) onPrev();
+            } else if (event.key === 'ArrowRight' && canNavigateNext) navigateAway(onNext);
+            else if (event.key === 'ArrowLeft' && canNavigatePrevious) navigateAway(onPrev);
             else if (event.key.toLowerCase() === 'j') {
                 event.preventDefault();
                 seekBy(-10);
@@ -226,7 +248,7 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
                 event.preventDefault();
                 seekBy(10);
             }
-    }, [canNavigateNext, canNavigatePrevious, onClose, onNext, onPrev, seekBy]);
+    }, [canNavigateNext, canNavigatePrevious, navigateAway, onClose, onNext, onPrev, seekBy]);
 
     useViewerKeyboard({
         blocked: isShortcutBlocked,
@@ -266,7 +288,25 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
 
     if (!revealed && !video.isMissing) {
         return (
-            <div role="dialog" aria-modal="true" aria-label={t('Hidden video')} className="fixed inset-0 z-[100] flex bg-black text-white">
+            <div role="dialog" aria-modal="true" aria-label={t('Hidden video')} className="group fixed inset-0 z-[100] flex bg-black text-white">
+                <button
+                    type="button"
+                    aria-label={t('Previous Image (Left Arrow)')}
+                    disabled={!canNavigatePrevious}
+                    onClick={event => { event.stopPropagation(); if (canNavigatePrevious) navigateAway(onPrev); }}
+                    className={`left-4 ${sideArrowClass(canNavigatePrevious)}`}
+                >
+                    <ChevronLeft className="h-6 w-6" />
+                </button>
+                <button
+                    type="button"
+                    aria-label={t('Next Image (Right Arrow)')}
+                    disabled={!canNavigateNext}
+                    onClick={event => { event.stopPropagation(); if (canNavigateNext) navigateAway(onNext); }}
+                    className={`right-4 ${sideArrowClass(canNavigateNext)}`}
+                >
+                    <ChevronRight className="h-6 w-6" />
+                </button>
                 <MaskedViewerGate
                     mediaLabel="video"
                     onReveal={() => setRevealedVideoId(video.id)}
@@ -279,9 +319,33 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
     return (
         <div role="dialog" aria-modal="true" aria-label={t('Video viewer: {{filename}}', { filename: video.filename })} className="fixed inset-0 z-[100] flex bg-black text-white">
             <main
-                className="relative flex min-w-0 flex-1 items-center justify-center bg-black"
+                className="group relative flex min-w-0 flex-1 items-center justify-center bg-black"
                 onClick={event => { if (event.target === event.currentTarget) onClose(); }}
             >
+                <button
+                    type="button"
+                    aria-label={t('Previous Image (Left Arrow)')}
+                    disabled={!canNavigatePrevious}
+                    onKeyDown={event => {
+                        if (event.key === 'Enter' || event.key === ' ') event.stopPropagation();
+                    }}
+                    onClick={event => { event.stopPropagation(); if (canNavigatePrevious) navigateAway(onPrev); }}
+                    className={`left-4 ${sideArrowClass(canNavigatePrevious)}`}
+                >
+                    <ChevronLeft className="h-6 w-6" />
+                </button>
+                <button
+                    type="button"
+                    aria-label={t('Next Image (Right Arrow)')}
+                    disabled={!canNavigateNext}
+                    onKeyDown={event => {
+                        if (event.key === 'Enter' || event.key === ' ') event.stopPropagation();
+                    }}
+                    onClick={event => { event.stopPropagation(); if (canNavigateNext) navigateAway(onNext); }}
+                    className={`right-4 ${sideArrowClass(canNavigateNext)}`}
+                >
+                    <ChevronRight className="h-6 w-6" />
+                </button>
                 <ViewerToolbarFrame filename={video.filename} actions={<>
                     {!video.isMissing && (
                         <ViewerToolbarButton label={t('Open in Default App')} onClick={() => void handleOpenExternal()}>
@@ -345,7 +409,7 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
                     >
                         <video
                             key={`${video.id}:${playerKey}`}
-                            ref={playerRef}
+                            ref={bindPlayer}
                             src={playbackUrl}
                             controls
                             muted

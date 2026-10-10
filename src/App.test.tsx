@@ -1492,7 +1492,7 @@ describe('App orchestration', () => {
         expect(requireProbe(captured.viewer, 'ImageViewer').canNavigateNext).toBe(false);
     });
 
-    it('photo search reset restores the full library', () => {
+    it('photo search clear restores the full library', () => {
         const match = image('match');
         const library = [image('one'), image('two'), image('three')];
         mocks.images = library;
