@@ -12,12 +12,18 @@ const FOCUSABLE_SELECTOR = [
     '[tabindex]:not([tabindex="-1"])',
 ].join(',');
 
+export interface ManualImportRequest {
+    addToActiveCollection: boolean;
+}
+
 interface ImportModalProps {
     isOpen: boolean;
     onClose: () => void;
     onOpenSettings: (tab: 'invokeai' | 'a1111' | 'comfyui' | 'folders') => void;
-    onImportFiles: () => void;
-    onImportVideos: () => void;
+    onImportFiles: (request: ManualImportRequest) => void;
+    onImportVideos: (request: ManualImportRequest) => void;
+    onImportFolder: (request: ManualImportRequest) => void;
+    activeCollection?: { id: string; name: string } | null;
 }
 
 export const ImportModal: React.FC<ImportModalProps> = ({
@@ -25,15 +31,25 @@ export const ImportModal: React.FC<ImportModalProps> = ({
     onClose,
     onOpenSettings,
     onImportFiles,
-    onImportVideos
+    onImportVideos,
+    onImportFolder,
+    activeCollection = null
 }) => {
     const { t } = useTranslation();
     const dialogRef = React.useRef<HTMLDivElement>(null);
     const headingRef = React.useRef<HTMLHeadingElement>(null);
+    const [addToCollection, setAddToCollection] = React.useState(true);
 
     React.useEffect(() => {
-        if (isOpen) headingRef.current?.focus();
-    }, [isOpen]);
+        if (isOpen) {
+            headingRef.current?.focus();
+            setAddToCollection(true);
+        }
+    }, [isOpen, activeCollection?.id]);
+
+    const importRequest = (): ManualImportRequest => ({
+        addToActiveCollection: Boolean(activeCollection) && addToCollection,
+    });
 
     const handleDialogKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (event.key !== 'Tab' || !dialogRef.current) return;
@@ -181,21 +197,33 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-5 font-medium leading-relaxed">
                                     {t('Add generated images, camera photos, screenshots, or supported videos. Image formats: PNG, JPEG, and WebP.')}</p>
 
+                                {activeCollection ? (
+                                    <label className="mb-5 flex items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 px-3 py-3 text-sm font-medium text-gray-800 dark:border-white/10 dark:bg-white/5 dark:text-gray-200">
+                                        <input
+                                            type="checkbox"
+                                            className="mt-0.5 h-4 w-4 shrink-0 accent-sage-500"
+                                            checked={addToCollection}
+                                            onChange={(event) => setAddToCollection(event.target.checked)}
+                                        />
+                                        <span>{t('Add to collection: {{name}}', { name: activeCollection.name })}</span>
+                                    </label>
+                                ) : null}
+
                                 <div className="grid grid-cols-3 gap-3">
                                     <button
-                                        onClick={() => { onImportFiles(); onClose(); }}
+                                        onClick={() => { onImportFiles(importRequest()); onClose(); }}
                                         className="flex-1 px-4 py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl text-xs font-black transition-all hover:translate-y-[-2px] hover:shadow-xl active:translate-y-0 active:scale-95 flex items-center justify-center gap-2 group shadow-lg"
                                     >
                                         <FileUp className="w-4 h-4 group-hover:scale-110 transition-transform" />
                                         {t('Select Images')}</button>
                                     <button
-                                        onClick={() => { onImportVideos(); onClose(); }}
+                                        onClick={() => { onImportVideos(importRequest()); onClose(); }}
                                         className="flex-1 px-4 py-4 bg-sage-600 hover:bg-sage-500 text-white rounded-xl text-xs font-black transition-all hover:translate-y-[-2px] active:translate-y-0 active:scale-95 flex items-center justify-center gap-2 group shadow-lg"
                                     >
                                         <Video className="w-4 h-4 group-hover:scale-110 transition-transform" />
                                         {t('Select Videos')}</button>
                                     <button
-                                        onClick={() => handleOpenSettings('folders')}
+                                        onClick={() => { onImportFolder(importRequest()); onClose(); }}
                                         className="flex-1 px-4 py-4 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-900 dark:text-white rounded-xl text-xs font-black transition-all hover:translate-y-[-2px] active:translate-y-0 active:scale-95 border border-gray-200 dark:border-white/5 flex items-center justify-center gap-2 group"
                                     >
                                         <FolderOpen className="w-4 h-4 group-hover:scale-110 transition-transform" />
