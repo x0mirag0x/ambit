@@ -74,10 +74,13 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
             setShowAllFolders(priorityCount === 0 && results.length > 0);
 
             if (warnings.length > 0) {
-                const warningLabel = warnings.length === 1 ? 'warning' : 'warnings';
                 const message = results.length === 0
-                    ? `Discovery completed with ${warnings.length} ${warningLabel} and no importable folders. Review scan debug log.`
-                    : `Discovery completed with ${warnings.length} ${warningLabel}. Review scan debug log.`;
+                    ? warnings.length === 1
+                        ? t('Discovery completed with {{n}} warning and no importable folders. Review scan debug log.', { n: warnings.length })
+                        : t('Discovery completed with {{n}} warnings and no importable folders. Review scan debug log.', { n: warnings.length })
+                    : warnings.length === 1
+                        ? t('Discovery completed with {{n}} warning. Review scan debug log.', { n: warnings.length })
+                        : t('Discovery completed with {{n}} warnings. Review scan debug log.', { n: warnings.length });
                 setLocalTestResult({ success: false, message });
             } else if (results.length === 0) {
                 setLocalTestResult({ success: false, message: "No potential folders containing images found." });
@@ -176,8 +179,11 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
 
                 if (importCancelled) {
                     const msg = completedNewFolderCount > 0
-                        ? `Import cancelled. ${completedNewFolderCount} folder(s) completed; ${unfinishedNewFolderCount} unfinished folder(s) were paused. Imported images were kept; rescan unfinished folders to continue.`
-                        : "Import cancelled. Imported images were kept; unfinished folders were paused. Rescan to continue.";
+                        ? t('Import cancelled. {{completed}} folder(s) completed; {{unfinished}} unfinished folder(s) were paused. Imported images were kept; rescan unfinished folders to continue.', {
+                            completed: completedNewFolderCount,
+                            unfinished: unfinishedNewFolderCount,
+                        })
+                        : t('Import cancelled. Imported images were kept; unfinished folders were paused. Rescan to continue.');
                     setLocalTestResult({ success: false, message: msg });
                     return;
                 }
@@ -199,11 +205,22 @@ export const A1111Tab: React.FC<TabProps> = React.memo(({ settings, setSettings,
                 const totalCount = foldersToSync.length;
                 if (importCompleted) {
                     const msg = refreshFailed
-                        ? `Processed ${totalCount} folders (${brandNew.length} new, ${alreadyLinked.length} rescanned), but refresh failed.`
-                        : `Processed ${totalCount} folders (${brandNew.length} new, ${alreadyLinked.length} rescanned)`;
+                        ? t('Processed {{total}} folders ({{created}} new, {{rescanned}} rescanned), but refresh failed.', {
+                            total: totalCount,
+                            created: brandNew.length,
+                            rescanned: alreadyLinked.length,
+                        })
+                        : t('Processed {{total}} folders ({{created}} new, {{rescanned}} rescanned)', {
+                            total: totalCount,
+                            created: brandNew.length,
+                            rescanned: alreadyLinked.length,
+                        });
                     setLocalTestResult({ success: !refreshFailed, message: msg });
                 } else {
-                    const msg = `Processed ${totalCount} folders with ${result.failedPaths.length} failed file(s). Completed folders were marked scanned; folders with failures were left retryable.`;
+                    const msg = t('Processed {{total}} folders with {{failed}} failed file(s). Completed folders were marked scanned; folders with failures were left retryable.', {
+                        total: totalCount,
+                        failed: result.failedPaths.length,
+                    });
                     setLocalTestResult({ success: false, message: msg });
                 }
         } catch (e) {

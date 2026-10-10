@@ -42,6 +42,8 @@
   "progress.optimizedThumbnailsWithAttention_other": "Optimized {{optimized}} thumbnails; {{attention}} need attention",
   "progress.connectedImages_one": "Connected! Found {{count}} image.",
   "progress.connectedImages_other": "Connected! Found {{count}} images.",
+  "progress.scanningLibrary": "Scanning {{name}} library...",
+  "progress.importingFraction": "Importing: {{current}} / {{total}}",
   "progress.lookupFailed": "Lookup failed: {{message}}",
   "progress.mediainfoStdoutExceeded": "MediaInfo stdout exceeded {{bytes}} bytes",
   "progress.resourceScanComplete": "Resource scan complete: {{found}} {{label}} found",

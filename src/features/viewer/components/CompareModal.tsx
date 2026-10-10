@@ -718,7 +718,7 @@ export const CompareModal: React.FC<CompareModalProps> = ({
                         </div>
 
                         <DiffRow label={t('Model')} valA={imageA.metadata.model} valB={imageB.metadata.model} />
-                        <DiffRow label={t('Seed')} valA={imageA.metadata.seed ?? 'Unknown'} valB={imageB.metadata.seed ?? 'Unknown'} />
+                        <DiffRow label={t('Seed')} valA={imageA.metadata.seed ?? t('Unknown')} valB={imageB.metadata.seed ?? t('Unknown')} />
                         <DiffRow label={t('Steps')} valA={imageA.metadata.steps} valB={imageB.metadata.steps} />
                         <DiffRow label={t('CFG')} valA={imageA.metadata.cfg} valB={imageB.metadata.cfg} />
                         <DiffRow label={t('Size')} valA={`${imageA.width}x${imageA.height}`} valB={`${imageB.width}x${imageB.height}`} />
@@ -747,8 +747,8 @@ export const CompareModal: React.FC<CompareModalProps> = ({
                                     renderPromptDiff(imageA.metadata.positivePrompt, imageB.metadata.positivePrompt)
                                 ) : (
                                     <div className="space-y-4">
-                                        {renderRawPrompt(imageA.metadata.positivePrompt, "Original (Image A)")}
-                                        {renderRawPrompt(imageB.metadata.positivePrompt, "New (Image B)")}
+                                        {renderRawPrompt(imageA.metadata.positivePrompt, t('Original (Image A)'))}
+                                        {renderRawPrompt(imageB.metadata.positivePrompt, t('New (Image B)'))}
                                     </div>
                                 )
                             )}

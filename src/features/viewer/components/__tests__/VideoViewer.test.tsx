@@ -650,8 +650,8 @@ describe('VideoViewer', () => {
         expect(pause).toHaveBeenCalledTimes(2);
 
         pause.mockClear();
-        props.onPrev.mockClear();
-        props.onNext.mockClear();
+        vi.mocked(props.onPrev).mockClear();
+        vi.mocked(props.onNext).mockClear();
         player.focus();
         fireEvent.keyDown(player, { key: 'ArrowLeft' });
         fireEvent.keyDown(player, { key: 'ArrowRight' });
