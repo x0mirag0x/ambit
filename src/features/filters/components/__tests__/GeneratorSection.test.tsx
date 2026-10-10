@@ -1,7 +1,8 @@
 import { fireEvent, render, screen } from '../../../../test/testUtils';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { GeneratorTool, type FilterState } from '../../../../types';
 import { GeneratorSection } from '../GeneratorSection';
+import i18n from '../../../../i18n';
 
 vi.mock('../FilterPrimitives', () => ({
     SectionHeader: ({ title, onToggle }: { title: string; onToggle: () => void }) => <button onClick={onToggle}>{title}</button>,
@@ -16,6 +17,10 @@ const filters = (tools: GeneratorTool[] = []): FilterState => ({
 });
 
 describe('GeneratorSection', () => {
+    afterEach(async () => {
+        await i18n.changeLanguage('en');
+    });
+
     it('renders only the header while collapsed and forwards toggles', () => {
         const onToggle = vi.fn();
         render(<GeneratorSection filters={filters()} setFilters={vi.fn()} tools={['ComfyUI']} isOpen={false} onToggle={onToggle} />);
@@ -50,6 +55,23 @@ describe('GeneratorSection', () => {
     it.each([null, undefined])('makes every tool available when valid names are %s', (validNames) => {
         render(<GeneratorSection filters={filters()} setFilters={vi.fn()} tools={[GeneratorTool.AUTOMATIC1111]} validNames={validNames} isOpen onToggle={vi.fn()} />);
         expect((screen.getByText(GeneratorTool.AUTOMATIC1111) as HTMLButtonElement).disabled).toBe(false);
+    });
+
+    it('translates the Other and Unknown generator labels', async () => {
+        await i18n.changeLanguage('ru');
+        render(
+            <GeneratorSection
+                filters={filters()}
+                setFilters={vi.fn()}
+                tools={[GeneratorTool.OTHER, GeneratorTool.UNKNOWN, GeneratorTool.MIDJOURNEY]}
+                isOpen
+                onToggle={vi.fn()}
+            />
+        );
+
+        expect(screen.getByText('Другое')).toBeTruthy();
+        expect(screen.getByText('Неизвестно')).toBeTruthy();
+        expect(screen.getByText('Midjourney')).toBeTruthy();
     });
 
     it('distinguishes loading, globally empty, and drill-down empty states', () => {

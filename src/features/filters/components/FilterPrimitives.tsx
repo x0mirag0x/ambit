@@ -3,7 +3,14 @@ import * as React from 'react';
 import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import { ChevronDown, ChevronRight, Check, Search, X, LucideIcon, ArrowDownWideNarrow } from 'lucide-react';
 import { TooltipButton } from '../../../components/ui/InfoTooltip';
+import { localizeFilterSentinel } from '../filterLabels';
 import { useTranslation } from 'react-i18next';
+
+const optionMatchesSearch = (value: string, searchTerm: string, translate: (key: string) => string): boolean => {
+    if (!searchTerm) return true;
+    const term = searchTerm.toLowerCase();
+    return value.toLowerCase().includes(term) || localizeFilterSentinel(value, translate).toLowerCase().includes(term);
+};
 
 // --- Section Header ---
 interface SectionHeaderProps {
@@ -30,21 +37,23 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({ title, isOpen, onT
 // --- Selectable Row ---
 interface SelectableRowProps {
     label: string;
+    detail?: string;
     isSelected: boolean;
     onClick: () => void;
     className?: string;
     disabled?: boolean;
 }
 
-export const SelectableRow: React.FC<SelectableRowProps> = ({ label, isSelected, onClick, className, disabled }) => (
+export const SelectableRow: React.FC<SelectableRowProps> = ({ label, detail, isSelected, onClick, className, disabled }) => (
     <div
         onClick={disabled ? undefined : onClick}
-        className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-all ease-spring border ${isSelected
+        className={`flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition-all ease-spring border ${isSelected
             ? 'bg-sage-100 dark:bg-sage-600/20 border-sage-200 dark:border-sage-500/30 text-sage-800 dark:text-sage-300 font-medium'
             : 'bg-transparent border-transparent text-gray-500 dark:text-gray-400 hover:bg-white/40 dark:hover:bg-white/5'
             } ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} ${className || ''}`}
     >
-        <span>{label}</span>
+        <span className="min-w-0 truncate">{label}</span>
+        {detail ? <span className="shrink-0 text-xs tabular-nums text-gray-400">{detail}</span> : null}
         {isSelected ? (
             <div className="w-4 h-4 rounded-full bg-sage-500 flex items-center justify-center">
                 <Check className="w-3 h-3 text-white" />
@@ -363,14 +372,14 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
 
         return groups.map(g => ({
             label: g.label,
-            items: g.items.filter(item => item.toLowerCase().includes(searchTerm.toLowerCase()))
+            items: g.items.filter(item => optionMatchesSearch(item, searchTerm, t))
         })).filter(g => g.items.length > 0);
-    }, [groups, searchTerm, hasGroups]);
+    }, [groups, searchTerm, hasGroups, t]);
 
     const filteredOptions = useMemo(() => {
         if (hasGroups) return []; // Ignore options if groups exist
-        return options.filter(opt => opt.toLowerCase().includes(searchTerm.toLowerCase()));
-    }, [options, searchTerm, hasGroups]);
+        return options.filter(opt => optionMatchesSearch(opt, searchTerm, t));
+    }, [options, searchTerm, hasGroups, t]);
 
     const toggleOption = (opt: string) => {
         if (selected.includes(opt)) {
@@ -403,7 +412,7 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
                     }`}>
                     {isSelected && <Check className="w-2.5 h-2.5 text-white" />}
                 </div>
-                <span className="truncate flex-1">{opt}</span>
+                <span className="truncate flex-1">{localizeFilterSentinel(opt, t)}</span>
             </button>
         );
     };
@@ -431,7 +440,7 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
                         {selected.length === 0
                             ? t('Select...')
                             : selected.length === 1
-                                ? selected[0]
+                                ? localizeFilterSentinel(selected[0], t)
                                 : t('{{length}} selected', { length: selected.length })}
                     </span>
                     <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />

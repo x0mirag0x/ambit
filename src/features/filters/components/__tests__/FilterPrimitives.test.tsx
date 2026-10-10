@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '../../../../test/testUtils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import i18n from '../../../../i18n';
 import { Zap } from 'lucide-react';
 import {
     ChipSelect,
@@ -13,8 +14,9 @@ import {
 } from '../FilterPrimitives';
 
 describe('FilterPrimitives', () => {
-    afterEach(() => {
+    afterEach(async () => {
         vi.restoreAllMocks();
+        await i18n.changeLanguage('en');
     });
 
     it('toggles section headers and keeps optional action controls visible', () => {
@@ -389,5 +391,22 @@ describe('FilterPrimitives', () => {
         fireEvent.click(screen.getByText('Select...'));
         fireEvent.mouseDown(screen.getByText('One'));
         expect(screen.getByText('One')).toBeTruthy();
+    });
+
+    it('translates Other and Unknown sampler options without renaming product values', async () => {
+        await i18n.changeLanguage('ru');
+        render(
+            <MultiSelectDropdown
+                label="Sampler"
+                selected={['Unknown']}
+                onChange={vi.fn()}
+                groups={[{ label: 'Other', items: ['Unknown', 'Euler'] }]}
+            />
+        );
+
+        expect(screen.getByText('Неизвестно')).toBeTruthy();
+        fireEvent.click(screen.getByRole('button', { name: 'Неизвестно' }));
+        expect(screen.getByText('Другое')).toBeTruthy();
+        expect(screen.getByText('Euler')).toBeTruthy();
     });
 });

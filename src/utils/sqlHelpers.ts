@@ -175,9 +175,10 @@ const parseSearchToken = (token: SearchToken): SearchCondition | null => {
             else { sql = "height = ?"; param = Number(val); }
         } else if (key === 'model') {
             const modelParam = `%${val}%`;
+            const sql = `(resolved_model_name LIKE ? OR json_extract(metadata_json, '$.model') LIKE ? OR json_extract(metadata_json, '$.overrideModel') LIKE ?)`;
             return {
-                sql: `(resolved_model_name LIKE ? OR json_extract(metadata_json, '$.model') LIKE ?)`,
-                params: [modelParam, modelParam],
+                sql: token.isNegative ? `NOT ${sql}` : sql,
+                params: [modelParam, modelParam, modelParam],
                 isPositivePrompt: false
             };
         } else if (key === 'seed') {

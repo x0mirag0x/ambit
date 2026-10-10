@@ -109,6 +109,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
         smart: true,
         params: true,
         generator: true,
+        models: true,
         checkpoints: true,
         resources: true,
         embeddings: false,
@@ -233,7 +234,17 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
     // Tab-Specific Dirty Checks (for dot indicators)
     // Note: dateRange is NOT included in isOrganizeDirty because Date Range is a global section in the footer, not part of Organize tab
     const isOrganizeDirty = !!(filters.collectionId || filters.favoritesOnly || filters.pinnedOnly);
-    const isGenerateDirty = !!(filters.tools.length > 0 || filters.minSteps || filters.maxSteps || filters.minCfg || filters.maxCfg || (filters.samplers && filters.samplers.length > 0) || (filters.generationTypes && filters.generationTypes.length > 0) || filters.controlNets.length > 0 || filters.ipAdapters.length > 0 || filters.similarColor);
+    const isGenerateDirty = !!(filters.tools.length > 0 || filters.models.length > 0 || filters.minSteps || filters.maxSteps || filters.minCfg || filters.maxCfg || (filters.samplers && filters.samplers.length > 0) || (filters.generationTypes && filters.generationTypes.length > 0) || filters.controlNets.length > 0 || filters.ipAdapters.length > 0 || filters.similarColor);
+    const modelFilterOptions = React.useMemo(() => {
+        const counts = new Map<string, number>();
+        for (const item of facets.checkpoints) {
+            if (!item.name || item.count <= 0) continue;
+            counts.set(item.name, (counts.get(item.name) ?? 0) + item.count);
+        }
+        return Array.from(counts.entries())
+            .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+            .map(([name, count]) => ({ name, count }));
+    }, [facets.checkpoints]);
     const isResourcesDirty = !!(filters.models.length > 0 || filters.loras.length > 0 || (filters.embeddings && filters.embeddings.length > 0) || (filters.hypernetworks && filters.hypernetworks.length > 0) || filters.controlNets.length > 0 || filters.ipAdapters.length > 0);
 
     const allResourceItems = React.useMemo(() => [
@@ -501,6 +512,13 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                                 isOpen={expanded.generator} onToggle={() => toggleSection('generator')}
                                 isLoading={isFacetsLoading}
                                 validNames={validFacetNames?.tools}
+                            />
+
+                            <ArchitectureSection
+                                filters={filters}
+                                setFilters={setFilters}
+                                models={modelFilterOptions}
+                                isOpen={expanded.models} onToggle={() => toggleSection('models')}
                             />
 
                             <ParameterSection

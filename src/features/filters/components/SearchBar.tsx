@@ -7,6 +7,7 @@ import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import type { SearchBarOption } from './SearchBarPopover';
 import { useTranslation } from 'react-i18next';
 import { isTauriRuntime } from '../../../services/runtime';
+import { formatModelName } from '../../../utils/formatUtils';
 
 const SearchBarPopover = React.lazy(() => import('./SearchBarPopover').then(module => ({ default: module.SearchBarPopover })));
 
@@ -54,7 +55,7 @@ export const SearchBar = React.memo(({
     onDraftPendingChange,
 }: SearchBarProps) => {
     const { t } = useTranslation();
-    const { filters, setFilters } = useSearch();
+    const { filters, setFilters, facets } = useSearch();
     const [localValue, setLocalValue] = React.useState(filters.searchQuery);
     const [activeOptionIndex, setActiveOptionIndex] = React.useState(-1);
     const [areOptionsDismissed, setAreOptionsDismissed] = React.useState(false);
@@ -124,6 +125,34 @@ export const SearchBar = React.memo(({
         });
     }, [localValue, operatorSuggestions, searchProps.isAiSearchEnabled, searchReadinessApi]);
 
+    const modelValueSuggestions = React.useMemo(() => {
+        if (searchProps.isAiSearchEnabled || matchingOperators.length > 0) return [];
+        const lastSpace = localValue.lastIndexOf(' ');
+        const lastToken = localValue.slice(lastSpace + 1);
+        const match = /^model:(.*)$/i.exec(lastToken);
+        if (!match) return [];
+
+        const typed = match[1].toLowerCase();
+        const seen = new Set<string>();
+        const suggestions: { value: string; description: string }[] = [];
+        for (const item of facets?.checkpoints ?? []) {
+            const rawName = item.name?.trim();
+            if (!rawName || rawName === 'Unknown') continue;
+            const display = formatModelName(rawName) || rawName;
+            const key = display.toLowerCase();
+            if (seen.has(key)) continue;
+            if (typed && !key.includes(typed) && !rawName.toLowerCase().includes(typed)) continue;
+            const value = /[\s"]/.test(display)
+                ? `"model:${display.replace(/"/g, '\\"')}"`
+                : `model:${display}`;
+            if (value.toLowerCase() === lastToken.toLowerCase()) continue;
+            seen.add(key);
+            suggestions.push({ value, description: String(item.count) });
+            if (suggestions.length >= 12) break;
+        }
+        return suggestions;
+    }, [facets, localValue, matchingOperators.length, searchProps.isAiSearchEnabled]);
+
     const options = React.useMemo<SearchBarOption[]>(() => {
         if (areOptionsDismissed) return [];
 
@@ -136,6 +165,15 @@ export const SearchBar = React.memo(({
             }));
         }
 
+        if (modelValueSuggestions.length > 0) {
+            return modelValueSuggestions.map((suggestion, index) => ({
+                id: `${listboxId}-option-${index}`,
+                kind: 'operator' as const,
+                value: suggestion.value,
+                description: suggestion.description,
+            }));
+        }
+
         if (!localValue && recentSearches.length > 0) {
             return recentSearches.map((value, index) => ({
                 id: `${listboxId}-option-${index}`,
@@ -145,7 +183,7 @@ export const SearchBar = React.memo(({
         }
 
         return [];
-    }, [areOptionsDismissed, listboxId, localValue, matchingOperators, recentSearches]);
+    }, [areOptionsDismissed, listboxId, localValue, matchingOperators, modelValueSuggestions, recentSearches]);
 
     const activeOption = activeOptionIndex >= 0 ? options[activeOptionIndex] : undefined;
 
