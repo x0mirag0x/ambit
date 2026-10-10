@@ -160,6 +160,19 @@ export default function App() {
     const resetVisualSearch = useVisualSearchStore(state => state.reset);
     const beginVisualSearch = useVisualSearchStore(state => state.begin);
     const showVisualSearch = useVisualSearchStore(state => state.show);
+    const visualSearchGenerationRef = useRef(0);
+    const resetPhotoSearch = useCallback(() => {
+        visualSearchGenerationRef.current += 1;
+        resetVisualSearch();
+    }, [resetVisualSearch]);
+    const filtersForPhotoSearchRef = useRef(filters);
+    useEffect(() => {
+        if (filtersForPhotoSearchRef.current === filters) return;
+        filtersForPhotoSearchRef.current = filters;
+        const visualSearch = useVisualSearchStore.getState();
+        if (!visualSearch.active && !visualSearch.searching) return;
+        resetPhotoSearch();
+    }, [filters, resetPhotoSearch]);
     const galleryImages = visualSearchActive ? visualSearchImages : images;
     const activeCollectionIdRef = useRef(filters.collectionId);
     const imagesRef = useRef(images);
@@ -613,28 +626,31 @@ export default function App() {
         setRecentSearches(prev => [term, ...prev.filter(search => search !== term)].slice(0, 8));
     }, [setFilters, setRecentSearches]);
     const searchByPhoto = useCallback(async (source: File | string) => {
+        const generation = ++visualSearchGenerationRef.current;
         beginVisualSearch();
         try {
-            if (typeof source === 'string') {
-                showVisualSearch(await searchSimilarImages(source));
-                return;
-            }
-            const { getBrowserMockImages } = await import('./services/browserMockData');
-            showVisualSearch(getBrowserMockImages().filter(image => image.mediaType !== 'video' && !image.isDeleted).slice(0, 12));
+            const results = typeof source === 'string'
+                ? await searchSimilarImages(source)
+                : (await import('./services/browserMockData')).getBrowserMockImages()
+                    .filter(image => image.mediaType !== 'video' && !image.isDeleted)
+                    .slice(0, 12);
+            if (generation !== visualSearchGenerationRef.current) return;
+            showVisualSearch(results);
         } catch (error) {
+            if (generation !== visualSearchGenerationRef.current) return;
             console.error('Photo search failed', error);
             showVisualSearch([]);
         }
     }, [beginVisualSearch, showVisualSearch]);
 
     const findSimilarColor = useCallback((color: string) => {
-        resetVisualSearch();
+        resetPhotoSearch();
         setFilters(previous => ({ ...previous, similarColor: color }));
         setViewerRevealGrantId(null);
         setSelectedImageIndex(null);
         setViewingImageId(null);
         if (viewMode !== 'grid' && viewMode !== 'timeline') changeViewMode('grid');
-    }, [changeViewMode, resetVisualSearch, setFilters, viewMode]);
+    }, [changeViewMode, resetPhotoSearch, setFilters, viewMode]);
 
     useEffect(() => {
         if (!isSettingsLoaded || !isTauriRuntime()) return;
@@ -660,17 +676,16 @@ export default function App() {
     }, [isSettingsLoaded]);
 
     const submitNavbarSearch = useCallback((query: string) => {
-        if (query.trim()) resetVisualSearch();
-        if (!query.trim()) {
-            void submitSearch(query);
-            return;
+        const visualSearch = useVisualSearchStore.getState();
+        if (query.trim() || visualSearch.active || visualSearch.searching) {
+            resetPhotoSearch();
         }
-
         void submitSearch(query);
+        if (!query.trim()) return;
         if (viewMode === 'dashboard' || viewMode === 'maintenance') {
             changeViewMode('grid');
         }
-    }, [changeViewMode, resetVisualSearch, submitSearch, viewMode]);
+    }, [changeViewMode, resetPhotoSearch, submitSearch, viewMode]);
 
     const openSearchHelp = useCallback(() => {
         modals.setShortcutsModalTab('search');
@@ -691,8 +706,8 @@ export default function App() {
         visualSearchActive,
         visualSearchBusy,
         onSearchByPhoto: (source: File | string) => { void searchByPhoto(source); },
-        onResetVisualSearch: resetVisualSearch,
-    }), [isAiSearchEnabled, isSearchingAi, inputRef, isSearchFocused, openSearchHelp, resetVisualSearch, searchByPhoto, submitNavbarSearch, toggleAiSearch, visualSearchActive, visualSearchBusy]);
+        onResetVisualSearch: resetPhotoSearch,
+    }), [isAiSearchEnabled, isSearchingAi, inputRef, isSearchFocused, openSearchHelp, resetPhotoSearch, searchByPhoto, submitNavbarSearch, toggleAiSearch, visualSearchActive, visualSearchBusy]);
 
     const activeCollection = filters.collectionId
         ? (collections.find(c => c.id === filters.collectionId) ?? null)
@@ -1052,7 +1067,7 @@ export default function App() {
                 scopeName={libraryPresentation.scopeName}
                 isFiltering={isFiltering || visualSearchBusy}
                 visualSearchActive={visualSearchActive}
-                onResetVisualSearch={resetVisualSearch}
+                onResetVisualSearch={resetPhotoSearch}
                 fileOps={fileOps}
                 onOpenImportModal={openImportModal}
                 clearAllFilters={clearAllFilters}

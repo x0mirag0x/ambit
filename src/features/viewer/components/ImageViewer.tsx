@@ -462,12 +462,6 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
         }
     };
 
-    const handleShare = () => {
-        if (navigator.share) {
-            navigator.share({ title: displayImage.filename, url: displayImage.url });
-        }
-    };
-
     return (
         <motion.div
             role="dialog"
@@ -498,7 +492,6 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
                     onCopy={handleCopyImage}
                     onOpenExternal={handleOpenExternal}
                     onToggleTheater={() => setIsTheaterMode(!isTheaterMode)}
-                    onShare={handleShare}
                     onToggleFavorite={onToggleFavorite ? handleToggleFavorite : undefined}
                     onTogglePin={onTogglePin ? handleTogglePin : undefined}
                     onDelete={onDelete ? () => onDelete(displayImage.id) : undefined}

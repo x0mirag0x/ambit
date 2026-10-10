@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { X, Share2, Heart, Pin, Trash2, PanelRightClose, PanelRightOpen, Copy, Layout, ExternalLink } from 'lucide-react';
+import { X, Heart, Pin, Trash2, PanelRightClose, PanelRightOpen, Copy, Layout, ExternalLink } from 'lucide-react';
 import { getFilename } from '../../../utils/pathUtils';
 import { AIImage } from '../../../types';
 import { ViewerToolbarButton } from './ViewerToolbarButton';
@@ -16,7 +16,6 @@ interface ViewerToolbarProps {
     onCopy: () => void;
     onOpenExternal: () => void;
     onToggleTheater: () => void;
-    onShare: () => void;
     onToggleFavorite?: () => void;
     onTogglePin?: () => void;
     onDelete?: () => void;
@@ -34,7 +33,6 @@ export const ViewerToolbar: React.FC<ViewerToolbarProps> = ({
     onCopy,
     onOpenExternal,
     onToggleTheater,
-    onShare,
     onToggleFavorite,
     onTogglePin,
     onDelete,
@@ -72,12 +70,6 @@ export const ViewerToolbar: React.FC<ViewerToolbarProps> = ({
                     className={isTheaterMode ? 'border-sage-500/50 text-sage-400' : ''}
                 >
                     <Layout className="w-5 h-5" />
-                </ViewerToolbarButton>
-                <ViewerToolbarButton
-                    label={t('Share Image')}
-                    onClick={onShare}
-                >
-                    <Share2 className="w-5 h-5" />
                 </ViewerToolbarButton>
                 {onToggleFavorite && (
                     <ViewerToolbarButton

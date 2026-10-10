@@ -108,8 +108,7 @@ Dvoyna Vault is free and open source. Support is optional and there are currentl
 
 *   Report bugs and feature requests through [GitHub Issues](https://github.com/x0mirag0x/ambit/issues).
 *   Follow packaged builds and release notes on [GitHub Releases](https://github.com/x0mirag0x/ambit/releases).
-*   Support development through [GitHub Sponsors](https://github.com/sponsors/AsuraAce).
-*   Leave a one-time tip on [Ko-fi](https://ko-fi.com/astraoriondev).
+*   Optional support: [Донат](https://vk.ru/dvoyna_studio).
 
 ## License
 

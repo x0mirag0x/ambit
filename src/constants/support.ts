@@ -3,8 +3,7 @@ export const ISSUES_URL = `${REPOSITORY_URL}/issues`;
 export const RELEASES_URL = `${REPOSITORY_URL}/releases`;
 /** Upstream project. Required for the GPL-3.0 attribution link. */
 export const UPSTREAM_REPOSITORY_URL = 'https://github.com/AsuraAce/ambit';
-export const GITHUB_SPONSORS_URL = 'https://github.com/sponsors/AsuraAce';
-export const KO_FI_URL = 'https://ko-fi.com/astraoriondev';
+export const DONATION_URL = 'https://vk.ru/dvoyna_studio';
 
 export interface SupportChannel {
     id: 'issues' | 'releases';
@@ -14,7 +13,7 @@ export interface SupportChannel {
 }
 
 export interface DonationProvider {
-    id: 'ko-fi' | 'github-sponsors' | 'patreon';
+    id: 'vk';
     label: string;
     ctaLabel: string;
     url: string | null;
@@ -37,22 +36,10 @@ export const SUPPORT_CHANNELS: SupportChannel[] = [
 
 export const DONATION_PROVIDERS: DonationProvider[] = [
     {
-        id: 'ko-fi',
-        label: 'Ko-fi',
-        ctaLabel: 'Buy me a coffee',
-        url: KO_FI_URL
-    },
-    {
-        id: 'github-sponsors',
-        label: 'GitHub Sponsors',
-        ctaLabel: 'Sponsor on GitHub',
-        url: GITHUB_SPONSORS_URL
-    },
-    {
-        id: 'patreon',
-        label: 'Patreon',
-        ctaLabel: 'Become a patron',
-        url: null
+        id: 'vk',
+        label: 'VK',
+        ctaLabel: 'Donate',
+        url: DONATION_URL
     }
 ];
 

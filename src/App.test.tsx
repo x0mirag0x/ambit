@@ -42,6 +42,8 @@ type AppLayoutProbe = {
         onBlur: () => void;
         submitSearch: (query: string) => void;
         onOpenSearchHelp: () => void;
+        onResetVisualSearch: () => void;
+        visualSearchActive: boolean;
     };
     scopeName: string;
     scopeTotal: number;
@@ -1488,6 +1490,38 @@ describe('App orchestration', () => {
         act(() => requireProbe(captured.viewer, 'ImageViewer').onNext());
         await waitFor(() => expect(captured.viewer?.image.id).toBe(neighbor.id));
         expect(requireProbe(captured.viewer, 'ImageViewer').canNavigateNext).toBe(false);
+    });
+
+    it('photo search reset restores the full library', () => {
+        const match = image('match');
+        const library = [image('one'), image('two'), image('three')];
+        mocks.images = library;
+        useVisualSearchStore.getState().show([match]);
+        const view = render(<App />);
+
+        expect(requireProbe(captured.appLayout, 'AppLayout').images.map(item => item.id)).toEqual(['match']);
+        expect(requireProbe(captured.appLayout, 'AppLayout').displayedCount).toBe(1);
+        expect(requireProbe(captured.appLayout, 'AppLayout').searchProps.visualSearchActive).toBe(true);
+
+        act(() => requireProbe(captured.appLayout, 'AppLayout').searchProps.onResetVisualSearch());
+
+        expect(useVisualSearchStore.getState()).toMatchObject({ active: false, searching: false, images: [] });
+        const restored = requireProbe(captured.appLayout, 'AppLayout');
+        expect(restored.searchProps.visualSearchActive).toBe(false);
+        expect(restored.images.map(item => item.id)).toEqual(['one', 'two', 'three']);
+        expect(restored.displayedCount).toBe(3);
+
+        act(() => { useVisualSearchStore.getState().show([match]); });
+        expect(requireProbe(captured.appLayout, 'AppLayout').images.map(item => item.id)).toEqual(['match']);
+        mocks.filters = createDefaultFilters({ models: ['Nano'] });
+        view.rerender(<App />);
+        expect(useVisualSearchStore.getState().active).toBe(false);
+        expect(requireProbe(captured.appLayout, 'AppLayout').images.map(item => item.id)).toEqual(['one', 'two', 'three']);
+
+        act(() => { useVisualSearchStore.getState().show([match]); });
+        act(() => requireProbe(captured.appLayout, 'AppLayout').searchProps.submitSearch(''));
+        expect(useVisualSearchStore.getState().active).toBe(false);
+        expect(requireProbe(captured.appLayout, 'AppLayout').images.map(item => item.id)).toEqual(['one', 'two', 'three']);
     });
 
     it('opens a referenced asset outside the current query without changing gallery results', async () => {

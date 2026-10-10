@@ -1,30 +1,38 @@
-import { fireEvent, render, screen, waitFor } from '../../../test/testUtils';
-import { describe, expect, it, vi } from 'vitest';
+import { act, fireEvent, render, screen, waitFor } from '../../../test/testUtils';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { open } from '@tauri-apps/plugin-shell';
+import i18n from '../../../i18n';
 import { DonationModal } from '../DonationModal';
 
 describe('DonationModal', () => {
-    it('shows support routes and live donation providers', async () => {
+    afterEach(async () => {
+        await act(async () => {
+            await i18n.changeLanguage('en');
+        });
+    });
+
+    it('opens the studio donation page from the only support button', async () => {
         render(<DonationModal isOpen={true} onClose={vi.fn()} />);
 
-        expect(screen.getByText('Buy me a coffee')).toBeTruthy();
-        expect(screen.getByText('Sponsor on GitHub')).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Donate' })).toBeTruthy();
+        expect(screen.queryByText('Sponsor on GitHub')).toBeNull();
+        expect(screen.queryByText('Buy me a coffee')).toBeNull();
         expect(screen.getByText('Thank you for being part of the journey.')).toBeTruthy();
         expect(screen.queryByText('Report a bug')).toBeNull();
         expect(screen.queryByText('Follow releases')).toBeNull();
         expect(screen.queryByText('Donations are not configured yet')).toBeNull();
 
-        fireEvent.click(screen.getByText('Sponsor on GitHub'));
+        fireEvent.click(screen.getByRole('button', { name: 'Donate' }));
 
         await waitFor(() => {
-            expect(open).toHaveBeenCalledWith('https://github.com/sponsors/AsuraAce');
+            expect(open).toHaveBeenCalledWith('https://vk.ru/dvoyna_studio');
         });
 
-        fireEvent.click(screen.getByText('Buy me a coffee'));
-
-        await waitFor(() => {
-            expect(open).toHaveBeenCalledWith('https://ko-fi.com/astraoriondev');
+        await act(async () => {
+            await i18n.changeLanguage('ru');
         });
+        expect(screen.getByRole('button', { name: 'Донат' })).toBeTruthy();
+        expect(screen.queryByRole('button', { name: 'Поддержать на GitHub' })).toBeNull();
     });
 
     it('closes from the dismiss button and backdrop but not the dialog body', () => {

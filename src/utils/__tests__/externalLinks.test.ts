@@ -36,6 +36,16 @@ describe('externalLinks', () => {
         expect(open).toHaveBeenCalledWith('https://github.com/AsuraAce/ambit');
     });
 
+    it('opens the studio donation page and rejects the retired sponsor URL', async () => {
+        await openExternalUrl('https://vk.ru/dvoyna_studio');
+
+        expect(open).toHaveBeenCalledWith('https://vk.ru/dvoyna_studio');
+        expect(isAllowedExternalUrl('https://vk.ru/dvoyna_studio')).toBe(true);
+
+        await expect(openExternalUrl('https://github.com/sponsors/AsuraAce')).rejects.toThrow('External URL is not allowed');
+        expect(isAllowedExternalUrl('https://ko-fi.com/astraoriondev')).toBe(false);
+    });
+
     it('opens the exact Google AI Studio API key page', async () => {
         await openExternalUrl(GEMINI_API_KEY_URL);
 

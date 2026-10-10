@@ -11,7 +11,7 @@ const image = (overrides: Partial<AIImage> = {}): AIImage => ({
 const setup = (overrides: Partial<React.ComponentProps<typeof ViewerToolbar>> = {}) => {
     const props: React.ComponentProps<typeof ViewerToolbar> = {
         image: image(), versionsCount: 1, activeVersionIndex: 0, showControls: true, isTheaterMode: false, isSidebarOpen: true,
-        onCopy: vi.fn(), onOpenExternal: vi.fn(), onToggleTheater: vi.fn(), onShare: vi.fn(), onToggleFavorite: vi.fn(),
+        onCopy: vi.fn(), onOpenExternal: vi.fn(), onToggleTheater: vi.fn(), onToggleFavorite: vi.fn(),
         onTogglePin: vi.fn(), onDelete: vi.fn(), onToggleSidebar: vi.fn(), onClose: vi.fn(), ...overrides
     };
     const result = render(<ViewerToolbar {...props} />);
@@ -23,9 +23,11 @@ describe('ViewerToolbar', () => {
         const { props } = setup({ versionsCount: 3, activeVersionIndex: 1 });
         expect(screen.getByText('a.png')).toBeTruthy();
         expect(screen.getByText('Version 2 of 3')).toBeTruthy();
+        expect(screen.queryByRole('button', { name: 'Share Image' })).toBeNull();
+        expect(screen.getByRole('button', { name: 'Copy Image to Clipboard' })).toBeTruthy();
         const actions: Array<[string, () => void]> = [
             ['Copy Image to Clipboard', props.onCopy], ['Open in Default App', props.onOpenExternal], ['Enter Theater Mode (Z)', props.onToggleTheater],
-            ['Share Image', props.onShare], ['Add to Favorites (F)', props.onToggleFavorite!], ['Pin to Top (P)', props.onTogglePin!],
+            ['Add to Favorites (F)', props.onToggleFavorite!], ['Pin to Top (P)', props.onTogglePin!],
             ['Remove from Library', props.onDelete!], ['Hide Sidebar (I)', props.onToggleSidebar!], ['Close Viewer (Esc)', props.onClose]
         ];
         for (const [label, callback] of actions) {

@@ -52,14 +52,14 @@ export const SelectableRow: React.FC<SelectableRowProps> = ({ label, detail, isS
             : 'bg-transparent border-transparent text-gray-500 dark:text-gray-400 hover:bg-white/40 dark:hover:bg-white/5'
             } ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'} ${className || ''}`}
     >
-        <span className="min-w-0 truncate">{label}</span>
-        {detail ? <span className="shrink-0 text-xs tabular-nums text-gray-400">{detail}</span> : null}
+        <span className="min-w-0 flex-1 truncate">{label}</span>
+        {detail ? <span className="w-16 shrink-0 text-right text-xs tabular-nums text-gray-400">{detail}</span> : null}
         {isSelected ? (
-            <div className="w-4 h-4 rounded-full bg-sage-500 flex items-center justify-center">
+            <div className="w-4 h-4 shrink-0 rounded-full bg-sage-500 flex items-center justify-center">
                 <Check className="w-3 h-3 text-white" />
             </div>
         ) : (
-            <div className="w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" />
+            <div className="w-4 h-4 shrink-0 rounded-full border border-gray-300 dark:border-gray-600" />
         )}
     </div>
 );

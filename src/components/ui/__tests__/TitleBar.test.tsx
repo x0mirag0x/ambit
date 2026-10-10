@@ -44,6 +44,10 @@ describe('TitleBar', () => {
         settingsState.developer = true;
         settingsState.captureMode = false;
         vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+        vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+            ok: true,
+            arrayBuffer: async () => Uint8Array.from([137, 80, 78, 71]).buffer,
+        }));
     });
 
     it('labels the isolated QA profile independently of developer features', async () => {
@@ -71,8 +75,11 @@ describe('TitleBar', () => {
         mockedGetCurrentWindow.mockReturnValue(win as unknown as ReturnType<typeof getCurrentWindow>);
         const { unmount } = render(<TitleBar />);
         await screen.findByRole('img', { name: 'Dvoyna' });
+        expect(screen.getAllByRole('img')).toHaveLength(1);
         expect(screen.getByText('DEV')).toBeTruthy();
-        expect(win.setIcon).toHaveBeenCalledWith('/branding/dv-window-icon.png');
+        await waitFor(() => expect(win.setIcon).toHaveBeenCalledOnce());
+        expect(win.setIcon.mock.calls[0]?.[0]).toBeInstanceOf(Uint8Array);
+        expect(fetch).toHaveBeenCalledWith('/branding/dv-window-icon.png');
 
         const buttons = screen.getAllByRole('button');
         fireEvent.click(buttons[0]);

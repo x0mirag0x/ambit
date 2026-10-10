@@ -456,7 +456,7 @@ export const SearchBar = React.memo(({
                 ) : null}
             </div>
                 {searchProps.visualSearchActive ? (
-                    <div className="mt-2 flex items-center gap-2">
+                    <div className="relative z-[60] mt-2 flex items-center gap-2">
                         <span className="rounded-full border border-sage-500/40 bg-sage-500/10 px-2.5 py-1 text-[11px] font-semibold text-sage-700 dark:text-sage-200">{t('Search by photo')}</span>
                         <button
                             type="button"

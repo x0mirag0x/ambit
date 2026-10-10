@@ -53,6 +53,23 @@ describe('FilterPrimitives', () => {
         expect(onClick).toHaveBeenCalledTimes(1);
     });
 
+    it('right-aligns counts in a fixed column before the radio', () => {
+        render(
+            <>
+                <SelectableRow label="Nano" detail="1" isSelected={false} onClick={vi.fn()} />
+                <SelectableRow label="Seedance 2.5" detail="51" isSelected onClick={vi.fn()} />
+            </>
+        );
+
+        for (const count of ['1', '51']) {
+            const countNode = screen.getByText(count);
+            expect(countNode.className).toContain('w-16');
+            expect(countNode.className).toContain('text-right');
+            expect(countNode.className).toContain('tabular-nums');
+            expect(countNode.nextElementSibling?.className).toContain('rounded-full');
+        }
+    });
+
     it('search input reports typing and exposes clear when populated', () => {
         const onChange = vi.fn();
         const { rerender } = render(
