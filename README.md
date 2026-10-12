@@ -1,76 +1,55 @@
 <div align="center">
-<img width="120" height="120" alt="Dvoyna Vault app icon" src="public/branding/d-mark.png" />
+<img width="120" height="120" alt="Знак Dvoyna" src="public/branding/d-mark.png" />
 
 # Dvoyna Vault
-### High-Performance Local AI Image Manager
+### Локальная библиотека изображений и видео, созданных ИИ
 </div>
 
-Dvoyna Vault is a local-first desktop app for organizing large AI-generated image libraries. It helps you import folders, browse fast, search by generation metadata, resolve model references, and keep library maintenance work on your own machine.
+**Dvoyna Vault** (коротко **Dvoyna** или **DV**) ведёт локальную библиотеку изображений и видео, созданных ИИ. Исходные файлы остаются в своих папках. Каталог, миниатюры, поиск и настройки хранятся на вашем компьютере, без телеметрии.
 
-Dvoyna Vault is based on [Ambit](https://github.com/AsuraAce/ambit) by AsuraAce, licensed under GPL-3.0, with modifications. This fork uses its own bundle id (`com.dvoyna.vault`) and does not read or migrate an existing Ambit library.
+Основано на Ambit by AsuraAce — https://github.com/AsuraAce/ambit
+
+Каталог Dvoyna хранится отдельно (`com.dvoyna.vault`) и оставляет уже существующую библиотеку Ambit на месте.
 
 <p align="center">
-  <img alt="Dvoyna Vault dark gallery with filters, collections, and pinned images" src="docs/assets/showcase/ambit-gallery-dark.webp" />
+  <img alt="Библиотека Dvoyna Vault: открыта коллекция «Форматы», тёмная тема" src="docs/assets/dvoyna/library.webp" />
 </p>
 
-## Screenshots
+<!-- Здесь позже добавим ещё скриншоты. -->
 
-| Light theme and advanced search | Timeline browsing |
-| --- | --- |
-| ![Dvoyna Vault light theme gallery with advanced search filters](docs/assets/showcase/ambit-gallery-light.webp) | ![Dvoyna Vault timeline view grouped by month](docs/assets/showcase/ambit-timeline-dark.webp) |
+## Возможности
 
-| AI prompt recovery | Creative prompt variations |
-| --- | --- |
-| ![Dvoyna Vault AI prompt recovery style selection](docs/assets/showcase/ambit-ai-prompt-recovery.webp) | ![Dvoyna Vault AI creative prompt variations modal](docs/assets/showcase/ambit-ai-prompt-variations.webp) |
+*   **Русский интерфейс.** Язык переключается в настройках. Если язык системы русский, первый запуск открывается по-русски.
+*   **Коллекции.** Ручные подборки и умные коллекции по правилам. Если открыта ручная коллекция, разовый импорт (выбранные изображения, видео или папка) добавляет файлы в библиотеку и в эту коллекцию. В окне импорта есть флажок «Добавить в коллекцию: <имя>». Для открытой ручной коллекции он включён по умолчанию. В общей библиотеке и в умной коллекции флажка нет. Файл, который уже есть в библиотеке, попадает в коллекцию без второй копии. Счётчик и сетка обновляются сразу после импорта.
+*   **Фильтры** по генератору, модели, сэмплеру, цвету и дате.
+*   **Поиск по синтаксису.** В строке поиска работают операторы `model:` и `tool:`, например `model:sdxl tool:comfy`, вместе с обычными словами промпта.
+*   **Поиск по фото** со значка камеры в строке поиска.
+*   **Просмотр видео:** постеры, воспроизведение и переход по текущей подборке. Воспроизведение опирается на медиавозможности Windows.
+*   **Избранное и закреплённые** снимки.
+*   **Метаданные:** чтение промпта, воркфлоу и ресурсов из файла и ручные правки.
+*   **Интеграции** InvokeAI, ComfyUI и SD WebUI.
+*   **Ассистент Gemini** по желанию и только со своим ключом.
+*   **Поиск хеша модели на CivitAI** после подтверждения «Определить онлайн». Уходит хеш, не файл изображения.
 
-## Key Features
+## Установка в Windows
 
-*   **Local library management**: Catalog image folders without moving your source files, then review, remove, recover, and maintain records from one desktop workspace.
-*   **Video library support**: Import supported local videos individually or through monitored folders, browse static posters, inspect ComfyUI metadata, and play or export originals. Playback depends on the Windows media runtime.
-*   **Generation-aware metadata**: Parse prompts, workflows, resources, dimensions, hashes, and model references from common AI image outputs.
-*   **Fast search and filtering**: Use SQLite-backed queries, facets, collections, and saved search state to stay responsive across large libraries.
-*   **Performance-focused browsing**: Virtualized grids, thumbnail handling, and minimized IPC keep day-to-day browsing usable as collections grow.
-*   **Optional intelligence tools**: Gemini-backed actions are available only when you configure your own key and explicitly run an AI feature.
-*   **Privacy-conscious by default**: Core browsing, search, metadata parsing, thumbnails, and settings work locally without telemetry.
+Готовые сборки сейчас выходят для Windows.
 
-## Technology Stack
+1. Скачайте установщик. Имя файла заканчивается на `-setup.exe`.
+   * Сборка [windows-installer](https://github.com/x0mirag0x/ambit/actions/workflows/windows-installer.yml): откройте нужный запуск и скачайте артефакт `Dvoyna-Vault-windows-setup`. Артефакт хранится около 14 дней.
+   * Либо страница [Releases](https://github.com/x0mirag0x/ambit/releases), если установщик уже опубликован там.
+2. Запустите установщик и откройте Dvoyna Vault.
+3. **SmartScreen.** Установщик не подписан. Windows может предупредить о неизвестном издателе («Система Windows защитила ваш компьютер»). Нажмите «Подробнее», затем «Выполнить в любом случае». В английской Windows: More info, затем Run anyway.
 
-*   **Frontend**: React 19, TypeScript, Tailwind CSS, Zustand, React Query
-*   **Backend**: Rust with Tauri v2 and SQLite (`rusqlite`)
-*   **Desktop distribution**: GitHub Releases with Tauri updater artifacts
+Для установки не нужны Node.js, pnpm, Rust и редактор кода.
 
-## Privacy and Network Behavior
+Пошаговое руководство: [docs/manual/index.md](docs/manual/index.md) (пока на английском).
 
-Dvoyna Vault is local-first. Core library management, browsing, search, metadata parsing, thumbnails, maintenance, and settings work on local files without telemetry.
+Ошибки и пожелания: [GitHub Issues](https://github.com/x0mirag0x/ambit/issues).
 
-The public beta has a small set of disclosed network paths:
+## Сборка из исходников
 
-*   Automatic update checks are off by default. When enabled, they contact this fork's GitHub Releases. Packaged builds from the manual Windows workflow are not updater-signed, so those builds cannot install as automatic updates until a new signing key is configured. Updates are downloaded and installed only after you confirm the prompt.
-*   Gemini features are optional. Requests are sent only when you configure a key and run an AI action or key verification.
-*   CivitAI model-hash resolution is optional. It runs only after you confirm Resolve Online and sends unresolved model hash strings, not image files.
-*   GitHub Sponsors, Ko-fi, and project links open only when clicked.
-
-## Getting Started
-
-### Public Beta Builds
-
-Dvoyna Vault is currently in public beta. Current builds are published on [GitHub Releases](https://github.com/x0mirag0x/ambit/releases).
-
-Official public beta builds are currently available for **Windows only** while macOS and Linux support is being validated.
-
-Maintainer-triggered Linux and macOS artifacts may appear separately as experimental community test builds.
-
-1.  Download the Windows setup installer (`-setup.exe`) from the release assets.
-2.  Install and launch the app.
-3.  Report bugs or feedback through [GitHub Issues](https://github.com/x0mirag0x/ambit/issues).
-
-The Windows installer includes the packaged app. You do not need Node.js, pnpm, Rust, or VS Code unless you want to build Dvoyna Vault from source.
-
-For a step-by-step product guide, see the [Dvoyna Vault User Manual](docs/manual/index.md).
-
-### Development
-
-For local development, Dvoyna Vault requires Node.js 24 or newer, pnpm 11.5.3, and Rust 1.96.0 as pinned by `rust-toolchain.toml`.
+Нужны Node.js 24 или новее, pnpm 11.5.3 и Rust 1.96.0 (версия зафиксирована в `rust-toolchain.toml`).
 
 ```bash
 git clone https://github.com/x0mirag0x/ambit.git
@@ -79,37 +58,31 @@ pnpm install
 pnpm run app:dev
 ```
 
-For clean feature-video capture while retaining the development profile and tools, start the app in capture mode from PowerShell:
+Проверки и правила для сопровождающих: [CONTRIBUTING.md](CONTRIBUTING.md).
 
-```powershell
-$env:VITE_CAPTURE_MODE='true'
-pnpm run app:dev
-```
+Сейчас проект ведёт сопровождающий. Сообщения об ошибках, правки документации и идеи принимаются. Пул-реквесты с кодом на время публичной беты не принимаются.
 
-Capture mode hides the React Query control and title-bar `DEV` badge without disabling developer features. Clear the flag before returning to the normal development UI:
+Сообщения по безопасности отправляйте по [SECURITY.md](SECURITY.md), не через обычный issue.
 
-```powershell
-$env:VITE_CAPTURE_MODE=$null
-```
+## Конфиденциальность
 
-For checks, branch expectations, and maintainer workflow notes, see [CONTRIBUTING.md](CONTRIBUTING.md).
+Библиотека, поиск, разбор метаданных, миниатюры и настройки работают локально. Телеметрии нет.
 
-## Contributing
+Сеть нужна только в этих случаях:
 
-Dvoyna Vault is currently maintainer-led. Bug reports, documentation corrections, and feature requests are welcome, but code contributions and pull requests are not being accepted during the public beta.
+*   Проверка обновлений выключена по умолчанию. После включения приложение обращается к GitHub Releases этого репозитория. Скачивание и установка идут после вашего подтверждения. Неподписанный установщик из Actions нельзя поставить как автоматическое обновление.
+*   Gemini необязателен. Запрос уходит, когда вы сами проверяете ключ или запускаете действие ассистента.
+*   Разрешение хеша на CivitAI необязательно. Оно стартует после «Определить онлайн» и отправляет строки хешей неразрешённых моделей, не файлы изображений.
+*   Внешние ссылки, включая поддержку, открываются только по нажатию.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the current contribution policy.
+## Поддержка
 
-For security-sensitive reports, follow [SECURITY.md](SECURITY.md) instead of opening a public issue.
+Dvoyna Vault бесплатный, отдельных платных функций нет.
 
-## Support
+Поддержать проект: https://vk.ru/dvoyna_studio
 
-Dvoyna Vault is free and open source. Support is optional and there are currently no paid-only features or priority-support tiers.
+## Лицензия
 
-*   Report bugs and feature requests through [GitHub Issues](https://github.com/x0mirag0x/ambit/issues).
-*   Follow packaged builds and release notes on [GitHub Releases](https://github.com/x0mirag0x/ambit/releases).
-*   Optional support: [Донат](https://vk.ru/dvoyna_studio).
+Dvoyna Vault распространяется по GNU General Public License v3.0 only (GPL-3.0). Текст лицензии: [LICENSE](LICENSE).
 
-## License
-
-Dvoyna Vault is based on Ambit by AsuraAce (https://github.com/AsuraAce/ambit), licensed under the GNU General Public License v3.0 only, with modifications. See [LICENSE](LICENSE) for details.
+Основано на Ambit by AsuraAce — https://github.com/AsuraAce/ambit
