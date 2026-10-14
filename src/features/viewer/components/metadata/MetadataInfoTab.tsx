@@ -347,7 +347,7 @@ export const MetadataInfoTab = ({
                                 <button type="button" onClick={() => setShowOriginalPrompt(true)} className={`rounded px-2 py-0.5 text-[10px] font-bold ${showOriginalPrompt ? 'bg-sage-600 text-white' : 'text-gray-500 dark:text-zinc-500'}`}>{t('Original')}</button>
                                 </div>
                             ) : null}
-                                {onRecoverMetadata ? <TooltipButton label={t('Recover Prompt with AI')} content={t('Recover Prompt with AI')} onClick={onRecoverMetadata} className="rounded p-1.5 text-amethyst-600 hover:bg-gray-100 dark:text-amethyst-300 dark:hover:bg-white/5"><Wand2 className="h-3.5 w-3.5" /></TooltipButton> : null}
+                                {onRecoverMetadata ? <TooltipButton label={t('Recover Prompt with AI')} content={t('Recover Prompt with AI')} onClick={onRecoverMetadata} className="rounded p-1.5 text-sage-600 hover:bg-gray-100 dark:text-sage-300 dark:hover:bg-white/5"><Wand2 className="h-3.5 w-3.5" /></TooltipButton> : null}
                             {onUpdatePrompt && onUpdateNegativePrompt && (image.metadata.tool === GeneratorTool.AUTOMATIC1111
                                 || image.metadata.tool === GeneratorTool.FORGE
                                     || image.metadata.tool === GeneratorTool.UNKNOWN) ? <TooltipButton label={t('Parse Prompt from Clipboard')} content={t('Parse Prompt from Clipboard')} onClick={() => void handleParseClipboard()} className="rounded p-1.5 text-sage-600 hover:bg-gray-100 dark:text-sage-300 dark:hover:bg-white/5"><ClipboardList className="h-3.5 w-3.5" /></TooltipButton> : null}
@@ -448,11 +448,11 @@ export const MetadataInfoTab = ({
             <div className="shrink-0 p-4 border-t border-gray-200 dark:border-white/5 bg-white dark:bg-zinc-900 z-10 shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-amethyst-600 dark:text-amethyst-300" />
-                        <h3 className="text-xs font-bold uppercase text-amethyst-600 dark:text-amethyst-300 tracking-wider">{t('Creative Assistant')}</h3>
+                        <Sparkles className="w-4 h-4 text-sage-600 dark:text-sage-300" />
+                        <h3 className="text-xs font-bold uppercase text-sage-600 dark:text-sage-300 tracking-wider">{t('Creative Assistant')}</h3>
                     </div>
                     {onOpenAIResult && (
-                        <button onClick={onOpenAIResult} className="flex items-center gap-1 text-xs text-amethyst-600 hover:text-amethyst-600 hover:underline dark:text-amethyst-300 dark:hover:text-amethyst-300">
+                        <button onClick={onOpenAIResult} className="flex items-center gap-1 text-xs text-sage-600 hover:text-sage-600 hover:underline dark:text-sage-300 dark:hover:text-sage-300">
                             {t('View last result')} <Eye className="w-3 h-3" />
                         </button>
                     )}
@@ -461,27 +461,27 @@ export const MetadataInfoTab = ({
                 <div className="grid grid-cols-2 gap-3">
                     <button
                         onClick={onAIAnalysis} disabled={isAnalyzing}
-                        className="p-4 bg-white/60 dark:bg-zinc-800/40 rounded-xl border border-gray-200 dark:border-white/5 hover:border-amethyst-300 dark:hover:border-amethyst-500/30 transition-all flex flex-col justify-between h-24 text-left group"
+                        className="p-4 bg-white/60 dark:bg-zinc-800/40 rounded-xl border border-gray-200 dark:border-white/5 hover:border-sage-300 dark:hover:border-sage-500/30 transition-all flex flex-col justify-between h-24 text-left group"
                     >
                         <span className="text-xs font-bold text-gray-700 dark:text-gray-300">{t('Prompt Analysis')}</span>
                         <div className="flex items-center justify-between w-full">
-                            <span className="text-[10px] text-gray-500 group-hover:text-amethyst-600 dark:text-zinc-400 dark:group-hover:text-amethyst-300">
+                            <span className="text-[10px] text-gray-500 group-hover:text-sage-600 dark:text-zinc-400 dark:group-hover:text-sage-300">
                                 {isAnalyzing ? t('Analyzing...') : t('Get insights')}
                             </span>
-                            {isAnalyzing ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-amethyst-600 border-t-transparent dark:border-amethyst-300" /> : <Wand2 className="w-4 h-4 text-amethyst-600 dark:text-amethyst-300" />}
+                            {isAnalyzing ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-sage-600 border-t-transparent dark:border-sage-300" /> : <Wand2 className="w-4 h-4 text-sage-600 dark:text-sage-300" />}
                         </div>
                     </button>
 
                     <button
                         onClick={onGenerateVariations} disabled={isAnalyzing}
-                        className="p-4 bg-white/60 dark:bg-zinc-800/40 rounded-xl border border-gray-200 dark:border-white/5 hover:border-amethyst-300 dark:hover:border-amethyst-500/30 transition-all flex flex-col justify-between h-24 text-left group"
+                        className="p-4 bg-white/60 dark:bg-zinc-800/40 rounded-xl border border-gray-200 dark:border-white/5 hover:border-sage-300 dark:hover:border-sage-500/30 transition-all flex flex-col justify-between h-24 text-left group"
                     >
                         <span className="text-xs font-bold text-gray-700 dark:text-gray-300">{t('Variations')}</span>
                         <div className="flex items-center justify-between w-full">
-                            <span className="text-[10px] text-gray-500 group-hover:text-amethyst-600 dark:text-zinc-400 dark:group-hover:text-amethyst-300">
+                            <span className="text-[10px] text-gray-500 group-hover:text-sage-600 dark:text-zinc-400 dark:group-hover:text-sage-300">
                                 {isAnalyzing ? t('Creating...') : t('Create twists')}
                             </span>
-                            {isAnalyzing ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-amethyst-600 border-t-transparent dark:border-amethyst-300" /> : <Shuffle className="w-4 h-4 text-amethyst-600 dark:text-amethyst-300" />}
+                            {isAnalyzing ? <div className="animate-spin rounded-full h-4 w-4 border-2 border-sage-600 border-t-transparent dark:border-sage-300" /> : <Shuffle className="w-4 h-4 text-sage-600 dark:text-sage-300" />}
                         </div>
                     </button>
                 </div>

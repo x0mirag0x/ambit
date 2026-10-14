@@ -115,7 +115,7 @@ describe('SelectionBar', () => {
         ]) {
             const button = screen.getByRole('button', { name: label });
             expect(button.className).toContain('text-gray-500');
-            expect(button.className).not.toContain('text-amethyst');
+            expect(button.className).not.toContain('text-sage');
             expect(button.className).not.toContain('text-green');
             expect(button.className).not.toContain('text-red');
         }
@@ -171,7 +171,7 @@ describe('SelectionBar', () => {
         const callbacks = renderBar([...images]);
         const button = screen.getByRole('button', { name: title });
         expect(button.className).toContain('text-gray-500');
-        expect(button.className).not.toContain('text-amethyst');
+        expect(button.className).not.toContain('text-sage');
         expect(button.className).not.toContain('text-green');
         expect(button.className.includes('border-dashed')).toBe(isMixed);
         fireEvent.click(button);

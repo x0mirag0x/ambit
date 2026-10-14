@@ -127,7 +127,7 @@ export const IntelligenceTab: React.FC<TabProps> = React.memo(({ settings, setSe
     return (
         <div className="space-y-6 max-w-2xl">
             <section className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/5 rounded-xl p-6 shadow-sm">
-                <h4 className="mb-6 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amethyst-600 dark:text-amethyst-300">
+                <h4 className="mb-6 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-sage-600 dark:text-sage-300">
                     <FlaskConical className="w-4 h-4" /> {t('Dvoyna Vault Intelligence')}</h4>
 
                 <div className="space-y-6">
@@ -136,7 +136,7 @@ export const IntelligenceTab: React.FC<TabProps> = React.memo(({ settings, setSe
                         className="flex items-center justify-between cursor-pointer group"
                     >
                         <div className="min-w-0 pr-4">
-                            <div className="text-base font-medium text-gray-900 transition-colors group-hover:text-amethyst-600 dark:text-gray-200 dark:group-hover:text-amethyst-300">{t('Enable AI Features')}</div>
+                            <div className="text-base font-medium text-gray-900 transition-colors group-hover:text-sage-600 dark:text-gray-200 dark:group-hover:text-sage-300">{t('Enable AI Features')}</div>
                             <div className="text-sm text-gray-500">{t('Unlocks natural language search, prompt analysis, and metadata recovery through on-demand Gemini requests.')}</div>
                         </div>
                         <button
@@ -144,7 +144,7 @@ export const IntelligenceTab: React.FC<TabProps> = React.memo(({ settings, setSe
                             role="switch"
                             aria-checked={settings.enableAI}
                             aria-label={t('Enable AI Features')}
-                            className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${settings.enableAI ? 'bg-amethyst-600' : 'bg-gray-200 dark:bg-white/10'}`}
+                            className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${settings.enableAI ? 'bg-sage-600' : 'bg-gray-200 dark:bg-white/10'}`}
                         >
                             <div className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow-sm transition-all ${settings.enableAI ? 'left-6' : 'left-1'}`} />
                         </button>
@@ -195,7 +195,7 @@ export const IntelligenceTab: React.FC<TabProps> = React.memo(({ settings, setSe
                                         <select
                                             value={effectiveAiModel}
                                             onChange={handleModelChange}
-                                            className="w-full rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700 outline-none transition-colors focus:border-amethyst-500 dark:border-white/10 dark:bg-black/20 dark:text-gray-300"
+                                            className="w-full rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700 outline-none transition-colors focus:border-sage-500 dark:border-white/10 dark:bg-black/20 dark:text-gray-300"
                                         >
                                             {AI_MODELS.map(model => (
                                                 <option key={model.id} value={model.id} className="dark:bg-zinc-900">
@@ -216,7 +216,7 @@ export const IntelligenceTab: React.FC<TabProps> = React.memo(({ settings, setSe
                                         <select
                                             value={effectiveAiThinkingMode}
                                             onChange={handleThinkingModeChange}
-                                            className="w-full rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700 outline-none transition-colors focus:border-amethyst-500 dark:border-white/10 dark:bg-black/20 dark:text-gray-300"
+                                            className="w-full rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700 outline-none transition-colors focus:border-sage-500 dark:border-white/10 dark:bg-black/20 dark:text-gray-300"
                                         >
                                             {supportedThinkingModes.map(mode => (
                                                 <option key={mode} value={mode} className="dark:bg-zinc-900">

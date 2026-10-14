@@ -399,9 +399,9 @@ export const OnboardingWizard: React.FC<OnboardingWizardProps> = ({
                                             aria-checked={enableAI}
                                             disabled={isVerifying}
                                             onClick={() => setEnableAIDraft(!enableAI)}
-                                            className={`mb-5 flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amethyst-500 disabled:cursor-not-allowed disabled:opacity-50 ${enableAI ? 'border-amethyst-500/50 bg-amethyst-500/5' : 'border-gray-200 dark:border-white/10'}`}
+                                            className={`mb-5 flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500 disabled:cursor-not-allowed disabled:opacity-50 ${enableAI ? 'border-sage-500/50 bg-sage-500/5' : 'border-gray-200 dark:border-white/10'}`}
                                         >
-                                            <span aria-hidden="true" className={`flex h-6 w-6 items-center justify-center rounded-lg border transition-all ${enableAI ? 'border-amethyst-500 bg-amethyst-500 shadow-lg shadow-amethyst-500/20' : 'border-gray-400'}`}>
+                                            <span aria-hidden="true" className={`flex h-6 w-6 items-center justify-center rounded-lg border transition-all ${enableAI ? 'border-sage-500 bg-sage-500 shadow-lg shadow-sage-500/20' : 'border-gray-400'}`}>
                                                 {enableAI ? <Check className="h-4 w-4 text-white" /> : null}
                                             </span>
                                             <span className="flex-1">
@@ -568,7 +568,7 @@ const FeatureRow = ({ icon, title, desc }: { icon: React.ReactNode; title: strin
 
 const CompactFeature = ({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) => (
     <div className="flex items-start gap-3 rounded-xl border border-gray-100 bg-gray-50 p-3 dark:border-white/5 dark:bg-white/5">
-        <div className="rounded-lg border border-gray-100 bg-white p-2 text-amethyst-600 shadow-sm dark:border-white/5 dark:bg-white/5 dark:text-amethyst-300">
+        <div className="rounded-lg border border-gray-100 bg-white p-2 text-sage-600 shadow-sm dark:border-white/5 dark:bg-white/5 dark:text-sage-300">
             {icon}
         </div>
         <div>
