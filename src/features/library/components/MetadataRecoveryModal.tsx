@@ -66,7 +66,7 @@ export const MetadataRecoveryModal: React.FC<MetadataRecoveryModalProps> = ({
     return (
         <AnimatePresence mode="wait">
             {isOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[130] flex items-center justify-center p-4">
                     {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -86,13 +86,13 @@ export const MetadataRecoveryModal: React.FC<MetadataRecoveryModalProps> = ({
                         className="relative w-full max-w-md bg-white dark:bg-[#0a0a0c] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden"
                     >
                         {/* Decorative top line */}
-                        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amethyst-500/50 to-transparent" />
+                        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-sage-500/50 to-transparent" />
 
                         {/* Header */}
                         <div className="px-6 py-4 border-b border-gray-100 dark:border-white/5 flex items-center justify-between bg-gray-50/50 dark:bg-white/[0.02]">
                             <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-lg bg-amethyst-500/10 border border-amethyst-500/20 flex items-center justify-center">
-                                    <Wand2 className="w-4 h-4 text-amethyst-600 dark:text-amethyst-300" />
+                                <div className="w-9 h-9 rounded-lg bg-sage-500/10 border border-sage-500/20 flex items-center justify-center">
+                                    <Wand2 className="w-4 h-4 text-sage-600 dark:text-sage-300" />
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-gray-900 dark:text-white text-sm">
@@ -119,8 +119,8 @@ export const MetadataRecoveryModal: React.FC<MetadataRecoveryModalProps> = ({
                             {isProcessing ? (
                                 <div className="py-8 flex flex-col items-center justify-center text-center">
                                     <div className="relative w-14 h-14 mb-4">
-                                        <div className="absolute inset-0 rounded-full bg-amethyst-500/20 animate-ping" />
-                                        <div className="relative w-14 h-14 border-4 border-amethyst-500/30 border-t-amethyst-500 rounded-full animate-spin" />
+                                        <div className="absolute inset-0 rounded-full bg-sage-500/20 animate-ping" />
+                                        <div className="relative w-14 h-14 border-4 border-sage-500/30 border-t-sage-500 rounded-full animate-spin" />
                                     </div>
                                     <h4 className="text-gray-900 dark:text-white font-bold mb-2">{t('Analyzing Image...')}</h4>
                                     <p className="text-xs text-gray-500 max-w-[250px]">
@@ -139,22 +139,22 @@ export const MetadataRecoveryModal: React.FC<MetadataRecoveryModalProps> = ({
                                                 className={cn(
                                                     "w-full text-left p-3 rounded-xl border transition-all flex items-start gap-3 group",
                                                     selectedStyle === opt.id
-                                                        ? 'bg-amethyst-50 dark:bg-amethyst-900/20 border-amethyst-500 ring-1 ring-amethyst-500/50'
-                                                        : 'bg-gray-50 dark:bg-white/[0.02] border-gray-200 dark:border-white/5 hover:border-amethyst-300 dark:hover:border-amethyst-500/30'
+                                                        ? 'bg-sage-50 dark:bg-sage-900/20 border-sage-500 ring-1 ring-sage-500/50'
+                                                        : 'bg-gray-50 dark:bg-white/[0.02] border-gray-200 dark:border-white/5 hover:border-sage-300 dark:hover:border-sage-500/30'
                                                 )}
                                             >
                                                 <div className={cn(
                                                     "mt-0.5 transition-colors",
                                                     selectedStyle === opt.id
-                                                        ? 'text-amethyst-600 dark:text-amethyst-300'
-                                                        : 'text-gray-400 group-hover:text-amethyst-600 dark:group-hover:text-amethyst-300'
+                                                        ? 'text-sage-600 dark:text-sage-300'
+                                                        : 'text-gray-400 group-hover:text-sage-600 dark:group-hover:text-sage-300'
                                                 )}>
                                                     {opt.icon}
                                                 </div>
                                                 <div>
                                                     <div className={cn(
                                                         "text-sm font-semibold transition-colors",
-                                                        selectedStyle === opt.id ? 'text-amethyst-600 dark:text-amethyst-300' : 'text-gray-700 dark:text-gray-300'
+                                                        selectedStyle === opt.id ? 'text-sage-600 dark:text-sage-300' : 'text-gray-700 dark:text-gray-300'
                                                     )}>
                                                         {t(opt.label)}
                                                     </div>
@@ -172,7 +172,7 @@ export const MetadataRecoveryModal: React.FC<MetadataRecoveryModalProps> = ({
                                             {t('Cancel')}</button>
                                         <button
                                             onClick={() => onConfirm(selectedStyle)}
-                                            className="px-5 py-2 bg-amethyst-600 hover:bg-amethyst-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-amethyst-500/20 flex items-center gap-2 transition-colors"
+                                            className="px-5 py-2 bg-sage-600 hover:bg-sage-500 text-white rounded-xl text-sm font-bold shadow-lg shadow-sage-500/20 flex items-center gap-2 transition-colors"
                                         >
                                             <Wand2 className="w-4 h-4" />
                                             {t('Generate Prompt')}</button>
