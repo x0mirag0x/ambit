@@ -180,7 +180,7 @@ describe('SettingsModal', () => {
         expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Close Settings' }));
     });
 
-    it('uses amethyst for the active Intelligence navigation icon', () => {
+    it('uses sage gold for the active Intelligence navigation icon', () => {
         render(
             <SettingsModal
                 isOpen={true}
@@ -200,7 +200,7 @@ describe('SettingsModal', () => {
 
         const intelligence = screen.getByRole('button', { name: 'Intelligence' });
         fireEvent.click(intelligence);
-        expect(intelligence.querySelector('svg')?.parentElement?.className).toContain('text-amethyst-300');
+        expect(intelligence.querySelector('svg')?.parentElement?.className).toContain('text-sage-300');
     });
     it('removes modal scale motion when reduced motion is requested', () => {
         motionTestState.reduced = true;

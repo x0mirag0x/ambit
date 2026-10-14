@@ -180,7 +180,7 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
                                         className={cn(
                                             "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-xs font-bold transition-colors",
                                             isActive
-                                                ? "bg-white dark:bg-zinc-700 text-amethyst-600 dark:text-amethyst-300 shadow-sm"
+                                                ? "bg-white dark:bg-zinc-700 text-sage-600 dark:text-sage-300 shadow-sm"
                                                 : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-200/50 dark:hover:bg-white/5"
                                         )}
                                     >
@@ -199,11 +199,11 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
                     {/* System Prompts Section */}
                     {activeTab === 'prompts' && (
                         <section className="space-y-4 animate-in fade-in duration-150 motion-reduce:animate-none">
-                            <div className="flex items-start gap-3 p-4 bg-amethyst-50 dark:bg-amethyst-500/10 border border-amethyst-200 dark:border-amethyst-500/20 rounded-xl">
-                                <BrainCircuit className="w-5 h-5 text-amethyst-600 dark:text-amethyst-300 mt-0.5 shrink-0" />
+                            <div className="flex items-start gap-3 p-4 bg-sage-50 dark:bg-sage-500/10 border border-sage-200 dark:border-sage-500/20 rounded-xl">
+                                <BrainCircuit className="w-5 h-5 text-sage-600 dark:text-sage-300 mt-0.5 shrink-0" />
                                 <div>
-                                    <h4 className="text-sm font-bold text-amethyst-600 dark:text-amethyst-300">{t('System Prompt Overrides')}</h4>
-                                    <p className="text-xs text-amethyst-600/70 dark:text-amethyst-300/70 mt-1 leading-relaxed">
+                                    <h4 className="text-sm font-bold text-sage-600 dark:text-sage-300">{t('System Prompt Overrides')}</h4>
+                                    <p className="text-xs text-sage-600/70 dark:text-sage-300/70 mt-1 leading-relaxed">
                                         {t('Customize the internal instructions sent to the AI models. Changes here apply immediately. "Reset to Default" removes your override.')}</p>
                                 </div>
                             </div>
@@ -242,7 +242,7 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
                                                     {!isEditing && (
                                                         <button
                                                             onClick={() => handleEditPrompt(key)}
-                                                            className="text-xs font-bold text-gray-600 dark:text-gray-300 hover:text-amethyst-600 dark:hover:text-amethyst-300 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
+                                                            className="text-xs font-bold text-gray-600 dark:text-gray-300 hover:text-sage-600 dark:hover:text-sage-300 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
                                                         >
                                                             {t('Edit')}</button>
                                                     )}
@@ -254,7 +254,7 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
                                                     <textarea
                                                         value={editValue}
                                                         onChange={(e) => setEditValue(e.target.value)}
-                                                        className="w-full h-96 bg-white dark:bg-zinc-950 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-xs font-mono text-gray-700 dark:text-gray-300 resize-y focus:outline-none focus:ring-2 focus:ring-amethyst-500/50"
+                                                        className="w-full h-96 bg-white dark:bg-zinc-950 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-xs font-mono text-gray-700 dark:text-gray-300 resize-y focus:outline-none focus:ring-2 focus:ring-sage-500/50"
                                                         autoFocus
                                                     />
                                                     <div className="flex justify-end gap-2 mt-3">
@@ -265,7 +265,7 @@ export const DevTab: React.FC<DevTabProps> = ({ onResetFirstRunOnboarding }) => 
                                                             {t('Cancel')}</button>
                                                         <button
                                                             onClick={() => handleSavePrompt(key)}
-                                                            className="px-4 py-1.5 bg-amethyst-600 hover:bg-amethyst-500 text-white rounded-lg text-xs font-bold flex items-center gap-2 shadow-lg shadow-amethyst-500/20"
+                                                            className="px-4 py-1.5 bg-sage-600 hover:bg-sage-500 text-white rounded-lg text-xs font-bold flex items-center gap-2 shadow-lg shadow-sage-500/20"
                                                         >
                                                             <Save className="w-3 h-3" /> {t('Save Override')}</button>
                                                     </div>

@@ -62,7 +62,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
                     <button
                         type="button"
                         onClick={() => { void openExternalUrl(GEMINI_API_KEY_URL); }}
-                        className="inline-flex items-center gap-1 rounded text-xs font-semibold text-amethyst-600 hover:text-amethyst-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amethyst-500 dark:text-amethyst-300"
+                        className="inline-flex items-center gap-1 rounded text-xs font-semibold text-sage-600 hover:text-sage-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-500 dark:text-sage-300"
                     >
                         {t('Get a Gemini API key')}<ExternalLink className="w-3 h-3" aria-hidden="true" />
                     </button>
@@ -75,9 +75,9 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
                         role="group"
                         aria-label={showLabel ? undefined : t(label)}
                         aria-labelledby={showLabel ? labelId : undefined}
-                        className="flex items-center gap-3 rounded-xl border border-amethyst-200 bg-amethyst-50 p-4 text-sm text-amethyst-600 dark:border-amethyst-500/20 dark:bg-amethyst-500/10 dark:text-amethyst-300"
+                        className="flex items-center gap-3 rounded-xl border border-sage-200 bg-sage-50 p-4 text-sm text-sage-600 dark:border-sage-500/20 dark:bg-sage-500/10 dark:text-sage-300"
                     >
-                        <Key className="w-5 h-5 text-amethyst-600 dark:text-amethyst-300" />
+                        <Key className="w-5 h-5 text-sage-600 dark:text-sage-300" />
                         <span className="font-medium">{t('Environment API key detected')}</span>
                         <div className="flex-1" />
                         {hasPositiveStatus ? (
@@ -90,7 +90,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
                             type="button"
                             onClick={onTestEnvKey}
                             disabled={isVerifying}
-                            className="flex items-center gap-2 rounded-lg bg-amethyst-600 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white transition-all hover:bg-amethyst-500"
+                            className="flex items-center gap-2 rounded-lg bg-sage-600 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white transition-all hover:bg-sage-500"
                         >
                             {isVerifying ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
                             {isVerifying ? t('Checking') : t('Test environment key')}
@@ -111,7 +111,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
                                 if (!isVerifying) onChange(e.target.value);
                             }}
                             className={cn(
-                                "w-full bg-gray-50 dark:bg-white/5 border rounded-xl px-4 py-4 pr-32 text-sm text-gray-900 outline-none transition-all focus:border-amethyst-500/50 focus:ring-4 focus:ring-amethyst-500/5 dark:text-white",
+                                "w-full bg-gray-50 dark:bg-white/5 border rounded-xl px-4 py-4 pr-32 text-sm text-gray-900 outline-none transition-all focus:border-sage-500/50 focus:ring-4 focus:ring-sage-500/5 dark:text-white",
                                 isVerifying && 'cursor-wait opacity-70',
                                 hasPositiveStatus ? 'border-sage-500/50' :
                                     status === 'error' ? 'border-red-500/50' :
@@ -134,7 +134,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({
                                 {isVerifying ? (
                                     <Loader2 className="w-3 h-3 animate-spin" />
                                 ) : (
-                                    <Sparkles className="h-3 w-3 text-amethyst-600 dark:text-amethyst-300" />
+                                    <Sparkles className="h-3 w-3 text-sage-600 dark:text-sage-300" />
                                 )}
                                 {isVerifying ? t('Checking...') : verifyLabel}
                             </button>

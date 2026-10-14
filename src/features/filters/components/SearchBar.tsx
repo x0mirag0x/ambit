@@ -412,7 +412,7 @@ export const SearchBar = React.memo(({
                 {showLoadingIndicator ? (
                     <LoaderCircle
                         aria-hidden="true"
-                        className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin ${searchProps.isSearchingAi ? 'text-amethyst-600 dark:text-amethyst-300' : 'text-sage-600 dark:text-sage-300'}`}
+                        className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin ${searchProps.isSearchingAi ? 'text-sage-600 dark:text-sage-300' : 'text-sage-600 dark:text-sage-300'}`}
                     />
                 ) : (
                     <Search aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors text-gray-400 dark:text-zinc-500 group-focus-within:text-sage-600 dark:group-focus-within:text-sage-400" />
@@ -431,7 +431,7 @@ export const SearchBar = React.memo(({
                     aria-busy={showLoadingIndicator}
                     readOnly={searchProps.isSearchingAi}
                     placeholder={searchProps.isAiSearchEnabled ? t('Ask {{APP_NAME}}...', { APP_NAME: APP_NAME }) : t('Search in {{scopeName}}...', { scopeName: localizeScopeName(scopeName, t) })}
-                    className={`w-full bg-gray-100 dark:bg-zinc-800/50 border rounded-xl py-2 pl-10 ${showTextClear && showPhotoClear ? 'pr-24' : showTextClear || showPhotoClear ? 'pr-16' : 'pr-10'} text-sm focus:outline-none transition-all text-gray-900 dark:text-gray-100 placeholder-gray-500 ${searchProps.isAiSearchEnabled ? 'border-amethyst-300 dark:border-amethyst-800 focus:border-amethyst-500/50 focus:ring-1 focus:ring-amethyst-500/30' : 'border-gray-200 dark:border-white/10 focus:border-sage-500/50 focus:ring-1 focus:ring-sage-500/30'}`}
+                    className={`w-full bg-gray-100 dark:bg-zinc-800/50 border rounded-xl py-2 pl-10 ${showTextClear && showPhotoClear ? 'pr-24' : showTextClear || showPhotoClear ? 'pr-16' : 'pr-10'} text-sm focus:outline-none transition-all text-gray-900 dark:text-gray-100 placeholder-gray-500 ${searchProps.isAiSearchEnabled ? 'border-sage-300 dark:border-sage-800 focus:border-sage-500/50 focus:ring-1 focus:ring-sage-500/30' : 'border-gray-200 dark:border-white/10 focus:border-sage-500/50 focus:ring-1 focus:ring-sage-500/30'}`}
                     value={localValue}
                     onChange={handleSearchChange}
                     onKeyDown={handleKeyDown}
@@ -496,7 +496,7 @@ export const SearchBar = React.memo(({
                 aria-pressed={searchProps.isAiSearchEnabled}
                 disabled={searchProps.isSearchingAi}
                 onClick={searchProps.toggleAiSearch}
-                className={`p-2 rounded-xl transition-all border disabled:cursor-wait disabled:opacity-60 ${searchProps.isAiSearchEnabled ? 'bg-amethyst-100 dark:bg-amethyst-600/20 border-amethyst-500/50 text-amethyst-600 dark:text-amethyst-300 shadow-[0_0_15px_rgba(130,130,196,0.2)]' : 'bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-white/10 text-gray-500 dark:text-zinc-500 hover:text-amethyst-600 dark:hover:text-amethyst-300 hover:border-amethyst-300 dark:hover:border-amethyst-500/30'}`}
+                className={`p-2 rounded-xl transition-all border disabled:cursor-wait disabled:opacity-60 ${searchProps.isAiSearchEnabled ? 'bg-sage-100 dark:bg-sage-600/20 border-sage-500/50 text-sage-600 dark:text-sage-300 shadow-[0_0_15px_rgba(168,135,62,0.2)]' : 'bg-gray-100 dark:bg-zinc-800/50 border-gray-200 dark:border-white/10 text-gray-500 dark:text-zinc-500 hover:text-sage-600 dark:hover:text-sage-300 hover:border-sage-300 dark:hover:border-sage-500/30'}`}
             >
                 <Sparkles aria-hidden="true" className="w-4 h-4" />
             </TooltipButton>
