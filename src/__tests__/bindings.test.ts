@@ -235,6 +235,7 @@ const commandCases: CommandCase[] = [
     { name: 'listInvokeaiImages', invokeName: 'list_invokeai_images', args: ['C:/invoke'], payload: { path: 'C:/invoke' }, returnsResult: true },
     { name: 'scanDirectoryRecursive', invokeName: 'scan_directory_recursive', args: ['C:/library'], payload: { path: 'C:/library' }, returnsResult: true },
     { name: 'openFile', invokeName: 'open_file', args: ['C:/image.png'], payload: { path: 'C:/image.png' }, returnsResult: true },
+    { name: 'copyImageToClipboard', invokeName: 'copy_image_to_clipboard', args: ['C:/image.png'], payload: { path: 'C:/image.png' }, returnsResult: true },
     { name: 'showInFolder', invokeName: 'show_in_folder', args: ['C:/image.png'], payload: { path: 'C:/image.png' }, returnsResult: true },
     { name: 'scanDirectoryWithStats', invokeName: 'scan_directory_with_stats', args: ['C:/library'], payload: { path: 'C:/library' }, returnsResult: true },
     { name: 'scanDirectorySince', invokeName: 'scan_directory_since', args: ['C:/library', 123], payload: { path: 'C:/library', since: 123 }, returnsResult: true },
