@@ -9,6 +9,7 @@ import { createDefaultFilters, getEffectiveImageKind, normalizeMediaTypeFilter }
 import { addLibraryScopeCount, createEmptyLibraryScopeCounts } from '../utils/libraryScopeCounts';
 import { getEffectiveMaskedKeywords, isImageMasked } from '../utils/maskingUtils';
 import { colorsAreSimilar } from '../utils/colorDistance';
+import { uniqueGeneratorToolNames } from '../utils/generatorTools';
 
 const STORAGE_KEY = 'ambit_browser_mock_state_v1';
 const MOCK_COUNT = 180;
@@ -746,7 +747,7 @@ export const getBrowserMockFacets = (filters?: FilterState): Facets => {
     const sourceFor = (type: FacetType) => (
         filters ? filterImages(current.images, getFacetSourceFilters(filters, type), collections) : current.images
     );
-    const tools = buildFacetItems(sourceFor('tools'), 'tools').map((item) => item.name);
+    const tools = uniqueGeneratorToolNames(buildFacetItems(sourceFor('tools'), 'tools').map((item) => item.name));
 
     return {
         checkpoints: buildFacetItems(sourceFor('checkpoints'), 'checkpoints'),

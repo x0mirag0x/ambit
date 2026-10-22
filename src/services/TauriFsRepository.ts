@@ -6,6 +6,7 @@ import { createDefaultAppSettings, inferPromptMaskingEnabled } from '../constant
 import { AppSettings, Collection, FilterState, SmartCollection } from '../types';
 import { createDefaultFilters } from '../utils/filterState';
 import { isValidGeneratorTool } from '../utils/validation';
+import { isPersistedGeneratorFilterValue } from '../utils/generatorTools';
 
 type PersistedCollection = Omit<Collection, 'createdAt' | 'filters' | 'imageIds'> & {
     createdAt?: number;
@@ -131,7 +132,7 @@ const isPersistedFilterState = (value: unknown): boolean => {
         && stringArrayKeys.every(key => hasValidOptionalValue(value, key, isStringArray))
         && hasValidOptionalValue(value, 'tools', item =>
             Array.isArray(item)
-            && item.every(tool => typeof tool === 'string' && isValidGeneratorTool(tool)))
+            && item.every(tool => isPersistedGeneratorFilterValue(tool)))
         && hasValidOptionalValue(value, 'dateRange', item =>
             isEnumValue(item, ['all', 'today', 'week', 'month', 'custom']))
         && hasValidOptionalValue(value, 'dateFrom', item => typeof item === 'string')

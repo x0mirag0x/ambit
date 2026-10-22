@@ -427,6 +427,24 @@ describe('TauriFsRepository', () => {
         }));
     });
 
+    it('keeps a custom generator name in a saved smart-collection filter', async () => {
+        fsMocks.exists.mockImplementation(async (fileName: string) => fileName === 'library.json');
+        fsMocks.readTextFile.mockResolvedValue(JSON.stringify({
+            ...stateFixture(),
+            images: [],
+            smartCollections: [{
+                id: 'krea-smart',
+                name: 'Krea',
+                filters: { searchQuery: '', tools: ['Krea', 'ComfyUI', 'Other'] },
+            }],
+        }));
+        const { TauriFsRepository } = await import('../TauriFsRepository');
+
+        const state = await new TauriFsRepository().load();
+
+        expect(state.smartCollections[0].filters.tools).toEqual(['Krea', 'ComfyUI', 'Other']);
+    });
+
     it('rejects an invalid persisted image-kind filter', async () => {
         fsMocks.exists.mockImplementation(async (fileName: string) => fileName === 'library.json');
         fsMocks.readTextFile.mockResolvedValue(JSON.stringify({

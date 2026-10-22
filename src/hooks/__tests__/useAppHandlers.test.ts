@@ -5,6 +5,7 @@ import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useAppHandlers } from '../useAppHandlers';
 import { AIImage, GeneratorTool } from '../../types';
+import { resetGeneratorToolOptionsForTests } from '../../utils/generatorToolOptions';
 
 const mockAddToast = vi.fn();
 vi.mock('../useToast', () => ({
@@ -83,6 +84,7 @@ describe('useAppHandlers', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        resetGeneratorToolOptionsForTests();
         dispatchedImages = [...mockImages];
         mockSetImages.mockImplementation((update: AIImage[] | ((previous: AIImage[]) => AIImage[])) => {
             dispatchedImages = typeof update === 'function' ? update(dispatchedImages) : update;
@@ -434,6 +436,33 @@ describe('useAppHandlers', () => {
         expect(dispatchedImages[0].metadata.tool).toBe(GeneratorTool.COMFYUI);
         expect(mockRebuildFacetCacheIncremental).toHaveBeenCalledWith('tools');
         expect(mockIncrementFacetCacheVersion).toHaveBeenCalled();
+    });
+
+    it('stores a collapsed custom generator name and reuses a built-in spelling', async () => {
+        const { result } = renderHandlers();
+        await act(async () => result.current.handleUpdateTool('img1', '  Nano   Banana  ' as GeneratorTool));
+        expect(mockUpdateImageMetadataFields).toHaveBeenCalledWith('img1', { tool: 'Nano Banana' });
+        expect(dispatchedImages[0].metadata.tool).toBe('Nano Banana');
+
+        await act(async () => result.current.handleUpdateTool('img1', ' comfyui ' as GeneratorTool));
+        expect(mockUpdateImageMetadataFields).toHaveBeenLastCalledWith('img1', { tool: GeneratorTool.COMFYUI });
+    });
+
+    it('does not write a blank name or a case-only change of the current custom name', async () => {
+        const image = {
+            ...mockImages[0],
+            metadata: { ...mockImages[0].metadata, tool: 'Krea' as GeneratorTool },
+        };
+        const { result } = renderHook(() => useAppHandlers({ ...props, images: [image] }), {
+            wrapper: ({ children }) => React.createElement(QueryClientProvider, { client: queryClient }, children),
+        });
+
+        await act(async () => {
+            await result.current.handleUpdateTool('img1', '   ' as GeneratorTool);
+            await result.current.handleUpdateTool('img1', ' krea ' as GeneratorTool);
+        });
+
+        expect(mockUpdateImageMetadataFields).not.toHaveBeenCalled();
     });
 
     it('ignores metadata and note updates for missing images', async () => {

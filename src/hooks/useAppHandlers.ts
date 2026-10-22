@@ -19,6 +19,8 @@ import type { ActiveImageStateAdapter } from './activeImageState';
 import { invalidateInvokeReferenceQueries } from '../services/db/invokeReferenceRepo';
 import type { DeleteRemovedImagesResult, ExactDuplicateResolution, ExactDuplicateResolutionResult } from '../bindings';
 import { useTranslation } from 'react-i18next';
+import { resolveGeneratorToolName } from '../utils/generatorTools';
+import { rememberGeneratorToolName } from '../utils/generatorToolOptions';
 
 interface UseAppHandlersProps {
     images: AIImage[];
@@ -121,7 +123,8 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
     const handleUpdateTool = async (id: string, tool: GeneratorTool) => {
         const img = getImage(id);
         if (!img) return;
-        if (img.metadata.tool === tool) return;
+        const normalized = resolveGeneratorToolName(tool, [img.metadata.tool]) as GeneratorTool | null;
+        if (!normalized || img.metadata.tool === normalized) return;
 
         const originalMetadata = img.originalMetadata || { ...img.metadata };
         const updatedImg = {
@@ -129,13 +132,14 @@ export const useAppHandlers = ({ images, setImages, refreshMaintenanceCounts, re
             originalMetadata,
             metadata: {
                 ...img.metadata,
-                tool,
+                tool: normalized,
                 fieldSources: { ...img.metadata.fieldSources, tool: 'user_override' as const }
             }
         };
 
         updateImage(id, () => updatedImg);
-        await updateImageMetadataFields(id, { tool });
+        await updateImageMetadataFields(id, { tool: normalized });
+        rememberGeneratorToolName(normalized);
 
         // Ensure filter panel is updated
         rebuildFacetCacheIncremental('tools').then(() => incrementFacetCacheVersion());

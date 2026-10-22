@@ -7,6 +7,7 @@ import { getAssetMatchKey, resolveAssetMatchKey, uniqueAssetAliases } from '../.
 import { describeDbQueryReason, timeDbCall } from '../../utils/dbTiming';
 import { commands } from '../../bindings';
 import { resourceReferenceEqualsSql, resourceReferenceSql } from '../../utils/sqlHelpers';
+import { uniqueGeneratorToolNames } from '../../utils/generatorTools';
 
 export interface LibraryStats {
     totalItems?: number;
@@ -1294,6 +1295,7 @@ export const getFacets = async (
         result.hypernetworks = finalizeGroups('hypernetworks');
         result.controlNets = finalizeGroups('control_nets');
         result.ipAdapters = finalizeGroups('ip_adapters');
+        result.tools = uniqueGeneratorToolNames(result.tools);
 
         return result;
 
