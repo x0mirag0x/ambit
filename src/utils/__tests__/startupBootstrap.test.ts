@@ -30,6 +30,8 @@ describe('startup bootstrap', () => {
         }
         expect(html).toContain('@media (prefers-reduced-motion: reduce)');
         expect(html).toContain('<svg class="static-loading__loader-ring"');
+        expect(html).toContain('class="static-loading__wordmark" src="/branding/dvoyna-wordmark.png"');
+        expect(html).not.toContain('>DV</h1>');
     });
     it('does not classify logo or stylesheet resource failures as startup failures', () => {
         const bootstrap = installBootstrap();
