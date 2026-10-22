@@ -70,3 +70,8 @@ windows-core = "=0.61.2"
 [dev-dependencies]
 tauri = { version = "2.11.2", features = ["test"] }
 sqlx = { version = "0.8.6", default-features = false, features = ["sqlite", "runtime-tokio"] }
+
+# Local patch of tauri-plugin-updater 2.10.1 that depends on zip ^9
+# (RUSTSEC-2026-0367/0368/0369). Drop once crates.io ships a fixed 2.x release.
+[patch.crates-io]
+tauri-plugin-updater = { path = "patches/tauri-plugin-updater" }
