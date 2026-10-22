@@ -51,6 +51,7 @@ import { INVOKE_REFERENCE_QUERY_KEY } from './services/db/invokeReferenceRepo';
 import type { ActiveImageStateAdapter } from './hooks/activeImageState';
 import { getEffectiveMaskedKeywords, isImageMasked } from './utils/maskingUtils';
 import { useLibraryModelOptions } from './features/viewer/hooks/useLibraryModelOptions';
+import { usePublishLibraryGeneratorOptions } from './features/viewer/hooks/useLibraryGeneratorOptions';
 import { startupDiagnostics } from './utils/startupDiagnostics';
 import { commands } from './bindings';
 import { isTauriRuntime } from './services/runtime';
@@ -103,6 +104,7 @@ export default function App() {
     const modals = useModalManager();
     const appVersion = useAppVersion();
     const modelOptions = useLibraryModelOptions();
+    usePublishLibraryGeneratorOptions();
 
     // --- Interaction State ---
     const [viewMode, setViewMode] = useState<ViewMode>('grid');

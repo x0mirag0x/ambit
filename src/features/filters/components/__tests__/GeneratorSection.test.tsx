@@ -74,6 +74,29 @@ describe('GeneratorSection', () => {
         expect(screen.getByText('Midjourney')).toBeTruthy();
     });
 
+    it('lists a custom generator once and matches it without case or extra spaces', () => {
+        let current = filters();
+        const setFilters = vi.fn((update: (previous: FilterState) => FilterState) => { current = update(current); });
+        render(
+            <GeneratorSection
+                filters={current}
+                setFilters={setFilters}
+                tools={['Krea', ' krea ', GeneratorTool.COMFYUI]}
+                validNames={['krea']}
+                isOpen
+                onToggle={vi.fn()}
+            />
+        );
+
+        expect(screen.getAllByText('Krea')).toHaveLength(1);
+        expect((screen.getByText('Krea') as HTMLButtonElement).disabled).toBe(false);
+        expect((screen.getByText(GeneratorTool.COMFYUI) as HTMLButtonElement).disabled).toBe(true);
+        fireEvent.click(screen.getByText('Krea'));
+        expect(current.tools).toEqual(['Krea']);
+        fireEvent.click(screen.getByText('Krea'));
+        expect(current.tools).toEqual([]);
+    });
+
     it('distinguishes loading, globally empty, and drill-down empty states', () => {
         const props = { filters: filters(), setFilters: vi.fn(), tools: [] as string[], isOpen: true, onToggle: vi.fn() };
         const { rerender } = render(<GeneratorSection {...props} isLoading />);

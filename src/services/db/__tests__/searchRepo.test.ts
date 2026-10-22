@@ -318,6 +318,21 @@ describe('searchRepo getFacets', () => {
         expect(db.select).toHaveBeenCalledTimes(1);
     });
 
+    it('collapses generator names that differ only by case or whitespace', async () => {
+        const db = createFacetDb([
+            { facet_type: 'tools', resource_name: 'Krea', count: 4 },
+            { facet_type: 'tools', resource_name: ' krea ', count: 2 },
+            { facet_type: 'tools', resource_name: 'comfyui', count: 1 },
+            { facet_type: 'tools', resource_name: 'Nano Banana', count: 3 },
+        ]);
+        getDbMock.mockResolvedValue(db);
+        const { getFacets } = await import('../searchRepo');
+
+        await expect(getFacets('', [], ['tools'])).resolves.toEqual(expect.objectContaining({
+            tools: ['Krea', 'ComfyUI', 'Nano Banana'],
+        }));
+    });
+
     it('hides asset-only cached tools by default and restores them when revealed regardless of resource scope', async () => {
         const db = createFacetDb(
             [

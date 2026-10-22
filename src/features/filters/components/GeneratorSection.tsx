@@ -2,7 +2,10 @@ import * as React from 'react';
 import { FilterState, GeneratorTool } from '../../../types';
 import { SectionHeader, SelectableRow } from './FilterPrimitives';
 import { localizeFilterSentinel } from '../filterLabels';
+import { generatorToolKey, uniqueGeneratorToolNames } from '../../../utils/generatorTools';
 import { useTranslation } from 'react-i18next';
+
+const toolKeysMatch = (left: string, right: string) => generatorToolKey(left) === generatorToolKey(right);
 
 interface GeneratorSectionProps {
     filters: FilterState;
@@ -29,11 +32,13 @@ export const GeneratorSection: React.FC<GeneratorSectionProps> = ({
     validNames
 }) => {
     const { t } = useTranslation();
-    const toggleTool = (tool: GeneratorTool) => {
+    const visibleTools = React.useMemo(() => uniqueGeneratorToolNames(tools), [tools]);
+    const toggleTool = (tool: string) => {
         setFilters(prev => {
-            const newTools = prev.tools.includes(tool)
-                ? prev.tools.filter(t => t !== tool)
-                : [...prev.tools, tool];
+            const selected = prev.tools.some(item => toolKeysMatch(item, tool));
+            const newTools = selected
+                ? prev.tools.filter(item => !toolKeysMatch(item, tool))
+                : [...prev.tools, tool as GeneratorTool];
             return { ...prev, tools: newTools };
         });
     };
@@ -43,9 +48,9 @@ export const GeneratorSection: React.FC<GeneratorSectionProps> = ({
         // Always available if no validNames filtering is active
         if (validNames === null || validNames === undefined) return true;
         // Always available if currently selected (Disjunctive: self-selected are always valid)
-        if (filters.tools.includes(tool as GeneratorTool)) return true;
-        // Otherwise, check if in validNames
-        return validNames.includes(tool);
+        if (filters.tools.some(item => toolKeysMatch(item, tool))) return true;
+        // Otherwise, check if in validNames, ignoring case and surrounding whitespace
+        return validNames.some(name => toolKeysMatch(name, tool));
     }, [validNames, filters.tools]);
 
     return (
@@ -53,13 +58,13 @@ export const GeneratorSection: React.FC<GeneratorSectionProps> = ({
             <SectionHeader title={t('Generator')} isOpen={isOpen} onToggle={onToggle} isLoading={isLoading} />
             {isOpen && (
                 <div className="space-y-1 animate-in slide-in-from-top-2 duration-300 ease-spring">
-                    {tools.length > 0 ? tools.map(tool => {
+                    {visibleTools.length > 0 ? visibleTools.map(tool => {
                         const available = isToolAvailable(tool);
                         return (
                             <SelectableRow
                                 key={tool}
                                 label={localizeFilterSentinel(tool, t)}
-                                isSelected={filters.tools.includes(tool as GeneratorTool)}
+                                isSelected={filters.tools.some(item => toolKeysMatch(item, tool))}
                                 onClick={() => toggleTool(tool as GeneratorTool)}
                                 className={available ? '' : 'opacity-40 line-through'}
                                 disabled={!available}
