@@ -550,6 +550,7 @@
   "Failed to check for updates: {{message}}": "Не удалось проверить обновления: {{message}}",
   "Failed to clean up thumbnails": "Не удалось очистить миниатюры",
   "Failed to copy diagnostics": "Не удалось скопировать диагностику",
+  "Failed to copy image": "Не удалось скопировать изображение",
   "Failed to create collection": "Не удалось создать коллекцию",
   "Failed to force refresh: {{v0}}": "Не удалось принудительно обновить: {{v0}}",
   "Failed to install update: {{message}}": "Не удалось установить обновление: {{message}}",

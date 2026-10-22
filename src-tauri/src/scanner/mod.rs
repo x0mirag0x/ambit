@@ -230,6 +230,14 @@ pub async fn open_file(app: tauri::AppHandle, path: String) -> Result<(), String
 
 #[tauri::command]
 #[specta::specta]
+pub async fn copy_image_to_clipboard(app: tauri::AppHandle, path: String) -> Result<(), String> {
+    tauri::async_runtime::spawn_blocking(move || utils::copy_image_to_clipboard_impl(&app, path))
+        .await
+        .map_err(|e| e.to_string())?
+}
+
+#[tauri::command]
+#[specta::specta]
 pub async fn show_in_folder(app: tauri::AppHandle, path: String) -> Result<(), String> {
     tauri::async_runtime::spawn_blocking(move || utils::show_in_folder_impl(&app, path))
         .await

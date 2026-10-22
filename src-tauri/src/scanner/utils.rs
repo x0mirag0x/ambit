@@ -61,6 +61,51 @@ pub fn open_file_impl(app: &tauri::AppHandle, path: String) -> Result<(), String
     open_file_path(&target)
 }
 
+pub fn copy_image_to_clipboard_impl(app: &tauri::AppHandle, path: String) -> Result<(), String> {
+    let conn = open_configured_app_db(app)?;
+    let target = resolve_known_media_file_target(&conn, &path)?;
+    let (width, height, bytes) = decode_clipboard_image(&target)?;
+    write_decoded_image_to_clipboard(width, height, bytes)
+}
+
+fn decode_clipboard_image(path: &Path) -> Result<(u32, u32, Vec<u8>), String> {
+    use image::ImageDecoder;
+
+    let mut reader = image::ImageReader::open(path)
+        .map_err(|error| format!("Failed to open image: {error}"))?;
+    reader.set_format(
+        image::ImageFormat::from_path(path)
+            .map_err(|error| format!("Failed to recognize image: {error}"))?,
+    );
+    let mut decoder = reader
+        .into_decoder()
+        .map_err(|error| format!("Failed to decode image: {error}"))?;
+    let orientation = decoder
+        .orientation()
+        .unwrap_or(image::metadata::Orientation::NoTransforms);
+    let mut image = image::DynamicImage::from_decoder(decoder)
+        .map_err(|error| format!("Failed to decode image: {error}"))?;
+    image.apply_orientation(orientation);
+    let rgba = image.into_rgba8();
+    let (width, height) = rgba.dimensions();
+    if width == 0 || height == 0 {
+        return Err("Image has no pixels".to_string());
+    }
+    Ok((width, height, rgba.into_raw()))
+}
+
+fn write_decoded_image_to_clipboard(width: u32, height: u32, bytes: Vec<u8>) -> Result<(), String> {
+    let mut clipboard = arboard::Clipboard::new()
+        .map_err(|error| format!("Failed to open the clipboard: {error}"))?;
+    clipboard
+        .set_image(arboard::ImageData {
+            width: width as usize,
+            height: height as usize,
+            bytes: std::borrow::Cow::Owned(bytes),
+        })
+        .map_err(|error| format!("Failed to copy the image: {error}"))
+}
+
 pub fn show_in_folder_impl(app: &tauri::AppHandle, path: String) -> Result<(), String> {
     let backup_dir = resolve_backup_dir_path(app)?;
     let (canonical_file, is_backup_file) = resolve_existing_show_target(&path, &backup_dir)?;
@@ -270,9 +315,9 @@ fn normalize_path_string(path: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::{
-        probe_file_metadata_bulk_impl, resolve_existing_regular_file, resolve_existing_show_target,
-        resolve_known_media_file_target, resolve_show_in_folder_target,
-        validate_metadata_probe_paths,
+        decode_clipboard_image, probe_file_metadata_bulk_impl, resolve_existing_regular_file,
+        resolve_existing_show_target, resolve_known_media_file_target,
+        resolve_show_in_folder_target, validate_metadata_probe_paths,
     };
     use crate::scanner::models::FileMetadataProbe;
     use rusqlite::Connection;
@@ -515,6 +560,26 @@ mod tests {
 
     fn normalize(path: &Path) -> String {
         path.to_string_lossy().replace('\\', "/")
+    }
+
+    #[test]
+    fn clipboard_image_decode_reads_png_pixels_and_rejects_other_files() {
+        let temp_root = temp_dir("clipboard_png");
+        fs::create_dir_all(&temp_root).unwrap();
+        let image_path = temp_root.join("pixel.png");
+        image::RgbaImage::from_pixel(2, 3, image::Rgba([10, 20, 30, 255]))
+            .save(&image_path)
+            .unwrap();
+        let text_path = temp_root.join("notes.txt");
+        fs::write(&text_path, "not an image").unwrap();
+
+        let (width, height, bytes) = decode_clipboard_image(&image_path).unwrap();
+        assert_eq!((width, height), (2, 3));
+        assert_eq!(bytes.len(), 24);
+        assert_eq!(&bytes[..4], &[10, 20, 30, 255]);
+        assert!(decode_clipboard_image(&text_path).is_err());
+
+        fs::remove_dir_all(&temp_root).unwrap();
     }
 
     fn temp_dir(name: &str) -> PathBuf {
