@@ -7,6 +7,7 @@
   <title>DV | Local AI Workspace</title>
   <link rel="icon" type="image/png" href="/branding/dv-favicon.png" />
   <link rel="preload" href="/branding/d-mark.svg" as="image" type="image/svg+xml" />
+  <link rel="preload" href="/branding/dvoyna-wordmark.png" as="image" type="image/png" />
   <style>
     /* Critical: Set background immediately to prevent white flash */
     html,
@@ -107,12 +108,17 @@
     }
 
     .static-loading__title {
-      font-size: 1.65rem;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.95);
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
       margin: 0;
+      line-height: 0;
+    }
+
+    .static-loading__wordmark {
+      display: block;
+      height: 2.65rem;
+      width: auto;
+      user-select: none;
+      -webkit-user-drag: none;
+      filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.32));
     }
 
     .static-loading__subtitle {
@@ -180,7 +186,9 @@
         </svg>
       </div>
       <div class="static-loading__text">
-        <h1 class="static-loading__title">DV</h1>
+        <h1 class="static-loading__title">
+          <img class="static-loading__wordmark" src="/branding/dvoyna-wordmark.png" alt="Dvoyna" fetchpriority="high" decoding="sync" />
+        </h1>
       </div>
     </div>
     <div class="static-loading__status" aria-live="polite">
