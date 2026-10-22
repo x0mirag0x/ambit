@@ -79,6 +79,24 @@ describe('videoService', () => {
         );
     });
 
+    it('counts a video kept in Removed separately from a rejected file', async () => {
+        mocks.importVideoAsset.mockResolvedValue({
+            status: 'ok',
+            data: {
+                status: 'rejected',
+                asset: null,
+                reason: 'removedAsset: restore this asset before importing it again',
+            },
+        });
+        const { importVideoPaths } = await import('../videoService');
+
+        const summary = await importVideoPaths(['C:/videos/removed.mp4']);
+
+        expect(summary).toMatchObject({ imported: 0, duplicate: 0, rejected: 0, removed: 1 });
+        expect(summary.handledPaths).toEqual(['C:/videos/removed.mp4']);
+        expect(summary.failedPaths).toEqual([]);
+    });
+
     it('does not decode a poster again for an unchanged video record', async () => {
         const createElement = vi.spyOn(document, 'createElement');
         mocks.importVideoAsset.mockResolvedValue({

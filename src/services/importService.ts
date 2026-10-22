@@ -51,32 +51,47 @@ export const applyPersistedUserOverrides = (metadata: ImageMetadata, previous: P
     }
 };
 
+interface ExistingPathSets {
+    active: Set<string>;
+    removed: Set<string>;
+}
+
+interface RemovedAccounting {
+    count: number;
+}
+
 /**
  * Queries the database for paths that already exist.
- * Used to skip already-imported files during rescan.
+ * Active library rows stay skipped. Removed rows are reported separately so
+ * the import can explain that those files are waiting in Removed.
  */
-/**
- * Queries the database for paths that already exist.
- * Used to skip already-imported files during rescan.
- */
-const getExistingPaths = async (paths: string[]): Promise<Set<string>> => {
+const classifyExistingPaths = async (paths: string[]): Promise<ExistingPathSets> => {
     const db = await getDb();
     const CHUNK_SIZE = 900; // SQLite parameter limit
-    const existingSet = new Set<string>();
+    const active = new Set<string>();
+    const removed = new Set<string>();
 
     for (let i = 0; i < paths.length; i += CHUNK_SIZE) {
         const chunk = paths.slice(i, i + CHUNK_SIZE).map(normalizePath);
         const placeholders = chunk.map(() => '?').join(',');
-        const rows = await db.select<{ id: string }[]>(
-            `SELECT id FROM images WHERE id IN (${placeholders})
-             UNION
-             SELECT id FROM removed_images WHERE id IN (${placeholders})`,
+        const rows = await db.select<{ id: string; presence?: string }[]>(
+            `SELECT id, 'library' AS presence FROM images WHERE id IN (${placeholders})
+             UNION ALL
+             SELECT id, 'removed' AS presence FROM removed_images WHERE id IN (${placeholders})`,
             [...chunk, ...chunk]
         );
-        rows.forEach(r => existingSet.add(r.id));
+        rows.forEach(row => {
+            const id = normalizePath(row.id);
+            if (row.presence === 'removed' && !active.has(id)) {
+                removed.add(id);
+                return;
+            }
+            active.add(id);
+            removed.delete(id);
+        });
     }
 
-    return existingSet;
+    return { active, removed };
 };
 
 export interface ImportStats {
@@ -96,6 +111,8 @@ export interface ImportResult {
     wasCancelled: boolean;
     completedSourcePaths: string[];
     cancelledSourcePaths: string[];
+    /** Files left in Removed. They were found on disk and were not imported again. */
+    removedCount?: number;
     videoSummary?: VideoImportSummary;
 }
 
@@ -226,7 +243,8 @@ async function processImageFileEntries(
     entries: FileEntry[],
     stats: ImportStats,
     options: ImportOptions,
-    defaultTool?: GeneratorTool
+    defaultTool: GeneratorTool | undefined,
+    removedAccounting: RemovedAccounting
 ): Promise<{ images: AIImage[]; handledPaths: string[]; failedPaths: string[]; touchedFacetTypes: FacetType[]; touchedFacetResources: TouchedFacetResources; wasCancelled: boolean }> {
     const { onProgress, abortSignal, forceRescan, skipThumbnail = true, waitForStableFiles, perfContext } = options;
     const newImages: AIImage[] = [];
@@ -252,17 +270,25 @@ async function processImageFileEntries(
         if (onProgress) onProgress(0, allPaths.length, 'Checking for duplicates...');
 
         const existingLookupStartedAt = liveWatchNow();
-        const existingPaths = await getExistingPaths(allPaths);
+        const existingPaths = await classifyExistingPaths(allPaths);
         if (abortSignal?.aborted) {
             wasCancelled = true;
         }
-        pathsToProcess = allPaths.filter(p => !existingPaths.has(normalizePath(p)));
-        stats.skipped += (allPaths.length - pathsToProcess.length);
+        const removedBefore = removedAccounting.count;
+        pathsToProcess = allPaths.filter(path => {
+            const key = normalizePath(path);
+            if (existingPaths.removed.has(key)) {
+                removedAccounting.count += 1;
+                return false;
+            }
+            return !existingPaths.active.has(key);
+        });
+        stats.skipped += allPaths.length - pathsToProcess.length - (removedAccounting.count - removedBefore);
         debugLiveWatchPerf('Import duplicate check complete', {
             cycleId,
             candidatePathCount: allPaths.length,
-            existingPathCount: existingPaths.size,
-            skippedPathCount: allPaths.length - pathsToProcess.length,
+            existingPathCount: existingPaths.active.size + existingPaths.removed.size,
+            skippedPathCount: allPaths.length - pathsToProcess.length - (removedAccounting.count - removedBefore),
             duplicateCheckMs: elapsedMs(existingLookupStartedAt)
         });
     }
@@ -599,6 +625,7 @@ const emptyVideoSummary = (): VideoImportSummary => ({
     imported: 0,
     duplicate: 0,
     rejected: 0,
+    removed: 0,
     cancelled: 0,
     posterFailures: 0,
     assets: [],
@@ -615,6 +642,7 @@ const mergeVideoSummaries = (
         imported: merged.imported + next.imported,
         duplicate: merged.duplicate + next.duplicate,
         rejected: merged.rejected + next.rejected,
+        removed: (merged.removed ?? 0) + (next.removed ?? 0),
         cancelled: merged.cancelled + next.cancelled,
         posterFailures: merged.posterFailures + next.posterFailures,
         assets: [...merged.assets, ...next.assets],
@@ -626,7 +654,8 @@ const mergeVideoSummaries = (
 async function processVideoFileEntries(
     entries: FileEntry[],
     stats: ImportStats,
-    options: ImportOptions
+    options: ImportOptions,
+    removedAccounting: RemovedAccounting
 ): Promise<{ images: AIImage[]; handledPaths: string[]; failedPaths: string[]; touchedFacetTypes: FacetType[]; touchedFacetResources: TouchedFacetResources; wasCancelled: boolean; videoSummary: VideoImportSummary }> {
     const { abortSignal, forceRescan, onProgress, waitForStableFiles } = options;
     const allPaths = entries.map(entry => normalizePath(entry.path));
@@ -634,9 +663,16 @@ async function processVideoFileEntries(
 
     if (!forceRescan && !abortSignal?.aborted) {
         onProgress?.(0, allPaths.length, 'Checking for duplicates...');
-        const existingPaths = await getExistingPaths(allPaths);
-        pathsToProcess = allPaths.filter(path => !existingPaths.has(path));
-        stats.skipped += allPaths.length - pathsToProcess.length;
+        const existingPaths = await classifyExistingPaths(allPaths);
+        const removedBefore = removedAccounting.count;
+        pathsToProcess = allPaths.filter(path => {
+            if (existingPaths.removed.has(path)) {
+                removedAccounting.count += 1;
+                return false;
+            }
+            return !existingPaths.active.has(path);
+        });
+        stats.skipped += allPaths.length - pathsToProcess.length - (removedAccounting.count - removedBefore);
     }
 
     if (abortSignal?.aborted || pathsToProcess.length === 0) {
@@ -687,6 +723,7 @@ async function processVideoFileEntries(
         stats.imported += summary.imported;
         stats.skipped += summary.duplicate;
         stats.errors += summary.failedPaths.length;
+        removedAccounting.count += summary.removed ?? 0;
         const nextMetadata = await getExistingMetadata(summary.handledPaths);
         const touchedFacetTypes = new Set<FacetType>();
         let touchedFacetResources = createEmptyTouchedFacetResources();
@@ -729,17 +766,18 @@ async function processMediaFileEntries(
     stats: ImportStats,
     options: ImportOptions,
     defaultTool?: GeneratorTool
-): Promise<{ images: AIImage[]; handledPaths: string[]; failedPaths: string[]; touchedFacetTypes: FacetType[]; touchedFacetResources: TouchedFacetResources; wasCancelled: boolean; videoSummary?: VideoImportSummary }> {
+): Promise<{ images: AIImage[]; handledPaths: string[]; failedPaths: string[]; touchedFacetTypes: FacetType[]; touchedFacetResources: TouchedFacetResources; wasCancelled: boolean; videoSummary?: VideoImportSummary; removedCount: number }> {
+    const removedAccounting: RemovedAccounting = { count: 0 };
     const imageEntries = entries.filter(entry => candidateMediaType(entry) === 'image');
     const videoEntries = entries.filter(entry => candidateMediaType(entry) === 'video');
     const total = imageEntries.length + videoEntries.length;
     const images = await processImageFileEntries(imageEntries, stats, {
         ...options,
         onProgress: (current, _imageTotal, message) => options.onProgress?.(current, total, message)
-    }, defaultTool);
+    }, defaultTool, removedAccounting);
 
     if (images.wasCancelled || options.abortSignal?.aborted || videoEntries.length === 0) {
-        return images;
+        return { ...images, removedCount: removedAccounting.count };
     }
 
     const videos = await processVideoFileEntries(videoEntries, stats, {
@@ -749,7 +787,7 @@ async function processMediaFileEntries(
             total,
             message
         )
-    });
+    }, removedAccounting);
 
     return {
         images: [...images.images, ...videos.images],
@@ -764,7 +802,8 @@ async function processMediaFileEntries(
             videos.touchedFacetResources
         ),
         wasCancelled: videos.wasCancelled,
-        videoSummary: videos.videoSummary
+        videoSummary: videos.videoSummary,
+        removedCount: removedAccounting.count
     };
 }
 
@@ -784,7 +823,8 @@ export async function processFoldersUnified(
         touchedFacetResources: createEmptyTouchedFacetResources(),
         wasCancelled: false,
         completedSourcePaths: [],
-        cancelledSourcePaths: []
+        cancelledSourcePaths: [],
+        removedCount: 0
     };
 
     const { onProgress, abortSignal, deferFacetCacheRefresh = false, preserveSourceBoundaries = true } = options;
@@ -966,6 +1006,7 @@ export async function processFoldersUnified(
         if (imported.videoSummary) {
             result.videoSummary = mergeVideoSummaries(result.videoSummary, imported.videoSummary);
         }
+        result.removedCount = (result.removedCount ?? 0) + imported.removedCount;
 
         // precise increment
         globalProcessed += task.files.length;
@@ -1153,6 +1194,7 @@ export const processTargetedFiles = async (
     result.touchedFacetResources = imported.touchedFacetResources;
     result.wasCancelled = imported.wasCancelled;
     result.videoSummary = imported.videoSummary;
+    result.removedCount = imported.removedCount;
     if (imported.wasCancelled) {
         pushUniquePaths(result.cancelledSourcePaths, resolvedPaths);
     } else if (imported.failedPaths.length === 0) {
