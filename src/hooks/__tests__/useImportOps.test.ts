@@ -750,6 +750,7 @@ describe('useImportOps', () => {
     it('covers manual folder outcomes without imported images', async () => {
         const cases: Array<[ImportResult, string, 'info' | 'warning']> = [
             [importResult({ stats: { processed: 2, imported: 0, skipped: 2, errors: 0 } }), 'Scan complete. No new items found.', 'info'],
+            [importResult({ removedCount: 3, stats: { processed: 3, imported: 0, skipped: 0, errors: 0 } }), 'These files are already in Removed', 'info'],
             [importResult({ stats: { processed: 1, imported: 0, skipped: 0, errors: 1 } }), 'Scan complete with 1 errors.', 'warning'],
             [emptyImportResult(), 'No supported media found in selected folders', 'info']
         ];

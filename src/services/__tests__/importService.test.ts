@@ -1065,6 +1065,48 @@ describe('processTargetedFiles', () => {
         expect(result.completedSourcePaths).toEqual(['C:/library']);
     });
 
+    it('reports videos that already live in Removed instead of importing them again', async () => {
+        const paths = ['C:/export/a.mp4', 'C:/export/b.mp4', 'C:/export/c.mp4'];
+        mocks.scanDirectoryWithStats.mockResolvedValueOnce({
+            status: 'ok',
+            data: paths.map((path, index) => ({ path, modified: index + 1, size: 100, mediaType: 'video' }))
+        });
+        mocks.dbSelect.mockResolvedValueOnce(paths.map(id => ({ id, presence: 'removed' })));
+
+        const result = await processFoldersUnified([{ path: 'C:/export' }]);
+
+        expect(mocks.importVideoPaths).not.toHaveBeenCalled();
+        expect(result.removedCount).toBe(3);
+        expect(result.images).toEqual([]);
+        expect(result.stats).toEqual({ processed: 0, imported: 0, skipped: 0, errors: 0 });
+    });
+
+    it('keeps a removed-video rejection when the path lookup does not see the Removed row', async () => {
+        mocks.scanDirectoryWithStats.mockResolvedValueOnce({
+            status: 'ok',
+            data: [{ path: 'C:/export/a.mp4', modified: 1, size: 100, mediaType: 'video' }]
+        });
+        mocks.dbSelect.mockResolvedValueOnce([]);
+        mocks.importVideoPaths.mockResolvedValueOnce({
+            imported: 0,
+            duplicate: 0,
+            rejected: 0,
+            removed: 1,
+            cancelled: 0,
+            posterFailures: 0,
+            assets: [],
+            handledPaths: ['C:/export/a.mp4'],
+            failedPaths: []
+        });
+
+        const result = await processFoldersUnified([{ path: 'C:/export' }]);
+
+        expect(result.removedCount).toBe(1);
+        expect(result.images).toEqual([]);
+        expect(result.stats.skipped).toBe(0);
+        expect(result.stats.errors).toBe(0);
+    });
+
     it('falls back to treating a failed directory scan as a direct image file', async () => {
         mocks.scanDirectoryWithStats.mockRejectedValueOnce(new Error('not a directory'));
         mocks.getExistingMetadata.mockResolvedValueOnce(new Map());

@@ -18,6 +18,8 @@ export interface VideoImportSummary {
     imported: number;
     duplicate: number;
     rejected: number;
+    /** Files the library already keeps in Removed, so a new import must not add them again. */
+    removed: number;
     cancelled: number;
     posterFailures: number;
     assets: VideoAsset[];
@@ -47,6 +49,7 @@ export const importVideoPaths = async (
         imported: 0,
         duplicate: 0,
         rejected: 0,
+        removed: 0,
         cancelled: 0,
         posterFailures: 0,
         assets: [],
@@ -154,6 +157,7 @@ const countOutcome = (summary: VideoImportSummary, outcome: VideoImportOutcome) 
     if (outcome.status === 'imported' || outcome.status === 'updated') summary.imported += 1;
     else if (outcome.status === 'duplicate') summary.duplicate += 1;
     else if (outcome.status === 'cancelled') summary.cancelled += 1;
+    else if ((outcome.reason ?? '').startsWith('removedAsset')) summary.removed += 1;
     else summary.rejected += 1;
 };
 

@@ -1393,6 +1393,7 @@
   "Theme Mode": "Режим темы",
   "There are": "Есть",
   "There are no intermediate images in the current filtered view.": "В текущем отфильтрованном виде нет промежуточных изображений.",
+  "These files are already in Removed": "Эти файлы уже есть в разделе «Удалённые». Восстановите их там, чтобы снова добавить в библиотеку.",
   "Thinking Effort (Dev Mode)": "Глубина размышления (режим разработки)",
   "Thinking effort set to {{v0}}": "Глубина размышления: {{v0}}",
   "This clears the InvokeAI sync cursor. The next sync will scan the full InvokeAI database. Existing Dvoyna Vault records, files, and InvokeAI snapshots stay untouched.": "Это сбрасывает курсор синхронизации InvokeAI. Следующая синхронизация просмотрит всю базу данных InvokeAI. Существующие записи Dvoyna Vault, файлы и снимки InvokeAI останутся без изменений.",

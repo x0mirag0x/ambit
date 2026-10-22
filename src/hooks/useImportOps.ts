@@ -350,6 +350,8 @@ export const useImportOps = ({
                     addToast(t('Imported {{length}} items ({{v1}}) from {{v2}} folder(s), but {{failedFileCount}} file(s) failed', { length: result.images.length, v1: formatDetectedImageKindCounts(result.images), v2: folders.length, failedFileCount: failedFileCount }), 'warning');
                 } else if (result.images.length > 0) {
                     addToast(t('Imported {{length}} items ({{v1}}) from {{v2}} folder(s)', { length: result.images.length, v1: formatDetectedImageKindCounts(result.images), v2: folders.length }), 'success');
+                } else if ((result.removedCount ?? 0) > 0) {
+                    addToast(t('These files are already in Removed'), 'info');
                 } else if (result.stats.skipped > 0) {
                     addToast(t('Scan complete. No new items found.'), 'info');
                 } else if (result.stats.errors > 0) {
