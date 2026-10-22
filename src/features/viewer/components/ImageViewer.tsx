@@ -18,6 +18,7 @@ import { getFilename } from '../../../utils/pathUtils';
 import { getImageWithFullMetadata } from '../../../services/db/imageRepo';
 import { useToast } from '../../../hooks/useToast';
 import type { PromptHighlightSpec } from '../utils/searchHighlights';
+import { copyLibraryImage } from '../../../services/clipboardImage';
 import { isOsOpenUnavailable, openFileInDefaultApp } from '../../../services/osOpen';
 import {
     getEffectiveAiModel,
@@ -445,13 +446,11 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
 
     const handleCopyImage = async () => {
         try {
-            const response = await fetch(displayImage.url);
-            const blob = await response.blob();
-            await navigator.clipboard.write([
-                new ClipboardItem({ [blob.type]: blob })
-            ]);
-        } catch (e) {
-            console.error("Copy failed", e);
+            await copyLibraryImage(displayImage.id, displayImage.url);
+            addToast(t('Image copied to clipboard'), 'success');
+        } catch (error) {
+            console.error('Copy failed', error);
+            addToast(t('Failed to copy image'), 'error');
         }
     };
 

@@ -588,7 +588,7 @@ describe('ImageViewer full metadata loading', () => {
             constructor(public value: Record<string, Blob>) {}
         });
         const blob = new Blob(['image'], { type: 'image/png' });
-        const fetchMock = vi.fn().mockResolvedValue({ blob: vi.fn().mockResolvedValue(blob) });
+        const fetchMock = vi.fn().mockResolvedValue({ ok: true, blob: vi.fn().mockResolvedValue(blob) });
         vi.stubGlobal('fetch', fetchMock);
         openFileMock
             .mockResolvedValueOnce({ status: 'error', error: 'open unavailable' })
@@ -607,17 +607,19 @@ describe('ImageViewer full metadata loading', () => {
 
         await toolbar.onCopy();
         expect(clipboardWrite).toHaveBeenCalled();
+        expect(toastMock).toHaveBeenNthCalledWith(1, 'Image copied to clipboard', 'success');
         fetchMock.mockRejectedValueOnce(new Error('copy failed'));
         const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
         await toolbar.onCopy();
         expect(errorSpy).toHaveBeenCalledWith('Copy failed', expect.any(Error));
+        expect(toastMock).toHaveBeenNthCalledWith(2, 'Failed to copy image', 'error');
         errorSpy.mockRestore();
 
         await toolbar.onOpenExternal();
         await toolbar.onOpenExternal();
         await toolbar.onOpenExternal();
-        expect(toastMock).toHaveBeenNthCalledWith(1, 'open unavailable', 'info');
-        expect(toastMock).toHaveBeenNthCalledWith(2, 'permission denied', 'error');
+        expect(toastMock).toHaveBeenNthCalledWith(3, 'open unavailable', 'info');
+        expect(toastMock).toHaveBeenNthCalledWith(4, 'permission denied', 'error');
         expect(share).not.toHaveBeenCalled();
         act(() => {
             toolbar.onToggleFavorite();

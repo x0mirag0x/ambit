@@ -99,6 +99,7 @@ vi.mock('../../../utils/maskingUtils', async (importOriginal) => ({
 
 vi.mock('../../../services/runtime', () => ({
     isBrowserMockMode: () => runtimeMocks.browserMockMode,
+    isTauriRuntime: () => false,
 }));
 
 vi.mock('../../../services/osOpen', () => osMocks);
@@ -343,7 +344,7 @@ describe('AppContextMenu', () => {
 
     it('copies prompts, seeds, generation details, file paths, and image blobs', async () => {
         const blob = new Blob(['image'], { type: 'image/png' });
-        vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ blob: vi.fn().mockResolvedValue(blob) }));
+        vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, blob: vi.fn().mockResolvedValue(blob) }));
         renderMenu();
         const menu = requireMenu();
 
@@ -363,15 +364,18 @@ describe('AppContextMenu', () => {
         expect(onClose).toHaveBeenCalledTimes(5);
     });
 
-    it('falls back to the image URL when clipboard blob copying fails', async () => {
+    it('reports a failed image copy instead of substituting the asset URL', async () => {
         vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('blocked')));
+        const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
         renderMenu();
 
         await requireMenu().onCopyImage();
 
-        expect(clipboardWriteText).toHaveBeenCalledWith('asset://image.png');
-        expect(toastMocks.addToast).toHaveBeenCalledWith('Image path copied (fallback)', 'info');
+        expect(clipboardWriteText).not.toHaveBeenCalled();
+        expect(errorSpy).toHaveBeenCalledWith('Copy failed', expect.any(Error));
+        expect(toastMocks.addToast).toHaveBeenCalledWith('Failed to copy image', 'error');
         expect(onClose).toHaveBeenCalledOnce();
+        errorSpy.mockRestore();
     });
 
     it('routes collection and image mutations to their owning hooks', async () => {

@@ -7,6 +7,7 @@ import { useCollectionStore } from '../../stores/collectionStore';
 import { AIImage, ContextMenuState, FilterState, getDetectedSourceKind, getEffectiveSourceKind, isVideoAsset } from '../../types';
 import { useQueryClient } from '@tanstack/react-query';
 import { isBrowserMockMode } from '../../services/runtime';
+import { copyLibraryImage } from '../../services/clipboardImage';
 import { isOsOpenUnavailable, openFileInDefaultApp, showPathInFolder } from '../../services/osOpen';
 import { toggleImageIntermediate } from '../../services/db/imageRepo';
 import { invoke } from '@tauri-apps/api/core';
@@ -108,18 +109,13 @@ export const AppContextMenu: React.FC<AppContextMenuProps> = ({
                 onClose();
             } : undefined}
             onCopyImage={async () => {
-                if (activeImage?.url) {
+                if (activeImage) {
                     try {
-                        const response = await fetch(activeImage.url);
-                        const blob = await response.blob();
-                        await navigator.clipboard.write([
-                            new ClipboardItem({ [blob.type]: blob })
-                        ]);
+                        await copyLibraryImage(activeImage.id, activeImage.url);
                         addToast(t('Image copied to clipboard'), 'success');
-                    } catch (e) {
-                        // Fallback to path if blob copy fails (e.g. browser security)
-                        navigator.clipboard.writeText(activeImage.url);
-                        addToast(t('Image path copied (fallback)'), 'info');
+                    } catch (error) {
+                        console.error('Copy failed', error);
+                        addToast(t('Failed to copy image'), 'error');
                     }
                 }
                 onClose();

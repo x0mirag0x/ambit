@@ -124,6 +124,7 @@ pub fn create_builder() -> tauri_specta::Builder<tauri::Wry> {
             scanner::scan_directory_recursive,
             scanner::open_file,
             scanner::show_in_folder,
+            scanner::copy_image_to_clipboard,
             scanner::scan_directory_with_stats,
             scanner::scan_directory_since,
             scanner::a1111::discover_a1111_folders,
