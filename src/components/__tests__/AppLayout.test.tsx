@@ -121,9 +121,19 @@ vi.mock('../../contexts/SearchContext', () => ({
     useSearch: () => searchState.value
 }));
 
+const collectionRepoMocks = vi.hoisted(() => ({
+    getCollectionImageIds: vi.fn(),
+}));
+
+vi.mock('../../services/db/collectionRepo', () => ({
+    getCollectionImageIds: (...args: unknown[]) => collectionRepoMocks.getCollectionImageIds(...args),
+}));
+
 describe('AppLayout', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        collectionRepoMocks.getCollectionImageIds.mockReset();
+        collectionRepoMocks.getCollectionImageIds.mockResolvedValue(['img-a', 'img-b']);
         useSettingsStore.setState({
             settings: {
                 ...useSettingsStore.getState().settings,
@@ -703,14 +713,49 @@ describe('AppLayout', () => {
         expect(errorSpy).toHaveBeenCalled();
 
         panel.onPlayCollection('collection-2');
-        panel.onExportCollection('collection-3');
+        await act(async () => {
+            panel.onExportCollection('collection-3');
+        });
         panel.onOpenResourceFolders();
         const playUpdater = setFilters.mock.calls[0][0] as (value: Record<string, unknown>) => Record<string, unknown>;
         const exportUpdater = setFilters.mock.calls[1][0] as (value: Record<string, unknown>) => Record<string, unknown>;
         expect(playUpdater({ keep: true })).toEqual({ keep: true, collectionId: 'collection-2' });
         expect(exportUpdater({ keep: true })).toEqual({ keep: true, collectionId: 'collection-3' });
+        expect(collectionRepoMocks.getCollectionImageIds).toHaveBeenCalledWith('collection-3');
+        expect(defaultProps.setExportIds).toHaveBeenCalledWith(new Set(['img-a', 'img-b']));
+        expect(modals.openModal).toHaveBeenCalledWith('export');
         expect(modals.setInitialSettingsTab).toHaveBeenCalledWith('folders');
         errorSpy.mockRestore();
+    });
+
+    it('loads collection membership before opening ZIP export and skips empty collections', async () => {
+        const setFilters = vi.fn();
+        const setExportIds = vi.fn();
+        const addToast = vi.fn();
+        const modals = {
+            setInitialSettingsTab: vi.fn(), openModal: vi.fn(), setShortcutsModalTab: vi.fn(),
+            setSlideshowShuffle: vi.fn(), isPinnedShelfCollapsed: false, setIsPinnedShelfCollapsed: vi.fn()
+        };
+        render(<AppLayout {...defaultProps} setFilters={setFilters} setExportIds={setExportIds} addToast={addToast} modals={modals} />);
+        const panel = capturedProps.filterPanel as { onExportCollection: (id: string) => void };
+
+        await act(async () => {
+            panel.onExportCollection('olga');
+        });
+        expect(collectionRepoMocks.getCollectionImageIds).toHaveBeenCalledWith('olga');
+        expect(setExportIds).toHaveBeenCalledWith(new Set(['img-a', 'img-b']));
+        expect(modals.openModal).toHaveBeenCalledWith('export');
+        expect(addToast).not.toHaveBeenCalled();
+
+        collectionRepoMocks.getCollectionImageIds.mockResolvedValueOnce([]);
+        modals.openModal.mockClear();
+        setExportIds.mockClear();
+        await act(async () => {
+            panel.onExportCollection('empty');
+        });
+        expect(setExportIds).toHaveBeenCalledWith(new Set());
+        expect(modals.openModal).not.toHaveBeenCalled();
+        expect(addToast).toHaveBeenCalledWith('No valid items found to export', 'info');
     });
 
     it('wires pinned shelf and grid item interactions with global indices', () => {

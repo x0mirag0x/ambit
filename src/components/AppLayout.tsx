@@ -366,8 +366,24 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                     modals.openModal('slideshow');
                 }}
                 onExportCollection={(id) => {
-                    setFilters(f => ({ ...f, collectionId: id }));
-                    modals.openModal('export');
+                    void (async () => {
+                        setFilters(f => ({ ...f, collectionId: id }));
+                        try {
+                            const { getCollectionImageIds } = await import('../services/db/collectionRepo');
+                            const imageIds = await getCollectionImageIds(id);
+                            if (imageIds.length === 0) {
+                                setExportIds(new Set());
+                                addToast(t('No valid items found to export'), 'info');
+                                return;
+                            }
+                            setExportIds(new Set(imageIds));
+                            modals.openModal('export');
+                        } catch (error) {
+                            console.error('[AppLayout] Failed to prepare collection export', error);
+                            setExportIds(new Set());
+                            addToast(t('Export failed'), 'error');
+                        }
+                    })();
                 }}
                 onResetCollectionThumbnail={colOps.resetCollectionThumbnail}
                 onEditCollection={onEditCollection}

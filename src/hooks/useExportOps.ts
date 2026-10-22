@@ -21,7 +21,11 @@ export const useExportOps = ({ images }: UseExportOpsProps) => {
         }
 
         const idArray = Array.from(ids);
-        if (idArray.length === 0 || !destinationFolder) return;
+        if (!destinationFolder) return;
+        if (idArray.length === 0) {
+            addToast(t('No valid items found to export'), 'info');
+            return;
+        }
 
         setIsExporting(true);
         try {
