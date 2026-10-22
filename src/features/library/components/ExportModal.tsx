@@ -20,7 +20,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     isExporting
 }) => {
     const { t } = useTranslation();
-    const [filename, setFilename] = useState(`ambit_export_${new Date().toISOString().slice(0, 10)}`);
+    const [filename, setFilename] = useState(`dvoyna_export_${new Date().toISOString().slice(0, 10)}`);
     const [folder, setFolder] = useState<string | null>(null);
     const closeButtonRef = React.useRef<HTMLButtonElement>(null);
 
@@ -119,8 +119,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
                             <div className="mt-10 flex flex-col gap-3">
                                 <button
-                                    onClick={() => folder && onConfirm(filename, folder)}
-                                    disabled={!filename.trim() || !folder || isExporting}
+                                    onClick={() => folder && count > 0 && onConfirm(filename, folder)}
+                                    disabled={count < 1 || !filename.trim() || !folder || isExporting}
                                     className="w-full py-4 px-6 bg-gradient-to-br from-sage-500 to-sage-600 hover:shadow-[0_8px_20px_-4px_rgba(115,140,85,0.4)] text-white rounded-2xl text-sm font-bold shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
                                     {isExporting ? (

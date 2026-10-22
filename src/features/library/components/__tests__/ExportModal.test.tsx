@@ -52,4 +52,18 @@ describe('ExportModal', () => {
         expect((screen.getByRole('button', { name: 'Exporting...' }) as HTMLButtonElement).disabled).toBe(true);
         expect((screen.getByRole('button', { name: 'Cancel' }) as HTMLButtonElement).disabled).toBe(true);
     });
+
+    it('keeps Begin Export disabled when the selection is empty', async () => {
+        mockedOpen.mockResolvedValueOnce('C:/Exports');
+        const onConfirm = vi.fn();
+        render(<ExportModal isOpen onClose={vi.fn()} count={0} onConfirm={onConfirm} isExporting={false} />);
+        const begin = screen.getByRole('button', { name: 'Begin Export' }) as HTMLButtonElement;
+        expect(begin.disabled).toBe(true);
+        fireEvent.click(screen.getByRole('button', { name: 'Choose destination folder...' }));
+        await screen.findByText('C:/Exports');
+        expect(begin.disabled).toBe(true);
+        fireEvent.click(begin);
+        expect(onConfirm).not.toHaveBeenCalled();
+        expect((screen.getByPlaceholderText('Enter filename...') as HTMLInputElement).value).toMatch(/^dvoyna_export_\d{4}-\d{2}-\d{2}$/);
+    });
 });
