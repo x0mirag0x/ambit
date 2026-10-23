@@ -1,0 +1,585 @@
+{
+  "source": "Trimmed embedded ComfyUI prompt/workflow from FastH3_OmniRef_00019 (new, prompt starts with '<Subject 1>') and the older 00006 prompt text. Node ids and the prompt link match the real MiniMaxH3ReferenceToVideo graph.",
+  "positivePrompt": "<Subject 1> is the BALANCER COFFEE product box and stick in <Picture 1>.\n<Subject 2> is the BALANCER COFFEE product box in <Picture 2>.\nThe voice-over uses the voice, timbre and pace of <Audio 1>, but says only the exact words written in [SPEECH].\n\n[0–3 sec]\n[VISUAL]: Extreme close-up: fingers tear open the top of the stick from <Subject 1> with a crisp snap, a tiny puff of coffee powder flies up in slow motion. At 00:01.200, dark coffee powder and guarana seeds pour down into a cup of steaming hot coffee, splashing and swirling into a spiral, warm amber backlight, rising steam, black background, shallow depth of field, cinematic.\n[SPEECH]: (silence until 00:01.500, then voice-over in the voice of <Audio 1>, off-screen) Утро начинается с силы природы.\n[SOUNDS]: A crisp, loud tearing sound of the stick, then a soft dry rustle of falling powder, a gentle splash and fizz of swirling coffee. No voice during the first 1.5 seconds.\n\n[3–5 sec]\n[VISUAL]: Slow dolly-out from a ceramic mug of coffee on a windowsill at dawn, blue city skyline outside, warm lamp light inside, the torn stick from <Subject 1> and two red guarana fruits next to the mug, steam rising, cinematic 35mm. Elegant text \"Кофе с экстрактом гуараны\" appears in the center, thin modern serif font, soft warm gold glow, gentle fade-in, sharp and readable.\n[SPEECH]: (voice-over in the voice of <Audio 1>, off-screen) Кофе с экстрактом гуараны и грибов.\n[SOUNDS]: Quiet morning city ambience, soft clink of the mug.\n\n[5–7 sec]\n[VISUAL]: Close-up of steam rising from the mug, the first ray of sunrise lights the steam in glowing gold, tiny sparkling energy particles rise in the light, slow motion. Elegant text \"Заряд бодрости, сил и хорошего настроения\", same thin serif font with gold glow, sharp and readable.\n[SPEECH]: (voice-over in the voice of <Audio 1>, off-screen) Заряд бодрости, сил и хорошего настроения.\n[SOUNDS]: Light airy whoosh, warm rising tone.\n\n[7–10 sec]\n[VISUAL]: Product hero shot, <Subject 2> and the coffee mug with red guarana fruits on a wooden table, soft morning light, slow push-in, steam, the box design and text stay exactly the same, sharp and readable, premium commercial look. Stylish title \"BALANCER Coffee\" at the top: \"BALANCER\" in bold wide spaced sans-serif, \"Coffee\" in elegant gold script, subtle metallic shine sweeping across the letters, sharp and readable. Calm hold on the final frame.\n[SPEECH]: (voice-over in the voice of <Audio 1>, off-screen) BALANCER Coffee. Энергия на весь день.\n[SOUNDS]: Soft final chime, light acoustic background music, calm confident voice close to the microphone.",
+  "olderPositivePrompt": "subject_definitions:\n<Subject 1> is the product pack in <Picture 1>: a BALANCER DRAIN MAXI grapefruit drink box.\n<Subject 2> is the scene in <Picture 2>: a glass of pink grapefruit drink with fresh grapefruit halves on a bright kitchen table.\n\nsummary:\n[reference generation] The target video is a 5-second, playful, bright product commercial with fun camera angles. A stick is torn open, powder pours into water and swirls into a pink drink.\n\nretention_analysis:\n<Subject 1> (appears in [Shot 4]): fully_preserved - the box design and text stay exactly the same, sharp and readable.\n<Subject 2> (appears in [Shot 3], [Shot 4]): fully_preserved - the glass, drink color and grapefruit are retained.\n\ndetailed_description:\nThe target video is a sunny, fresh, playful commercial with soft morning light and dynamic, fun camera moves.\n[Shot 1] Extreme close-up: fingers tear open the top of a slim drink stick with a crisp snap, a tiny puff of pink powder flies up in slow motion.\n[Shot 2] At 00:01.200, a fun angle from the bottom of the glass looking up through the water: pink powder rains down from above like falling snow and starts to swirl.\n[Shot 3] At 00:02.400, a top-down view straight into the glass: a spoon stirs and the drink spins into a bright pink whirlpool, a grapefruit slice drops in with a big juicy splash.\n[Shot 4] At 00:03.600, the camera quickly pulls back to the scene of <Picture 2>, <Subject 1> stands next to the glass, and a drop of water bounces off the table. Calm hold on the final frame.\n\noverall_soundscape:\nA crisp tearing sound of the stick, a soft whoosh of falling powder, fizz and swirling water, a juicy splash, a light clink of the spoon on glass.\n\nnon_diegetic_music:\nLight, playful upbeat ukulele melody.",
+  "workflow": {
+    "nodes": [
+      {
+        "id": 92,
+        "type": "SaveVideo",
+        "mode": 0,
+        "properties": {
+          "cnr_id": "comfy-core"
+        },
+        "inputs": [
+          {
+            "name": "video",
+            "type": "VIDEO",
+            "link": 10
+          }
+        ]
+      },
+      {
+        "id": 130,
+        "type": "CreateVideo",
+        "mode": 0,
+        "properties": {
+          "cnr_id": "comfy-core"
+        },
+        "inputs": [
+          {
+            "name": "images",
+            "type": "IMAGE",
+            "link": 11
+          },
+          {
+            "name": "audio",
+            "type": "AUDIO",
+            "link": 12
+          }
+        ]
+      },
+      {
+        "id": 122,
+        "type": "VAEDecode",
+        "mode": 0,
+        "properties": {
+          "cnr_id": "comfy-core"
+        },
+        "inputs": [
+          {
+            "name": "samples",
+            "type": "LATENT",
+            "link": 13
+          }
+        ]
+      },
+      {
+        "id": 121,
+        "type": "VAEDecodeAudio",
+        "mode": 0,
+        "properties": {
+          "cnr_id": "comfy-core"
+        },
+        "inputs": [
+          {
+            "name": "samples",
+            "type": "LATENT",
+            "link": 14
+          }
+        ]
+      },
+      {
+        "id": 125,
+        "type": "SamplerCustomAdvanced",
+        "mode": 0,
+        "properties": {
+          "cnr_id": "comfy-core"
+        },
+        "inputs": [
+          {
+            "name": "noise",
+            "type": "NOISE",
+            "link": 15
+          },
+          {
+            "name": "guider",
+            "type": "GUIDER",
+            "link": 16
+          },
+          {
+            "name": "sampler",
+            "type": "SAMPLER",
+            "link": 17
+          },
+          {
+            "name": "sigmas",
+            "type": "SIGMAS",
+            "link": 18
+          },
+          {
+            "name": "latent_image",
+            "type": "LATENT",
+            "link": 19
+          }
+        ]
+      },
+      {
+        "id": 126,
+        "type": "BasicGuider",
+        "mode": 0,
+        "properties": {
+          "cnr_id": "comfy-core"
+        },
+        "inputs": [
+          {
+            "name": "model",
+            "type": "MODEL",
+            "link": 20
+          },
+          {
+            "name": "conditioning",
+            "type": "CONDITIONING",
+            "link": 21
+          }
+        ]
+      },
+      {
+        "id": 136,
+        "type": "MiniMaxH3ReferenceToVideo",
+        "mode": 0,
+        "properties": {
+          "cnr_id": "comfy-core"
+        },
+        "inputs": [
+          {
+            "name": "clip",
+            "type": "CLIP",
+            "link": 23
+          },
+          {
+            "name": "prompt",
+            "type": "STRING",
+            "link": 22
+          },
+          {
+            "name": "ref_audios.ref_audio_0",
+            "type": "AUDIO",
+            "link": 24
+          }
+        ],
+        "widgets_values": [
+          "",
+          1344,
+          768,
+          124,
+          "match"
+        ]
+      },
+      {
+        "id": 138,
+        "type": "PrimitiveStringMultiline",
+        "mode": 0,
+        "properties": {
+          "cnr_id": "comfy-core"
+        },
+        "inputs": [],
+        "widgets_values": [
+          "<Subject 1> is the BALANCER COFFEE product box and stick in <Picture 1>.\n<Subject 2> is the BALANCER COFFEE product box in <Picture 2>.\nThe voice-over uses the voice, timbre and pace of <Audio 1>, but says only the exact words written in [SPEECH].\n\n[0–3 sec]\n[VISUAL]: Extreme close-up: fingers tear open the top of the stick from <Subject 1> with a crisp snap, a tiny puff of coffee powder flies up in slow motion. At 00:01.200, dark coffee powder and guarana seeds pour down into a cup of steaming hot coffee, splashing and swirling into a spiral, warm amber backlight, rising steam, black background, shallow depth of field, cinematic.\n[SPEECH]: (silence until 00:01.500, then voice-over in the voice of <Audio 1>, off-screen) Утро начинается с силы природы.\n[SOUNDS]: A crisp, loud tearing sound of the stick, then a soft dry rustle of falling powder, a gentle splash and fizz of swirling coffee. No voice during the first 1.5 seconds.\n\n[3–5 sec]\n[VISUAL]: Slow dolly-out from a ceramic mug of coffee on a windowsill at dawn, blue city skyline outside, warm lamp light inside, the torn stick from <Subject 1> and two red guarana fruits next to the mug, steam rising, cinematic 35mm. Elegant text \"Кофе с экстрактом гуараны\" appears in the center, thin modern serif font, soft warm gold glow, gentle fade-in, sharp and readable.\n[SPEECH]: (voice-over in the voice of <Audio 1>, off-screen) Кофе с экстрактом гуараны и грибов.\n[SOUNDS]: Quiet morning city ambience, soft clink of the mug.\n\n[5–7 sec]\n[VISUAL]: Close-up of steam rising from the mug, the first ray of sunrise lights the steam in glowing gold, tiny sparkling energy particles rise in the light, slow motion. Elegant text \"Заряд бодрости, сил и хорошего настроения\", same thin serif font with gold glow, sharp and readable.\n[SPEECH]: (voice-over in the voice of <Audio 1>, off-screen) Заряд бодрости, сил и хорошего настроения.\n[SOUNDS]: Light airy whoosh, warm rising tone.\n\n[7–10 sec]\n[VISUAL]: Product hero shot, <Subject 2> and the coffee mug with red guarana fruits on a wooden table, soft morning light, slow push-in, steam, the box design and text stay exactly the same, sharp and readable, premium commercial look. Stylish title \"BALANCER Coffee\" at the top: \"BALANCER\" in bold wide spaced sans-serif, \"Coffee\" in elegant gold script, subtle metallic shine sweeping across the letters, sharp and readable. Calm hold on the final frame.\n[SPEECH]: (voice-over in the voice of <Audio 1>, off-screen) BALANCER Coffee. Энергия на весь день.\n[SOUNDS]: Soft final chime, light acoustic background music, calm confident voice close to the microphone."
+        ],
+        "title": "Input Text (Prompt)"
+      },
+      {
+        "id": 152,
+        "type": "LoadAudio",
+        "mode": 0,
+        "properties": {
+          "cnr_id": "comfy-core"
+        },
+        "inputs": [],
+        "widgets_values": [
+          "audio_2026-10-23_14-20-51.ogg"
+        ]
+      },
+      {
+        "id": 127,
+        "type": "UNETLoader",
+        "mode": 0,
+        "properties": {
+          "cnr_id": "comfy-core"
+        },
+        "inputs": [],
+        "widgets_values": [
+          "fasth3_omniref_8step_pruned_int8_convrot.safetensors",
+          "default"
+        ]
+      },
+      {
+        "id": 128,
+        "type": "CLIPLoader",
+        "mode": 0,
+        "properties": {
+          "cnr_id": "comfy-core"
+        },
+        "inputs": [],
+        "widgets_values": [
+          "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+          "minimax",
+          "default"
+        ]
+      },
+      {
+        "id": 123,
+        "type": "KSamplerSelect",
+        "mode": 0,
+        "properties": {
+          "cnr_id": "comfy-core"
+        },
+        "inputs": [],
+        "widgets_values": [
+          "euler"
+        ]
+      },
+      {
+        "id": 124,
+        "type": "BasicScheduler",
+        "mode": 0,
+        "properties": {
+          "cnr_id": "comfy-core"
+        },
+        "inputs": [
+          {
+            "name": "model",
+            "type": "MODEL",
+            "link": 25
+          }
+        ],
+        "widgets_values": [
+          "simple",
+          8,
+          1.0
+        ]
+      },
+      {
+        "id": 129,
+        "type": "RandomNoise",
+        "mode": 0,
+        "properties": {
+          "cnr_id": "comfy-core"
+        },
+        "inputs": [],
+        "widgets_values": [
+          771204598
+        ]
+      }
+    ],
+    "links": [
+      [
+        10,
+        130,
+        0,
+        92,
+        0,
+        "VIDEO"
+      ],
+      [
+        11,
+        122,
+        0,
+        130,
+        0,
+        "IMAGE"
+      ],
+      [
+        12,
+        121,
+        0,
+        130,
+        1,
+        "AUDIO"
+      ],
+      [
+        13,
+        125,
+        0,
+        122,
+        0,
+        "LATENT"
+      ],
+      [
+        14,
+        125,
+        0,
+        121,
+        0,
+        "LATENT"
+      ],
+      [
+        15,
+        129,
+        0,
+        125,
+        0,
+        "NOISE"
+      ],
+      [
+        16,
+        126,
+        0,
+        125,
+        1,
+        "GUIDER"
+      ],
+      [
+        17,
+        123,
+        0,
+        125,
+        2,
+        "SAMPLER"
+      ],
+      [
+        18,
+        124,
+        0,
+        125,
+        3,
+        "SIGMAS"
+      ],
+      [
+        19,
+        136,
+        1,
+        125,
+        4,
+        "LATENT"
+      ],
+      [
+        20,
+        127,
+        0,
+        126,
+        0,
+        "MODEL"
+      ],
+      [
+        21,
+        136,
+        0,
+        126,
+        1,
+        "CONDITIONING"
+      ],
+      [
+        22,
+        138,
+        0,
+        136,
+        1,
+        "STRING"
+      ],
+      [
+        23,
+        128,
+        0,
+        136,
+        0,
+        "CLIP"
+      ],
+      [
+        24,
+        152,
+        0,
+        136,
+        2,
+        "AUDIO"
+      ],
+      [
+        25,
+        127,
+        0,
+        124,
+        0,
+        "MODEL"
+      ]
+    ]
+  },
+  "prompt": {
+    "92": {
+      "class_type": "SaveVideo",
+      "inputs": {
+        "filename_prefix": "video/FastH3_OmniRef",
+        "format": "auto",
+        "codec": "auto",
+        "video": [
+          "130",
+          0
+        ]
+      },
+      "_meta": {
+        "title": "Сохранить видео"
+      }
+    },
+    "130": {
+      "class_type": "CreateVideo",
+      "inputs": {
+        "fps": 24.0,
+        "images": [
+          "122",
+          0
+        ],
+        "audio": [
+          "121",
+          0
+        ]
+      }
+    },
+    "122": {
+      "class_type": "VAEDecode",
+      "inputs": {
+        "samples": [
+          "125",
+          0
+        ],
+        "vae": [
+          "119",
+          0
+        ]
+      }
+    },
+    "121": {
+      "class_type": "VAEDecodeAudio",
+      "inputs": {
+        "samples": [
+          "125",
+          0
+        ],
+        "vae": [
+          "120",
+          0
+        ]
+      }
+    },
+    "125": {
+      "class_type": "SamplerCustomAdvanced",
+      "inputs": {
+        "noise": [
+          "129",
+          0
+        ],
+        "guider": [
+          "126",
+          0
+        ],
+        "sampler": [
+          "123",
+          0
+        ],
+        "sigmas": [
+          "124",
+          0
+        ],
+        "latent_image": [
+          "136",
+          1
+        ]
+      }
+    },
+    "126": {
+      "class_type": "BasicGuider",
+      "inputs": {
+        "model": [
+          "127",
+          0
+        ],
+        "conditioning": [
+          "136",
+          0
+        ]
+      }
+    },
+    "136": {
+      "class_type": "MiniMaxH3ReferenceToVideo",
+      "inputs": {
+        "prompt": [
+          "138",
+          0
+        ],
+        "width": [
+          "115",
+          0
+        ],
+        "height": [
+          "115",
+          1
+        ],
+        "ref_image_size": "match",
+        "clip": [
+          "128",
+          0
+        ],
+        "ref_audios.ref_audio_0": [
+          "152",
+          0
+        ]
+      },
+      "_meta": {
+        "title": "MiniMax H3: референс в видео"
+      }
+    },
+    "138": {
+      "class_type": "PrimitiveStringMultiline",
+      "inputs": {
+        "value": "<Subject 1> is the BALANCER COFFEE product box and stick in <Picture 1>.\n<Subject 2> is the BALANCER COFFEE product box in <Picture 2>.\nThe voice-over uses the voice, timbre and pace of <Audio 1>, but says only the exact words written in [SPEECH].\n\n[0–3 sec]\n[VISUAL]: Extreme close-up: fingers tear open the top of the stick from <Subject 1> with a crisp snap, a tiny puff of coffee powder flies up in slow motion. At 00:01.200, dark coffee powder and guarana seeds pour down into a cup of steaming hot coffee, splashing and swirling into a spiral, warm amber backlight, rising steam, black background, shallow depth of field, cinematic.\n[SPEECH]: (silence until 00:01.500, then voice-over in the voice of <Audio 1>, off-screen) Утро начинается с силы природы.\n[SOUNDS]: A crisp, loud tearing sound of the stick, then a soft dry rustle of falling powder, a gentle splash and fizz of swirling coffee. No voice during the first 1.5 seconds.\n\n[3–5 sec]\n[VISUAL]: Slow dolly-out from a ceramic mug of coffee on a windowsill at dawn, blue city skyline outside, warm lamp light inside, the torn stick from <Subject 1> and two red guarana fruits next to the mug, steam rising, cinematic 35mm. Elegant text \"Кофе с экстрактом гуараны\" appears in the center, thin modern serif font, soft warm gold glow, gentle fade-in, sharp and readable.\n[SPEECH]: (voice-over in the voice of <Audio 1>, off-screen) Кофе с экстрактом гуараны и грибов.\n[SOUNDS]: Quiet morning city ambience, soft clink of the mug.\n\n[5–7 sec]\n[VISUAL]: Close-up of steam rising from the mug, the first ray of sunrise lights the steam in glowing gold, tiny sparkling energy particles rise in the light, slow motion. Elegant text \"Заряд бодрости, сил и хорошего настроения\", same thin serif font with gold glow, sharp and readable.\n[SPEECH]: (voice-over in the voice of <Audio 1>, off-screen) Заряд бодрости, сил и хорошего настроения.\n[SOUNDS]: Light airy whoosh, warm rising tone.\n\n[7–10 sec]\n[VISUAL]: Product hero shot, <Subject 2> and the coffee mug with red guarana fruits on a wooden table, soft morning light, slow push-in, steam, the box design and text stay exactly the same, sharp and readable, premium commercial look. Stylish title \"BALANCER Coffee\" at the top: \"BALANCER\" in bold wide spaced sans-serif, \"Coffee\" in elegant gold script, subtle metallic shine sweeping across the letters, sharp and readable. Calm hold on the final frame.\n[SPEECH]: (voice-over in the voice of <Audio 1>, off-screen) BALANCER Coffee. Энергия на весь день.\n[SOUNDS]: Soft final chime, light acoustic background music, calm confident voice close to the microphone."
+      },
+      "_meta": {
+        "title": "Input Text (Prompt)"
+      }
+    },
+    "152": {
+      "class_type": "LoadAudio",
+      "inputs": {
+        "audio": "audio_2026-10-23_14-20-51.ogg"
+      }
+    },
+    "127": {
+      "class_type": "UNETLoader",
+      "inputs": {
+        "unet_name": "fasth3_omniref_8step_pruned_int8_convrot.safetensors",
+        "weight_dtype": "default"
+      }
+    },
+    "128": {
+      "class_type": "CLIPLoader",
+      "inputs": {
+        "clip_name": "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+        "type": "minimax",
+        "device": "default"
+      }
+    },
+    "123": {
+      "class_type": "KSamplerSelect",
+      "inputs": {
+        "sampler_name": "euler"
+      }
+    },
+    "124": {
+      "class_type": "BasicScheduler",
+      "inputs": {
+        "scheduler": "simple",
+        "steps": 8,
+        "denoise": 1.0,
+        "model": [
+          "127",
+          0
+        ]
+      }
+    },
+    "129": {
+      "class_type": "RandomNoise",
+      "inputs": {
+        "noise_seed": 771204598
+      }
+    },
+    "115": {
+      "class_type": "ResolutionSelector",
+      "inputs": {
+        "aspect_ratio": "9:16 (Portrait Widescreen)",
+        "megapixels": 1.5,
+        "multiple": 32
+      }
+    },
+    "119": {
+      "class_type": "VAELoader",
+      "inputs": {
+        "vae_name": "minimax_h3_video_vae_int8_convrot.safetensors"
+      }
+    },
+    "120": {
+      "class_type": "VAELoader",
+      "inputs": {
+        "vae_name": "minimax_h3_audio_vae_fp32.safetensors"
+      }
+    }
+  }
+}

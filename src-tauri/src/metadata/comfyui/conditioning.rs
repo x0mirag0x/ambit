@@ -17,6 +17,26 @@ use std::collections::{HashSet, VecDeque};
 const MAX_TRANSFORM_STRING_BYTES: usize = 64 * 1024;
 const MAX_TRANSFORM_PATTERN_BYTES: usize = 4 * 1024;
 
+/// A bare `prompt` input is the positive conditioning text (for example
+/// MiniMaxH3ReferenceToVideo). Do not copy it onto the negative branch.
+fn skip_generic_prompt_on_negative_branch(input_lower: &str, prompt_role: &str) -> bool {
+    prompt_role == "negative" && input_lower.contains("prompt") && !input_lower.contains("negative")
+}
+
+fn literal_video_conditioning_prompt(node: &Value, input_name: &str) -> Option<String> {
+    // Text generators keep an instruction in `prompt` and do not embed the
+    // produced text. Only video conditioning nodes type the user prompt there.
+    let node_type = get_node_type(node).to_ascii_lowercase();
+    if !node_type.contains("tovideo") || !input_name.eq_ignore_ascii_case("prompt") {
+        return None;
+    }
+    let text = get_node_param(node, input_name)?.as_str()?.trim();
+    if text.len() <= 2 || is_missing_prompt_value(text) {
+        return None;
+    }
+    Some(text.to_string())
+}
+
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum StringEvaluationMode {
     Prompt,
@@ -325,7 +345,9 @@ pub(crate) fn find_reachable_prompts_with_role_and_sources(
                 continue;
             }
 
-            // Trace upstream
+            // Trace upstream. "prompt" is included because conditioning nodes such as
+            // MiniMaxH3ReferenceToVideo take the user text on a linked `prompt`
+            // input instead of `text` or `conditioning`.
             let relevant_prefixes = [
                 "conditioning",
                 "positive",
@@ -336,6 +358,7 @@ pub(crate) fn find_reachable_prompts_with_role_and_sources(
                 "text_g",
                 "text_l",
                 "text",
+                "prompt",
             ];
 
             // 1. Check pre-resolved inputs (preferred, covers both API and UI format)
@@ -356,6 +379,11 @@ pub(crate) fn find_reachable_prompts_with_role_and_sources(
                         if !is_broadcaster
                             && prompt_role == "negative"
                             && input_lower.contains("positive")
+                        {
+                            continue;
+                        }
+                        if !is_broadcaster
+                            && skip_generic_prompt_on_negative_branch(&input_lower, prompt_role)
                         {
                             continue;
                         }
@@ -392,6 +420,9 @@ pub(crate) fn find_reachable_prompts_with_role_and_sources(
                         if prompt_role == "negative" && is_positive_input {
                             continue;
                         }
+                        if skip_generic_prompt_on_negative_branch(&input_lower, prompt_role) {
+                            continue;
+                        }
                         if let Some(s) = get_conditioning_source_id(
                             graph,
                             &current_id,
@@ -400,6 +431,11 @@ pub(crate) fn find_reachable_prompts_with_role_and_sources(
                             branch_strict_connections,
                         ) {
                             queue.push_back((s, branch_strict_connections));
+                        } else if let Some(text) =
+                            literal_video_conditioning_prompt(node, input_key)
+                        {
+                            prompts.push(text);
+                            source_node_ids.push(current_id.clone());
                         }
                     }
                 }
@@ -414,6 +450,9 @@ pub(crate) fn find_reachable_prompts_with_role_and_sources(
                                 continue;
                             }
                             if prompt_role == "negative" && input_lower.contains("positive") {
+                                continue;
+                            }
+                            if skip_generic_prompt_on_negative_branch(&input_lower, prompt_role) {
                                 continue;
                             }
                             if input.get("link").and_then(|v| v.as_i64()).is_some() {
