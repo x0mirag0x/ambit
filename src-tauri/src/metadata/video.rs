@@ -1332,4 +1332,46 @@ mod tests {
 
         let _ = fs::remove_dir_all(root);
     }
+
+    #[test]
+    fn fasth3_omniref_embedded_linked_prompt_is_the_positive_prompt() {
+        let fixture: Value = serde_json::from_str(include_str!(
+            "comfyui/tests/fixtures/fasth3_omniref_linked_prompt.json"
+        ))
+        .expect("fasth3 fixture");
+        let positive = fixture["positivePrompt"].as_str().expect("positive prompt");
+        let mediainfo = serde_json::json!({
+            "media": {
+                "@type": "General",
+                "workflow": fixture["workflow"].to_string(),
+                "prompt": fixture["prompt"].to_string(),
+            }
+        });
+
+        let evidence = extract_video_metadata(Path::new("FastH3_OmniRef_00019_.mp4"), &mediainfo);
+        assert!(
+            evidence.metadata.diagnostics.is_empty(),
+            "{:?}",
+            evidence.metadata.diagnostics
+        );
+        assert_eq!(evidence.metadata.tool, "ComfyUI");
+        assert_eq!(evidence.metadata.positive_prompt, positive);
+        assert_eq!(
+            evidence.metadata.model,
+            "fasth3_omniref_8step_pruned_int8_convrot"
+        );
+        assert_eq!(evidence.metadata.seed, Some(771204598));
+        assert_eq!(evidence.metadata.steps, 8);
+        assert_eq!(evidence.metadata.sampler, "euler (simple)");
+        assert_eq!(
+            evidence.metadata.generation_mode,
+            VideoGenerationMode::AudioLipSync
+        );
+        assert_eq!(evidence.metadata.parser_version, VIDEO_PARSER_VERSION);
+
+        let reparsed = reparse_video_metadata(&evidence.original_metadata_json)
+            .expect("stored evidence should reparse");
+        assert_eq!(reparsed.positive_prompt, positive);
+        assert_eq!(reparsed.parser_version, VIDEO_PARSER_VERSION);
+    }
 }

@@ -2632,6 +2632,61 @@ fn boogu_unresolved_prompt_reroute_remains_authoritative() {
 }
 
 #[test]
+fn minimax_h3_reference_to_video_follows_linked_primitive_prompt() {
+    let fixture: Value =
+        serde_json::from_str(include_str!("fixtures/fasth3_omniref_linked_prompt.json"))
+            .expect("fasth3 fixture");
+    let positive = fixture["positivePrompt"].as_str().expect("positive prompt");
+    let older = fixture["olderPositivePrompt"]
+        .as_str()
+        .expect("older positive prompt");
+
+    let chunks = HashMap::from([("prompt".to_string(), fixture["prompt"].to_string())]);
+    let (meta, diagnostics) = extract_comfyui_metadata_with_diagnostics(&chunks);
+    assert_eq!(meta.positive_prompt, positive);
+    assert!(meta.positive_prompt.starts_with("<Subject 1>"));
+    assert!(meta.positive_prompt.contains("[SPEECH]"));
+    assert!(meta.positive_prompt.contains("<Picture 1>"));
+    assert_eq!(meta.model, "fasth3_omniref_8step_pruned_int8_convrot");
+    assert_eq!(meta.seed, Some(771204598));
+    assert_eq!(meta.steps, 8);
+    assert_eq!(meta.sampler, "euler (simple)");
+    assert!(matches!(
+        diagnostics
+            .field_sources
+            .get(&ComfyMetadataField::PositivePrompt),
+        Some(ComfyParseLayer::SamplerTraversal | ComfyParseLayer::SamplerFallback)
+    ));
+
+    let mut older_prompt = fixture["prompt"].clone();
+    older_prompt["138"]["inputs"]["value"] = json!(older);
+    let chunks = HashMap::from([("prompt".to_string(), older_prompt.to_string())]);
+    let (older_meta, _) = extract_comfyui_metadata_with_diagnostics(&chunks);
+    assert_eq!(older_meta.positive_prompt, older);
+    assert!(older_meta
+        .positive_prompt
+        .starts_with("subject_definitions:"));
+
+    let workflow_chunks =
+        HashMap::from([("workflow".to_string(), fixture["workflow"].to_string())]);
+    let (workflow_meta, _) = extract_comfyui_metadata_with_diagnostics(&workflow_chunks);
+    assert_eq!(workflow_meta.positive_prompt, positive);
+}
+
+#[test]
+fn minimax_h3_reference_to_video_reads_unlinked_prompt_text() {
+    let (meta, _) = extract_basic_guider_prompt(vec![(
+        "2",
+        json!({
+            "class_type": "MiniMaxH3ReferenceToVideo",
+            "inputs": { "prompt": "<Subject 1> says hello in [SPEECH]" }
+        }),
+    )]);
+
+    assert_eq!(meta.positive_prompt, "<Subject 1> says hello in [SPEECH]");
+}
+
+#[test]
 fn bernini_prompt_reroute_cycle_remains_authoritative() {
     let (meta, diagnostics) = extract_custom_conditioning_prompt(vec![
         (
