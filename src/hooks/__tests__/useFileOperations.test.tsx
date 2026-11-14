@@ -48,7 +48,7 @@ vi.mock('../useToast', () => ({
 
 // Mock Services
 vi.mock('../../services/exportService', () => ({
-    exportImagesToZip: vi.fn(),
+    exportLibraryArchive: vi.fn(),
 }));
 
 vi.mock('../../services/importService', () => ({
@@ -194,15 +194,26 @@ describe('useFileOperations', () => {
 
     describe('exportImages', () => {
         it('should call export service with correct parameters', async () => {
-            const { exportImagesToZip } = await import('../../services/exportService');
+            const { exportLibraryArchive } = await import('../../services/exportService');
             const { result } = renderFileOperations();
 
             await act(async () => {
                 await result.current.exportImages('test.zip', ['1'], 'C:/dest');
             });
 
-            expect(exportImagesToZip).toHaveBeenCalledWith([mockImages[0]], 'C:/dest', 'test.zip');
+            expect(exportLibraryArchive).toHaveBeenCalledWith([mockImages[0]], 'C:/dest', 'test.zip', 'dvoyna');
             expect(mockAddToast).toHaveBeenCalledWith('Export complete', 'success');
+        });
+
+        it('should forward PromptBase archive format', async () => {
+            const { exportLibraryArchive } = await import('../../services/exportService');
+            const { result } = renderFileOperations();
+
+            await act(async () => {
+                await result.current.exportImages('pb.zip', ['1'], 'C:/dest', undefined, 'promptbase');
+            });
+
+            expect(exportLibraryArchive).toHaveBeenCalledWith([mockImages[0]], 'C:/dest', 'pb.zip', 'promptbase');
         });
 
         it('should bail if no images match the IDs', async () => {

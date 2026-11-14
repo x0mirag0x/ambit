@@ -1228,8 +1228,8 @@ export default function App() {
                 filteredImages={libraryPresentation.images}
                 canCheckForUpdates={updater.canCheckForUpdates}
                 onSettingsSave={setSettings}
-                onExportConfirm={(name, folder) => {
-                    actions.handleExportConfirm(name, folder, exportIds.size > 0 ? exportIds : undefined);
+                onExportConfirm={(name, folder, format) => {
+                    actions.handleExportConfirm(name, folder, exportIds.size > 0 ? exportIds : undefined, format);
                     setExportIds(new Set());
                 }}
                 onDeleteConfirm={actions.executeDelete}

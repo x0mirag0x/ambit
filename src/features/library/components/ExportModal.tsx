@@ -3,12 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { X, Share, Archive, FolderOpen, CheckCircle2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import type { ExportArchiveFormat } from '../../../services/exportService';
 
 interface ExportModalProps {
     isOpen: boolean;
     onClose: () => void;
     count: number;
-    onConfirm: (filename: string, folder: string) => void;
+    onConfirm: (filename: string, folder: string, format: ExportArchiveFormat) => void;
     isExporting: boolean;
 }
 
@@ -22,6 +23,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     const { t } = useTranslation();
     const [filename, setFilename] = useState(`dvoyna_export_${new Date().toISOString().slice(0, 10)}`);
     const [folder, setFolder] = useState<string | null>(null);
+    const [format, setFormat] = useState<ExportArchiveFormat>('dvoyna');
     const closeButtonRef = React.useRef<HTMLButtonElement>(null);
 
     React.useEffect(() => {
@@ -77,10 +79,43 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 tracking-tight">{t('Export Selection')}</h3>
                                 <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
-                                    {t('Export')} <strong>{count}</strong> {t('items and metadata into a single ZIP archive.')}</p>
+                                    {format === 'promptbase'
+                                        ? <>{t('Export')} <strong>{count}</strong> {t('items into a PromptBase-compatible ZIP with prompts.')}</>
+                                        : <>{t('Export')} <strong>{count}</strong> {t('items and metadata into a single ZIP archive.')}</>}
+                                </p>
                             </div>
 
                             <div className="space-y-6">
+                                <div>
+                                    <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1">{t('Export Format')}</label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <button
+                                            type="button"
+                                            disabled={isExporting}
+                                            aria-pressed={format === 'dvoyna'}
+                                            onClick={() => setFormat('dvoyna')}
+                                            className={`rounded-2xl border px-3 py-3 text-left transition-all ${format === 'dvoyna'
+                                                ? 'border-sage-500/40 bg-sage-50/70 text-sage-800 dark:bg-sage-500/10 dark:text-sage-200'
+                                                : 'border-gray-200 bg-gray-50 text-gray-600 dark:border-white/5 dark:bg-black/20 dark:text-gray-400'}`}
+                                        >
+                                            <div className="text-xs font-bold">{t('Dvoyna ZIP')}</div>
+                                            <div className="mt-1 text-[10px] leading-snug opacity-80">{t('Files + JSON metadata')}</div>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            disabled={isExporting}
+                                            aria-pressed={format === 'promptbase'}
+                                            onClick={() => setFormat('promptbase')}
+                                            className={`rounded-2xl border px-3 py-3 text-left transition-all ${format === 'promptbase'
+                                                ? 'border-sage-500/40 bg-sage-50/70 text-sage-800 dark:bg-sage-500/10 dark:text-sage-200'
+                                                : 'border-gray-200 bg-gray-50 text-gray-600 dark:border-white/5 dark:bg-black/20 dark:text-gray-400'}`}
+                                        >
+                                            <div className="text-xs font-bold">{t('PromptBase ZIP')}</div>
+                                            <div className="mt-1 text-[10px] leading-snug opacity-80">{t('Importable archive with prompts')}</div>
+                                        </button>
+                                    </div>
+                                </div>
+
                                 {/* Filename Input */}
                                 <div>
                                     <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 ml-1">{t('Archive Name')}</label>
@@ -119,7 +154,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
                             <div className="mt-10 flex flex-col gap-3">
                                 <button
-                                    onClick={() => folder && count > 0 && onConfirm(filename, folder)}
+                                    onClick={() => folder && count > 0 && onConfirm(filename, folder, format)}
                                     disabled={count < 1 || !filename.trim() || !folder || isExporting}
                                     className="w-full py-4 px-6 bg-gradient-to-br from-sage-500 to-sage-600 hover:shadow-[0_8px_20px_-4px_rgba(115,140,85,0.4)] text-white rounded-2xl text-sm font-bold shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >

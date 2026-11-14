@@ -536,13 +536,14 @@ describe('useAppActions', () => {
         mockFileOps.exportImages.mockImplementation(async (_name, _ids, _folder, onComplete) => onComplete?.());
         const { result } = renderHook(() => useAppActions(props));
         await act(async () => result.current.handleExportConfirm('selected.zip', 'C:/out'));
-        expect(mockFileOps.exportImages).toHaveBeenCalledWith('selected.zip', props.selectedIds, 'C:/out', expect.any(Function));
+        expect(mockFileOps.exportImages).toHaveBeenCalledWith('selected.zip', props.selectedIds, 'C:/out', expect.any(Function), 'dvoyna');
         expect(mockSetSelectedIds).toHaveBeenCalledWith(new Set());
         expect(mockModalManager.closeModal).toHaveBeenCalledWith('export');
 
         mockSetSelectedIds.mockClear();
         const explicit = new Set(['2']);
-        await act(async () => result.current.handleExportConfirm('one.zip', 'C:/out', explicit));
+        await act(async () => result.current.handleExportConfirm('one.zip', 'C:/out', explicit, 'promptbase'));
+        expect(mockFileOps.exportImages).toHaveBeenCalledWith('one.zip', explicit, 'C:/out', expect.any(Function), 'promptbase');
         expect(mockSetSelectedIds).not.toHaveBeenCalled();
     });
 
@@ -557,7 +558,8 @@ describe('useAppActions', () => {
             'videos.zip',
             videoProps.selectedIds,
             'C:/out',
-            expect.any(Function)
+            expect.any(Function),
+            'dvoyna',
         );
     });
 

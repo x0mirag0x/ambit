@@ -1,6 +1,7 @@
 mod app_data_migration;
 mod comfy_support_replay;
 mod db;
+mod export_promptbase;
 mod fs_commands;
 mod media;
 mod metadata;
@@ -159,6 +160,7 @@ pub fn create_builder() -> tauri_specta::Builder<tauri::Wry> {
             media::store_video_poster,
             media::prepare_video_playback,
             media::export_asset_original,
+            export_promptbase::build_promptbase_database,
             // fs commands
             fs_commands::move_to_trash,
             fs_commands::delete_removed_images_from_disk,

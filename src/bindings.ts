@@ -828,6 +828,14 @@ async exportAssetOriginal(assetId: string, destinationDirectory: string) : Promi
     else return { status: "error", error: e  as any };
 }
 },
+async buildPromptbaseDatabase(items: PromptBaseExportItem[], libraryName: string) : Promise<Result<number[], string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("build_promptbase_database", { items, libraryName }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
 async moveToTrash(path: string) : Promise<Result<null, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("move_to_trash", { path }) };
@@ -967,6 +975,7 @@ export type NumericRange = { min: number; max: number }
 export type ParameterRanges = { steps: NumericRange | null; cfg: NumericRange | null; denoisingStrength: NumericRange | null; samplers: string[]; generationTypes: string[]; controlNets: string[]; ipAdapters: string[]; guidanceSubtypes: Partial<{ [key in string]: string }> }
 export type PhotoMetadata = { capturedAt: CaptureTimeMetadata | null; captureTimeRaw: string | null; cameraMake: string | null; cameraModel: string | null; lensMake: string | null; lensModel: string | null; focalLengthMm: number | null; focalLength35Mm: number | null; apertureFNumber: number | null; exposureTimeSeconds: number | null; iso: number | null; orientation: number | null; artist: string | null; copyright: string | null; gpsLatitude: number | null; gpsLongitude: number | null }
 export type PrivacyMaskRefreshResult = { changed: boolean; updated: number }
+export type PromptBaseExportItem = { title: string; prompt: string; aiModel: string; tags: string; relativePath: string; width: number | null; height: number | null; contentType: string; createdAt: string; isBookmarked: boolean }
 export type RemovedLifecycleMutationResult = { affectedIds: string[]; notFoundIds: string[]; membershipWarningIds: string[]; touchedResources: FacetResourceTouches }
 export type ReparseBatchResult = { processed: number; updated: number; errors: number }
 /**

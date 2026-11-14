@@ -3,10 +3,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { join } from '@tauri-apps/api/path';
 import { readFile, writeFile } from '@tauri-apps/plugin-fs';
 import { GeneratorTool, type AIImage, type VideoAsset } from '../../types';
-import { exportImagesToZip } from '../exportService';
+import { exportImagesToPromptBaseZip, exportImagesToZip, exportLibraryArchive } from '../exportService';
+import { commands } from '../../bindings';
 
 vi.mock('@tauri-apps/plugin-fs', () => ({ readFile: vi.fn(), writeFile: vi.fn() }));
 vi.mock('@tauri-apps/api/path', () => ({ join: vi.fn() }));
+vi.mock('../../bindings', () => ({
+  commands: {
+    buildPromptbaseDatabase: vi.fn(),
+  },
+}));
+
+const mockedBuildPromptbaseDatabase = vi.mocked(commands.buildPromptbaseDatabase);
 
 const mockedReadFile = vi.mocked(readFile);
 const mockedWriteFile = vi.mocked(writeFile);
@@ -156,5 +164,60 @@ describe('exportImagesToZip', () => {
         expect(await zip.file('remote.png.error.txt')!.async('string')).toBe(
             'Failed to download source item: https://example.test/missing.png'
         );
+    });
+});
+
+describe('exportImagesToPromptBaseZip', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        vi.spyOn(console, 'error').mockImplementation(() => undefined);
+        mockedJoin.mockImplementation(async (...parts) => parts.join('/'));
+        mockedWriteFile.mockResolvedValue(undefined);
+        mockedBuildPromptbaseDatabase.mockResolvedValue({ status: 'ok', data: [1, 2, 3, 4] });
+    });
+
+    it('writes PromptBase layout: manifest, database, and media/1 files', async () => {
+        mockedReadFile.mockResolvedValueOnce(new Uint8Array([9, 8, 7]));
+        const onProgress = vi.fn();
+
+        await exportImagesToPromptBaseZip([image()], 'C:/exports', 'promptbase', onProgress, 'Dvoyna Export');
+
+        expect(onProgress).toHaveBeenCalledWith(1, 1);
+        expect(mockedBuildPromptbaseDatabase).toHaveBeenCalledWith([
+            expect.objectContaining({
+                title: 'photo.png',
+                relativePath: 'photo.png',
+                prompt: 'Prompt:\nportrait',
+                aiModel: 'flux',
+                contentType: 'image',
+            }),
+        ], 'Dvoyna Export');
+        const zip = await writtenZip();
+        expect(await zip.file('media/1/photo.png')?.async('uint8array')).toEqual(new Uint8Array([9, 8, 7]));
+        expect(await zip.file('database/promptbase.db')?.async('uint8array')).toEqual(new Uint8Array([1, 2, 3, 4]));
+        expect(JSON.parse(await zip.file('manifest.json')!.async('string'))).toMatchObject({
+            format: 'promptbase-archive',
+            version: 1,
+            profileId: 'dvoyna-export',
+            profileName: 'Dvoyna Export',
+        });
+        expect(zip.file('metadata/photo.png.json')).toBeNull();
+    });
+
+    it('routes exportLibraryArchive by format', async () => {
+        mockedReadFile.mockResolvedValue(new Uint8Array([1]));
+        mockedBuildPromptbaseDatabase.mockResolvedValue({ status: 'ok', data: [5] });
+
+        await exportLibraryArchive([image()], 'C:/exports', 'dvoyna-out', 'dvoyna');
+        expect(mockedBuildPromptbaseDatabase).not.toHaveBeenCalled();
+        let zip = await writtenZip();
+        expect(zip.file('photo.png')).not.toBeNull();
+
+        mockedWriteFile.mockClear();
+        await exportLibraryArchive([image()], 'C:/exports', 'pb-out', 'promptbase');
+        expect(mockedBuildPromptbaseDatabase).toHaveBeenCalledOnce();
+        zip = await writtenZip();
+        expect(zip.file('media/1/photo.png')).not.toBeNull();
+        expect(zip.file('database/promptbase.db')).not.toBeNull();
     });
 });

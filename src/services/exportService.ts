@@ -1,7 +1,17 @@
 import JSZip from 'jszip';
+import { commands } from '../bindings';
 import { AIImage, isVideoAsset } from '../types';
 import { writeFile, readFile } from '@tauri-apps/plugin-fs';
 import { join } from '@tauri-apps/api/path';
+import { unwrap } from '../utils/spectaUtils';
+import {
+  buildPromptBaseExportItems,
+  buildPromptBaseManifest,
+  PROMPTBASE_LIBRARY_ID,
+  type ExportArchiveFormat,
+} from './promptbaseExport';
+
+export type { ExportArchiveFormat } from './promptbaseExport';
 
 export const exportImagesToZip = async (
   images: AIImage[],
@@ -87,4 +97,77 @@ export const exportImagesToZip = async (
   // Save natively using Tauri
   const finalPath = await join(destinationFolder, zipFilename.endsWith('.zip') ? zipFilename : `${zipFilename}.zip`);
   await writeFile(finalPath, content);
+};
+
+const toUint8Array = (value: number[] | Uint8Array): Uint8Array =>
+  value instanceof Uint8Array ? value : Uint8Array.from(value);
+
+export const exportImagesToPromptBaseZip = async (
+  images: AIImage[],
+  destinationFolder: string,
+  zipFilename: string,
+  onProgress?: (current: number, total: number) => void,
+  profileName = 'Dvoyna Export',
+): Promise<void> => {
+  const zip = new JSZip();
+  const mediaFolder = zip.folder(`media/${PROMPTBASE_LIBRARY_ID}`)!;
+  const prepared = buildPromptBaseExportItems(images);
+  const total = prepared.length;
+  let count = 0;
+
+  let nextIndex = 0;
+  const workerCount = Math.min(4, Math.max(total, 1));
+  await Promise.all(Array.from({ length: workerCount }, async () => {
+    while (nextIndex < total) {
+      const index = nextIndex;
+      nextIndex += 1;
+      const entry = prepared[index];
+      const source = images.find(image => image.id === entry.sourceId) ?? images[index];
+      try {
+        const data = await readFile(entry.sourceId);
+        mediaFolder.file(entry.relativePath, data);
+      } catch (error) {
+        console.error(`Failed to read file ${source?.filename ?? entry.relativePath}`, error);
+        if (source && (source.url.startsWith('http') || source.url.startsWith('blob:') || source.url.startsWith('data:'))) {
+          try {
+            const response = await fetch(source.url);
+            const blob = await response.blob();
+            mediaFolder.file(entry.relativePath, blob);
+          } catch {
+            mediaFolder.file(`${entry.relativePath}.error.txt`, `Failed to download source item: ${source.url}`);
+          }
+        } else {
+          mediaFolder.file(`${entry.relativePath}.error.txt`, `Failed to read local file: ${entry.sourceId}`);
+        }
+      } finally {
+        count += 1;
+        onProgress?.(count, total);
+      }
+    }
+  }));
+
+  const dbBytes = toUint8Array(await unwrap(commands.buildPromptbaseDatabase(
+    prepared.map(entry => entry.item),
+    profileName,
+  )));
+  zip.folder('database')!.file('promptbase.db', dbBytes);
+  zip.file('manifest.json', JSON.stringify(buildPromptBaseManifest(profileName), null, 2));
+
+  const content = await zip.generateAsync({ type: 'uint8array' });
+  const finalPath = await join(destinationFolder, zipFilename.endsWith('.zip') ? zipFilename : `${zipFilename}.zip`);
+  await writeFile(finalPath, content);
+};
+
+export const exportLibraryArchive = async (
+  images: AIImage[],
+  destinationFolder: string,
+  zipFilename: string,
+  format: ExportArchiveFormat = 'dvoyna',
+  onProgress?: (current: number, total: number) => void,
+): Promise<void> => {
+  if (format === 'promptbase') {
+    await exportImagesToPromptBaseZip(images, destinationFolder, zipFilename, onProgress);
+    return;
+  }
+  await exportImagesToZip(images, destinationFolder, zipFilename, onProgress);
 };

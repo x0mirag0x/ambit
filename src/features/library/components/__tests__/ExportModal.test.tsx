@@ -42,8 +42,23 @@ describe('ExportModal', () => {
         await screen.findByText('C:/Exports');
         fireEvent.change(filename, { target: { value: 'archive-name' } });
         fireEvent.click(begin);
-        expect(onConfirm).toHaveBeenCalledWith('archive-name', 'C:/Exports');
+        expect(onConfirm).toHaveBeenCalledWith('archive-name', 'C:/Exports', 'dvoyna');
         expect(mockedOpen).toHaveBeenLastCalledWith({ directory: true, multiple: false, title: 'Select Export Destination' });
+    });
+
+    it('passes the PromptBase format when selected', async () => {
+        mockedOpen.mockResolvedValueOnce('C:/Exports');
+        const onConfirm = vi.fn();
+        render(<ExportModal isOpen onClose={vi.fn()} count={2} onConfirm={onConfirm} isExporting={false} />);
+
+        fireEvent.click(screen.getByRole('button', { name: /PromptBase ZIP/i }));
+        fireEvent.click(screen.getByRole('button', { name: 'Choose destination folder...' }));
+        await screen.findByText('C:/Exports');
+        fireEvent.change(screen.getByPlaceholderText('Enter filename...'), { target: { value: 'gallery' } });
+        fireEvent.click(screen.getByRole('button', { name: 'Begin Export' }));
+
+        expect(onConfirm).toHaveBeenCalledWith('gallery', 'C:/Exports', 'promptbase');
+        expect(screen.getByText(/PromptBase-compatible ZIP with prompts/i)).toBeTruthy();
     });
 
     it('locks controls and shows progress while exporting', () => {
