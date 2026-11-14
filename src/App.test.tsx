@@ -1098,8 +1098,8 @@ describe('App orchestration', () => {
         expect(mocks.removeImagesFromCollection).toHaveBeenCalledWith(['one'], 'target');
 
         act(() => layout.setExportIds(new Set(['one'])));
-        requireProbe(captured.globalModals, 'GlobalModals').onExportConfirm('export', 'C:/out');
-        expect(mocks.handleExportConfirm).toHaveBeenCalledWith('export', 'C:/out', new Set(['one']));
+        requireProbe(captured.globalModals, 'GlobalModals').onExportConfirm('export', 'C:/out', 'dvoyna');
+        expect(mocks.handleExportConfirm).toHaveBeenCalledWith('export', 'C:/out', new Set(['one']), 'dvoyna');
         requireProbe(captured.globalModals, 'GlobalModals').onDeleteCollectionConfirm();
         expect(mocks.deleteCollection).toHaveBeenCalledWith('collection-a');
         requireProbe(captured.globalModals, 'GlobalModals').onCloseExport();
@@ -2124,8 +2124,8 @@ describe('App orchestration', () => {
         expect(mocks.modals.setAddToCollectionMode).toHaveBeenCalledWith('add');
 
         act(() => layout.setExportIds(new Set()));
-        requireProbe(captured.globalModals, 'GlobalModals').onExportConfirm('all', 'C:/out');
-        expect(mocks.handleExportConfirm).toHaveBeenCalledWith('all', 'C:/out', undefined);
+        requireProbe(captured.globalModals, 'GlobalModals').onExportConfirm('all', 'C:/out', 'promptbase');
+        expect(mocks.handleExportConfirm).toHaveBeenCalledWith('all', 'C:/out', undefined, 'promptbase');
         requireProbe(captured.globalModals, 'GlobalModals').onDeleteCollectionConfirm();
         expect(mocks.deleteCollection).not.toHaveBeenCalled();
 
