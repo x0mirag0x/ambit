@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CircleHelp, FileCheck2, FileCode2, Pencil, Workflow } from 'lucide-react';
+import { CircleHelp, FileCheck2, FileCode2, UserRound, Workflow } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { TooltipButton } from '../../../../components/ui/InfoTooltip';
 
@@ -10,7 +10,8 @@ interface MetadataSourceBadgeProps {
 const SOURCE_DETAILS = {
     trusted_sidecar: { label: 'trusted sidecar', icon: FileCheck2 },
     embedded: { label: 'embedded metadata', icon: FileCode2 },
-    user_override: { label: 'user override', icon: Pencil },
+    // Keep this distinct from the field Edit pencil so provenance is not mistaken for a second editor.
+    user_override: { label: 'user override', icon: UserRound },
     workflow_default: { label: 'workflow default', icon: Workflow },
     unknown: { label: 'unknown', icon: CircleHelp },
 } as const;

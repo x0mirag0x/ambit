@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { convertFileSrc } from '@tauri-apps/api/core';
-import { ChevronLeft, ChevronRight, ExternalLink, Film, Heart, Link, Pin, Puzzle, RotateCcw, RotateCw, Save, Target, Trash2, X } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Copy, ExternalLink, Film, Heart, Link, Pin, Puzzle, RotateCcw, RotateCw, Save, Target, Trash2, X } from 'lucide-react';
 import { commands } from '../../../bindings';
 import { useCollectionStore } from '../../../stores/collectionStore';
 import { GeneratorTool, isVideoAsset, VideoAsset, type VideoGenerationMode } from '../../../types';
@@ -8,6 +8,7 @@ import { openFileInDefaultApp } from '../../../services/osOpen';
 import { getImageWithFullMetadata, updateVideoPlaybackStatus } from '../../../services/db/imageRepo';
 import { unwrap } from '../../../utils/spectaUtils';
 import { useToast } from '../../../hooks/useToast';
+import { TooltipButton } from '../../../components/ui/InfoTooltip';
 import { MaskedViewerGate } from './MaskedViewerGate';
 import { WorkflowInspector } from './WorkflowInspector';
 import { CollectionMembershipPicker } from './CollectionMembershipPicker';
@@ -118,6 +119,7 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
     const [positivePromptState, setPositivePromptState] = React.useState({ videoId: video.id, value: video.metadata.positivePrompt });
     const [negativePromptState, setNegativePromptState] = React.useState({ videoId: video.id, value: video.metadata.negativePrompt });
     const [fullVideo, setFullVideo] = React.useState<VideoAsset | null>(null);
+    const [copiedPrompt, setCopiedPrompt] = React.useState(false);
     const playbackStatus = playbackState.videoId === video.id ? playbackState.status : video.playbackStatus;
     const playbackUrl = playbackState.videoId === video.id ? playbackState.url : null;
     const notes = notesState.videoId === video.id ? notesState.value : (video.notes ?? '');
@@ -140,6 +142,7 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
         setNotesState({ videoId: video.id, value: video.notes ?? '' });
         setPositivePromptState({ videoId: video.id, value: video.metadata.positivePrompt });
         setNegativePromptState({ videoId: video.id, value: video.metadata.negativePrompt });
+        setCopiedPrompt(false);
     }, [video.id, video.notes, video.metadata]);
 
     React.useEffect(() => {
@@ -208,10 +211,22 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
         return () => { cancelled = true; };
     }, [revealed, video.id, video.isMissing, playerKey]);
 
-    const bindPlayer = React.useCallback((node: HTMLVideoElement | null) => {
-        if (playerRef.current && playerRef.current !== node) playerRef.current.pause();
-        playerRef.current = node;
+    const releasePlayer = React.useCallback((player: HTMLVideoElement | null | undefined) => {
+        if (!player) return;
+        player.pause();
+        player.removeAttribute('src');
+        player.load();
     }, []);
+
+    const bindPlayer = React.useCallback((node: HTMLVideoElement | null) => {
+        if (playerRef.current && playerRef.current !== node) releasePlayer(playerRef.current);
+        playerRef.current = node;
+    }, [releasePlayer]);
+
+    React.useEffect(() => () => {
+        releasePlayer(playerRef.current);
+        playerRef.current = null;
+    }, [releasePlayer]);
 
     const seekBy = React.useCallback((seconds: number) => {
         const player = playerRef.current;
@@ -225,6 +240,12 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
         playerRef.current?.pause();
         navigate();
     }, []);
+
+    const handleCopyPrompt = React.useCallback(() => {
+        void navigator.clipboard.writeText(positivePrompt);
+        setCopiedPrompt(true);
+        window.setTimeout(() => setCopiedPrompt(false), 2000);
+    }, [positivePrompt]);
 
     const handleViewerKeyDown = React.useCallback((event: KeyboardEvent) => {
             if (event.key === 'Escape') {
@@ -486,6 +507,18 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
                         }}
                         source={metadataVideo.metadata.fieldSources?.positivePrompt}
                         readOnly={!onUpdatePrompt}
+                        headerAction={
+                            <TooltipButton
+                                label={t('Copy Prompt')}
+                                content={t('Copy Prompt')}
+                                onClick={handleCopyPrompt}
+                                className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-zinc-500 dark:hover:bg-white/5 dark:hover:text-zinc-300"
+                            >
+                                {copiedPrompt
+                                    ? <Check className="h-3.5 w-3.5 text-sage-600 dark:text-sage-300" />
+                                    : <Copy className="h-3.5 w-3.5" />}
+                            </TooltipButton>
+                        }
                     />
                     <MetadataTextAreaField
                         kind="negativePrompt"

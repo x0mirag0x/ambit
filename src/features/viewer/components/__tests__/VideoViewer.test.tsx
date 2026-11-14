@@ -235,6 +235,23 @@ describe('VideoViewer', () => {
         expect(screen.queryByText('None detected')).toBeNull();
     });
 
+    it('copies the positive prompt from the video metadata header', async () => {
+        Object.defineProperty(navigator, 'clipboard', {
+            configurable: true,
+            value: { writeText: vi.fn().mockResolvedValue(undefined) },
+        });
+        setup(false, {
+            metadata: {
+                ...video.metadata,
+                positivePrompt: 'A moving test pattern for copy',
+            },
+        });
+        fireEvent.click(screen.getByRole('tab', { name: 'Metadata' }));
+
+        fireEvent.click(screen.getByRole('button', { name: 'Copy Prompt' }));
+        expect(navigator.clipboard.writeText).toHaveBeenCalledWith('A moving test pattern for copy');
+    });
+
     it('keeps disclosure choices while navigating within one viewer session', () => {
         const view = setup();
         fireEvent.click(screen.getByRole('tab', { name: 'Metadata' }));

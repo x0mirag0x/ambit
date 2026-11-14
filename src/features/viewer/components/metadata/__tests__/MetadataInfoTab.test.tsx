@@ -108,6 +108,17 @@ describe('MetadataInfoTab', () => {
         expect(screen.getByText('CFG').parentElement?.querySelector('[aria-label="Source: user override"]')).toBeNull();
     });
 
+    it('keeps prompt Edit distinct from user-override provenance', () => {
+        renderTab(image(
+            metadata({ positivePrompt: 'Edited prompt' }),
+            metadata({ positivePrompt: 'Imported prompt' }),
+        ));
+
+        expect(screen.getByRole('button', { name: 'Edit Positive prompt' })).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Source: user override' })).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Copy Prompt' })).toBeTruthy();
+    });
+
     it('does not save prompts merely because they received and lost focus', () => {
         const { props } = renderTab(image(metadata(), metadata()));
 
