@@ -58,7 +58,7 @@ type AppLayoutProbe = {
 
 type GlobalModalsProbe = {
     filteredImages: AIImage[];
-    onExportConfirm: (name: string, folder: string) => void;
+    onExportConfirm: (name: string, folder: string, format: 'dvoyna' | 'promptbase') => void;
     onDeleteCollectionConfirm: () => void;
     onCollectionAction: (ids: string[], targetId: string, mode: 'add' | 'move', sourceId?: string) => Promise<void>;
     onCloseExport: () => void;
