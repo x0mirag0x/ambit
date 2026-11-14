@@ -25,7 +25,7 @@ interface GlobalModalsProps {
     filteredImages: AIImage[];
     canCheckForUpdates: boolean;
     onSettingsSave: (settings: AppSettingsUpdate) => void;
-    onExportConfirm: (name: string, folder: string) => void;
+    onExportConfirm: (name: string, folder: string, format: 'dvoyna' | 'promptbase') => void;
     onDeleteConfirm: () => void | Promise<void>;
     onDeleteCollectionConfirm: () => void | Promise<void>;
     onRecoverMetadata: (style: RecoveryStyle) => void;

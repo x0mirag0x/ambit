@@ -4,6 +4,7 @@ import { useToast } from './useToast';
 import { isBrowserMockMode } from '../services/runtime';
 import { getImagesByIds } from '../services/db/imageRepo';
 import { useTranslation } from 'react-i18next';
+import type { ExportArchiveFormat } from '../services/exportService';
 
 interface UseExportOpsProps {
     images: AIImage[];
@@ -14,7 +15,13 @@ export const useExportOps = ({ images }: UseExportOpsProps) => {
     const { addToast } = useToast();
     const [isExporting, setIsExporting] = useState(false);
 
-    const exportImages = useCallback(async (filename: string, ids: Set<string> | string[], destinationFolder: string, onComplete?: () => void) => {
+    const exportImages = useCallback(async (
+        filename: string,
+        ids: Set<string> | string[],
+        destinationFolder: string,
+        onComplete?: () => void,
+        format: ExportArchiveFormat = 'dvoyna',
+    ) => {
         if (isBrowserMockMode()) {
             addToast(t('Unavailable in browser mock mode.'), 'info');
             return;
@@ -40,8 +47,8 @@ export const useExportOps = ({ images }: UseExportOpsProps) => {
                 return;
             }
 
-            const { exportImagesToZip } = await import('../services/exportService');
-            await exportImagesToZip(targetImages, destinationFolder, filename);
+            const { exportLibraryArchive } = await import('../services/exportService');
+            await exportLibraryArchive(targetImages, destinationFolder, filename, format);
             addToast(t('Export complete'), 'success');
             if (onComplete) onComplete();
         } catch (error) {
@@ -50,7 +57,7 @@ export const useExportOps = ({ images }: UseExportOpsProps) => {
         } finally {
             setIsExporting(false);
         }
-    }, [images, addToast]);
+    }, [images, addToast, t]);
 
     return {
         isExporting,

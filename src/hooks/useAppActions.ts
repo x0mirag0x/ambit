@@ -23,7 +23,13 @@ import { useTranslation } from 'react-i18next';
 
 interface AppActionFileOps {
     deleteImages: (ids: string[]) => Promise<boolean>;
-    exportImages: (filename: string, ids: Set<string> | string[], destinationFolder: string, onComplete?: () => void) => Promise<void>;
+    exportImages: (
+        filename: string,
+        ids: Set<string> | string[],
+        destinationFolder: string,
+        onComplete?: () => void,
+        format?: 'dvoyna' | 'promptbase',
+    ) => Promise<void>;
     recoverMetadata?: (targetId: string, style: RecoveryStyle) => Promise<AIImage | null>;
 }
 
@@ -237,12 +243,17 @@ export const useAppActions = ({
         openModal('deleteConfirm');
     };
 
-    const handleExportConfirm = async (filename: string, folder: string, ids?: Set<string>) => {
+    const handleExportConfirm = async (
+        filename: string,
+        folder: string,
+        ids?: Set<string>,
+        format: 'dvoyna' | 'promptbase' = 'dvoyna',
+    ) => {
         const targetIds = ids || selectedIds;
         await fileOps.exportImages(filename, targetIds, folder, () => {
             if (!ids) setSelectedIds(new Set());
             closeModal('export');
-        });
+        }, format);
     };
 
     const handleBulkFavorite = () => {

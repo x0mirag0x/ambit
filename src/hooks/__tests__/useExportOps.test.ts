@@ -7,13 +7,13 @@ const mocks = vi.hoisted(() => ({
     browserMode: false,
     addToast: vi.fn(),
     getImagesByIds: vi.fn(),
-    exportImagesToZip: vi.fn(),
+    exportLibraryArchive: vi.fn(),
 }));
 
 vi.mock('../../services/runtime', () => ({ isBrowserMockMode: () => mocks.browserMode }));
 vi.mock('../useToast', () => ({ useToast: () => ({ addToast: mocks.addToast }) }));
 vi.mock('../../services/db/imageRepo', () => ({ getImagesByIds: mocks.getImagesByIds }));
-vi.mock('../../services/exportService', () => ({ exportImagesToZip: mocks.exportImagesToZip }));
+vi.mock('../../services/exportService', () => ({ exportLibraryArchive: mocks.exportLibraryArchive }));
 
 const image = (id: string): AIImage => ({
     id,
@@ -40,7 +40,7 @@ describe('useExportOps', () => {
         vi.clearAllMocks();
         mocks.browserMode = false;
         mocks.getImagesByIds.mockResolvedValue([]);
-        mocks.exportImagesToZip.mockResolvedValue(undefined);
+        mocks.exportLibraryArchive.mockResolvedValue(undefined);
     });
 
     it('rejects exports in browser mock mode', async () => {
@@ -50,7 +50,7 @@ describe('useExportOps', () => {
         await act(async () => result.current.exportImages('out.zip', ['one'], 'C:/out'));
 
         expect(mocks.addToast).toHaveBeenCalledWith('Unavailable in browser mock mode.', 'info');
-        expect(mocks.exportImagesToZip).not.toHaveBeenCalled();
+        expect(mocks.exportLibraryArchive).not.toHaveBeenCalled();
     });
 
     it('ignores empty selections and destinations', async () => {
@@ -79,10 +79,19 @@ describe('useExportOps', () => {
         ));
 
         expect(mocks.getImagesByIds).toHaveBeenCalledWith(['local', 'remote']);
-        expect(mocks.exportImagesToZip).toHaveBeenCalledWith([local, remote], 'C:/out', 'selected.zip');
+        expect(mocks.exportLibraryArchive).toHaveBeenCalledWith([local, remote], 'C:/out', 'selected.zip', 'dvoyna');
         expect(mocks.addToast).toHaveBeenCalledWith('Export complete', 'success');
         expect(onComplete).toHaveBeenCalledTimes(1);
         expect(result.current.isExporting).toBe(false);
+    });
+
+    it('forwards the PromptBase archive format', async () => {
+        const local = image('local');
+        const { result } = renderHook(() => useExportOps({ images: [local] }));
+
+        await act(async () => result.current.exportImages('pb.zip', ['local'], 'C:/out', undefined, 'promptbase'));
+
+        expect(mocks.exportLibraryArchive).toHaveBeenCalledWith([local], 'C:/out', 'pb.zip', 'promptbase');
     });
 
     it('reports when selected ids no longer resolve to images', async () => {
@@ -91,13 +100,13 @@ describe('useExportOps', () => {
         await act(async () => result.current.exportImages('out.zip', ['missing'], 'C:/out'));
 
         expect(mocks.addToast).toHaveBeenCalledWith('No valid items found to export', 'error');
-        expect(mocks.exportImagesToZip).not.toHaveBeenCalled();
+        expect(mocks.exportLibraryArchive).not.toHaveBeenCalled();
         expect(result.current.isExporting).toBe(false);
     });
 
     it('reports export failures and clears exporting state', async () => {
         const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-        mocks.exportImagesToZip.mockRejectedValue(new Error('archive failed'));
+        mocks.exportLibraryArchive.mockRejectedValue(new Error('archive failed'));
         const { result } = renderHook(() => useExportOps({ images: [image('one')] }));
 
         await act(async () => result.current.exportImages('out.zip', ['one'], 'C:/out'));
