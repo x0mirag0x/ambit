@@ -40,6 +40,9 @@ const VIDEO_VIEWER_TABS: readonly ViewerTabDefinition<VideoViewerTab>[] = [
 ];
 const VIDEO_VIEWER_TAB_IDS = VIDEO_VIEWER_TABS.map(tab => tab.id);
 
+/** Give the WebView decoder a bounded window before we release it and keep the shell responsive. */
+export const VIDEO_PLAYBACK_START_TIMEOUT_MS = 8_000;
+
 const sideArrowClass = (enabled: boolean) =>
     `absolute z-30 rounded-full border border-white/5 bg-black/20 p-4 text-white/50 backdrop-blur-sm transition-all focus:opacity-100 enabled:hover:border-white/10 enabled:hover:bg-black/40 enabled:hover:text-white disabled:pointer-events-none disabled:opacity-0 ${enabled ? 'pointer-events-auto opacity-0 group-hover:opacity-100' : 'pointer-events-none opacity-0'}`;
 
@@ -120,6 +123,7 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
     const [negativePromptState, setNegativePromptState] = React.useState({ videoId: video.id, value: video.metadata.negativePrompt });
     const [fullVideo, setFullVideo] = React.useState<VideoAsset | null>(null);
     const [copiedPrompt, setCopiedPrompt] = React.useState(false);
+    const decodeReadyForKeyRef = React.useRef<number | null>(null);
     const playbackStatus = playbackState.videoId === video.id ? playbackState.status : video.playbackStatus;
     const playbackUrl = playbackState.videoId === video.id ? playbackState.url : null;
     const notes = notesState.videoId === video.id ? notesState.value : (video.notes ?? '');
@@ -215,8 +219,28 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
         if (!player) return;
         player.pause();
         player.removeAttribute('src');
+        // Detach media resources so a stuck decoder cannot keep freezing the shell.
         player.load();
     }, []);
+
+    const abandonPlayback = React.useCallback(() => {
+        releasePlayer(playerRef.current);
+        setPlaybackState({ videoId: video.id, status: 'external_required', url: null });
+        void updateVideoPlaybackStatus(video.id, 'external_required').catch(error => {
+            console.error('[VideoViewer] Failed to persist playback status after abandon', error);
+        });
+    }, [releasePlayer, video.id]);
+
+    const handleClose = React.useCallback(() => {
+        releasePlayer(playerRef.current);
+        playerRef.current = null;
+        setPlaybackState(current => ({
+            videoId: video.id,
+            status: current.videoId === video.id ? current.status : video.playbackStatus,
+            url: null,
+        }));
+        onClose();
+    }, [onClose, releasePlayer, video.id, video.playbackStatus]);
 
     const bindPlayer = React.useCallback((node: HTMLVideoElement | null) => {
         if (playerRef.current && playerRef.current !== node) releasePlayer(playerRef.current);
@@ -227,6 +251,24 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
         releasePlayer(playerRef.current);
         playerRef.current = null;
     }, [releasePlayer]);
+
+    React.useEffect(() => {
+        decodeReadyForKeyRef.current = null;
+    }, [video.id, playerKey]);
+
+    React.useEffect(() => {
+        if (!playbackUrl) return;
+        const keyAtStart = playerKey;
+        const timer = window.setTimeout(() => {
+            if (decodeReadyForKeyRef.current === keyAtStart) return;
+            console.warn('[VideoViewer] Playback start timed out; releasing decoder to keep the shell responsive', {
+                videoId: video.id,
+                timeoutMs: VIDEO_PLAYBACK_START_TIMEOUT_MS,
+            });
+            abandonPlayback();
+        }, VIDEO_PLAYBACK_START_TIMEOUT_MS);
+        return () => window.clearTimeout(timer);
+    }, [abandonPlayback, playbackUrl, playerKey, video.id]);
 
     const seekBy = React.useCallback((seconds: number) => {
         const player = playerRef.current;
@@ -249,7 +291,7 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
 
     const handleViewerKeyDown = React.useCallback((event: KeyboardEvent) => {
             if (event.key === 'Escape') {
-                onClose();
+                handleClose();
                 return;
             }
             const arrowKey = event.key === 'ArrowLeft' || event.key === 'ArrowRight';
@@ -270,7 +312,7 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
                 event.preventDefault();
                 seekBy(10);
             }
-    }, [canNavigateNext, canNavigatePrevious, navigateAway, onClose, onNext, onPrev, seekBy]);
+    }, [canNavigateNext, canNavigatePrevious, handleClose, navigateAway, onNext, onPrev, seekBy]);
 
     useViewerKeyboard({
         blocked: isShortcutBlocked,
@@ -332,7 +374,7 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
                 <MaskedViewerGate
                     mediaLabel="video"
                     onReveal={() => setRevealedVideoId(video.id)}
-                    onClose={onClose}
+                    onClose={handleClose}
                 />
             </div>
         );
@@ -342,7 +384,7 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
         <div role="dialog" aria-modal="true" aria-label={t('Video viewer: {{filename}}', { filename: video.filename })} className="fixed inset-0 z-[100] flex bg-black text-white">
             <main
                 className="group relative flex min-w-0 flex-1 items-center justify-center bg-black"
-                onClick={event => { if (event.target === event.currentTarget) onClose(); }}
+                onClick={event => { if (event.target === event.currentTarget) handleClose(); }}
             >
                 <button
                     type="button"
@@ -405,7 +447,7 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
                             <Trash2 />
                         </ViewerToolbarButton>
                     )}
-                    <ViewerToolbarButton label={t('Close Viewer (Esc)')} onClick={onClose}>
+                    <ViewerToolbarButton label={t('Close Viewer (Esc)')} onClick={handleClose}>
                         <X />
                     </ViewerToolbarButton>
                 </>} />
@@ -418,16 +460,15 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
                 ) : playbackStatus === 'external_required' ? (
                     <div className="flex max-w-md flex-col items-center rounded-2xl border border-white/10 bg-zinc-900 p-8 text-center">
                         <h2 className="text-xl font-bold">{t('Playback unavailable here')}</h2>
-                        <p className="mt-2 text-sm text-zinc-400">{t('The file is still in your library and can be opened with your default video app.')}</p>
+                        <p className="mt-2 text-sm text-zinc-400">{t('Close this preview to keep browsing. The file stays in your library.')}</p>
                         <div className="mt-6 flex gap-3">
                             <button onClick={() => { setPlaybackState({ videoId: video.id, status: 'unknown', url: null }); setPlayerKey(key => key + 1); }} className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2"><RotateCcw className="h-4 w-4" /> {t('Retry')}</button>
-                            <button onClick={() => void handleOpenExternal()} className="rounded-lg bg-sage-500 px-4 py-2 font-bold">{t('Open externally')}</button>
                         </div>
                     </div>
                 ) : playbackUrl ? (
                     <div
                         className="flex w-full max-w-[calc(100vw-24rem)] flex-col items-center gap-4 px-6"
-                        onClick={event => { if (event.target === event.currentTarget) onClose(); }}
+                        onClick={event => { if (event.target === event.currentTarget) handleClose(); }}
                     >
                         <video
                             key={`${video.id}:${playerKey}`}
@@ -437,8 +478,11 @@ export const VideoViewer: React.FC<VideoViewerProps> = ({
                             muted
                             playsInline
                             preload="metadata"
-                            onCanPlay={() => recordPlaybackStatus('playable')}
-                            onError={() => recordPlaybackStatus('external_required')}
+                            onCanPlay={() => {
+                                decodeReadyForKeyRef.current = playerKey;
+                                recordPlaybackStatus('playable');
+                            }}
+                            onError={() => abandonPlayback()}
                             className="max-h-[calc(100vh-8rem)] max-w-full bg-black"
                         />
                         <div className="flex items-center gap-3 text-xs text-zinc-400">
