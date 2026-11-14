@@ -19,6 +19,14 @@ describe('MetadataSourceBadge', () => {
         expect(screen.getByRole('tooltip').textContent).toBe(label);
     });
 
+    it('keeps user-override provenance visually distinct from the field Edit pencil', () => {
+        const { container } = render(<MetadataSourceBadge source="user_override" />);
+        const icon = container.querySelector('svg');
+        expect(screen.getByRole('button', { name: 'Source: user override' })).toBeTruthy();
+        // UserRound draws a circular head; Pencil does not.
+        expect(icon?.querySelector('circle')).toBeTruthy();
+    });
+
     it('renders nothing without provenance', () => {
         const { container } = render(<MetadataSourceBadge />);
         expect(container.firstChild).toBeNull();
