@@ -109,6 +109,33 @@ describe('ImageCard', () => {
         expect(props.onClick).toHaveBeenCalledTimes(1);
     });
 
+    it('shows copy prompt only when a non-empty prompt exists and does not open the card', async () => {
+        Object.defineProperty(navigator, 'clipboard', {
+            configurable: true,
+            value: { writeText: vi.fn().mockResolvedValue(undefined) },
+        });
+        const empty = setup();
+        expect(screen.queryByRole('button', { name: 'Copy Prompt' })).toBeNull();
+        empty.unmount();
+
+        const { props, container } = setup({
+            image: image({ metadata: { ...image().metadata, positivePrompt: '  forest storyboard prompt  ' } }),
+        });
+        const copy = screen.getByRole('button', { name: 'Copy Prompt' });
+        fireEvent.click(copy);
+        expect(navigator.clipboard.writeText).toHaveBeenCalledWith('forest storyboard prompt');
+        expect(props.onClick).not.toHaveBeenCalled();
+        expect((container.firstElementChild as HTMLElement).contains(copy)).toBe(true);
+    });
+
+    it('hides copy prompt while masked content is blurred', () => {
+        setup({
+            isMasked: true,
+            image: image({ metadata: { ...image().metadata, positivePrompt: 'secret prompt' } }),
+        });
+        expect(screen.queryByRole('button', { name: 'Copy Prompt' })).toBeNull();
+    });
+
     it('opens missing originals for cached inspection and forwards modifier selection', () => {
         const { container, props } = setup({ image: image({ isMissing: true }) });
         const openButton = screen.getByRole('button', { name: /Open image\.png/ });

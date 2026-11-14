@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { fireEvent, render, screen, waitFor } from '../../../../test/testUtils';
+import { act, fireEvent, render, screen, waitFor } from '../../../../test/testUtils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { GeneratorTool, type VideoAsset } from '../../../../types';
-import { VideoViewer } from '../VideoViewer';
+import { VIDEO_PLAYBACK_START_TIMEOUT_MS, VideoViewer } from '../VideoViewer';
 
 const mocks = vi.hoisted(() => ({
     updateVideoPlaybackStatus: vi.fn().mockResolvedValue(undefined),
@@ -362,7 +362,7 @@ describe('VideoViewer', () => {
         expect(mocks.prepareVideoPlayback).toHaveBeenCalledOnce();
     });
 
-    it('records decode success and renders an external fallback after a playback error', async () => {
+    it('records decode success and renders a close-friendly fallback after a playback error', async () => {
         setup();
         const player = await waitFor(() => {
             const element = document.querySelector('video') as HTMLVideoElement | null;
@@ -375,7 +375,48 @@ describe('VideoViewer', () => {
 
         fireEvent.error(player);
         expect(await screen.findByText('Playback unavailable here')).toBeTruthy();
+        expect(screen.getByText('Close this preview to keep browsing. The file stays in your library.')).toBeTruthy();
+        expect(screen.queryByText('Open externally')).toBeNull();
         expect(mocks.updateVideoPlaybackStatus).toHaveBeenCalledWith(video.id, 'external_required');
+    });
+
+    it('abandons a stuck decoder after the start timeout so the shell can stay responsive', async () => {
+        vi.useFakeTimers({ shouldAdvanceTime: true });
+        try {
+            setup();
+            await waitFor(() => expect(document.querySelector('video')).not.toBeNull());
+            expect(screen.queryByText('Playback unavailable here')).toBeNull();
+
+            await act(async () => {
+                await vi.advanceTimersByTimeAsync(VIDEO_PLAYBACK_START_TIMEOUT_MS);
+            });
+
+            expect(screen.getByText('Playback unavailable here')).toBeTruthy();
+            expect(document.querySelector('video')).toBeNull();
+            expect(screen.queryByText('Open externally')).toBeNull();
+            expect(mocks.updateVideoPlaybackStatus).toHaveBeenCalledWith(video.id, 'external_required');
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
+    it('releases the player before closing the preview', async () => {
+        const { props } = setup();
+        const player = await waitFor(() => {
+            const element = document.querySelector('video') as HTMLVideoElement | null;
+            expect(element).not.toBeNull();
+            return element as HTMLVideoElement;
+        });
+        const pause = vi.fn();
+        const load = vi.fn();
+        player.pause = pause;
+        player.load = load;
+
+        fireEvent.click(screen.getByRole('button', { name: 'Close Viewer (Esc)' }));
+
+        expect(pause).toHaveBeenCalled();
+        expect(load).toHaveBeenCalled();
+        expect(props.onClose).toHaveBeenCalledOnce();
     });
 
     it('uses the shared subdued toolbar controls and text-only viewer tabs', () => {

@@ -1387,6 +1387,7 @@
   "Thank you for being part of the journey.": "Спасибо, что вы с нами на этом пути.",
   "The deletion could not be completed. Any recoverable Removed entries were kept; you can safely try again.": "Удаление не удалось завершить. Восстановимые записи в «Удалённых» сохранены; можно безопасно повторить попытку.",
   "The file is still in your library and can be opened with your default video app.": "Файл по-прежнему в библиотеке, и его можно открыть в программе для видео по умолчанию.",
+  "Close this preview to keep browsing. The file stays in your library.": "Закройте предпросмотр и продолжайте листать библиотеку. Файл остаётся в хранилище.",
   "The full": "Полное",
   "The InvokeAI path and owner scope are locked until synchronization finishes.": "Путь InvokeAI и область владельца заблокированы до конца синхронизации.",
   "The referenced image is hidden by Privacy Mode.": "Связанное изображение скрыто режимом приватности.",

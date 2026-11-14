@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { formatImageDisplayDate } from '../../../utils/imageDates';
-import { Heart, CheckCircle, Pin, EyeOff, Unlink, Image as ImageIcon, Trash2, Play, Video } from 'lucide-react';
+import { Heart, Check, CheckCircle, Copy, Pin, EyeOff, Unlink, Image as ImageIcon, Trash2, Play, Video } from 'lucide-react';
 import { AIImage, ImageMetadata, isVideoAsset, getEffectiveSourceKind } from '../../../types';
 import { SmartImage } from '../../../features/library/components/SmartImage';
 import { formatModelName } from '../../../utils/formatUtils';
@@ -65,6 +65,7 @@ export const ImageCard: React.FC<ImageCardProps> = ({
 }) => {
   const { t } = useTranslation();
   const [isRevealed, setIsRevealed] = useState(false);
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
 
   const shouldBlur = isMasked && !isRevealed;
   const isMissing = !!image.isMissing;
@@ -73,6 +74,9 @@ export const ImageCard: React.FC<ImageCardProps> = ({
   const hasVideoPoster = isVideo && image.thumbnailSource === 'ambit-video-v1';
   const invokeAssetLabel = getInvokeImageAssetLabel(image.invokeImageCategory);
   const invokeAssetMarkerLabel = invokeAssetLabel ? `Asset · ${invokeAssetLabel}` : undefined;
+  const promptText = typeof image.metadata.positivePrompt === 'string'
+    ? image.metadata.positivePrompt.trim()
+    : '';
   const modelLabel = generationModelLabel(image.metadata);
   const typeLabel = isVideo
     ? t('Video')
@@ -192,6 +196,24 @@ export const ImageCard: React.FC<ImageCardProps> = ({
           <div className="p-1.5 bg-red-500/90 text-white rounded-full shadow-lg shadow-red-500/20 backdrop-blur-md pointer-events-auto" title={t('Source file not found')}>
             <Unlink className="w-3 h-3" />
           </div>
+        )}
+
+        {/* Copy prompt — only when a non-empty prompt exists and content is visible */}
+        {promptText && !isMissing && !shouldBlur && (
+          <TooltipButton
+            label={copiedPrompt ? t('Copied') : t('Copy Prompt')}
+            content={copiedPrompt ? t('Copied') : t('Copy Prompt')}
+            className={`pointer-events-auto rounded-full border border-white/20 bg-black/60 p-1.5 text-white shadow-lg backdrop-blur-md transition-all hover:bg-black/80 focus-visible:opacity-100 ${copiedPrompt ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 focus-visible:opacity-100'}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              void navigator.clipboard.writeText(promptText).then(() => {
+                setCopiedPrompt(true);
+                window.setTimeout(() => setCopiedPrompt(false), 2000);
+              }).catch(() => undefined);
+            }}
+          >
+            {copiedPrompt ? <Check className="h-3.5 w-3.5 text-sage-300" /> : <Copy className="h-3.5 w-3.5" />}
+          </TooltipButton>
         )}
 
         {/* Pin Icon */}
